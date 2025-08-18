@@ -1,14 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Footer from "../../components/Footer";
 import Link from "next/link";
 
-const Landing: React.FC = () => {
-  const router = useRouter();
+const LandingMain: React.FC = () => {
   const [slide, setSlide] = useState(0);
   const cars = ["/car.jpeg", "/lorry.jpeg", "/psv.jpeg"];
   const primary = "#397397";
@@ -22,18 +19,7 @@ const Landing: React.FC = () => {
   }, [cars.length]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-[#d7e8ee] via-white to-white">
-      {/* Header */}
-      <header className="px-4 md:px-16 py-6 flex justify-start items-center">
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={80}
-          height={80}
-          className="h-14 md:h-20 w-auto"
-        />
-      </header>
-
+    <>
       {/* Main Content */}
       <main className="flex-1 px-4 md:px-16 py-6 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden">
         {/* Text Section */}
@@ -147,10 +133,8 @@ const Landing: React.FC = () => {
           </div>
         </motion.div>
       </main>
-
-      <Footer />
-    </div>
+    </>
   );
 };
 
-export default Landing;
+export default LandingMain;
