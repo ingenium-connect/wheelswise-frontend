@@ -1,8 +1,7 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../../components/Footer";
 
 interface MotorType {
   id: string;
@@ -11,42 +10,49 @@ interface MotorType {
   image_url: string;
 }
 
-const Value: React.FC = () => {
+const VehicleValue: React.FC = () => {
   const router = useRouter();
-  const [selectedMotorType, setSelectedMotorType] = useState<MotorType | null>(null);
+  const [selectedMotorType, setSelectedMotorType] = useState<MotorType | null>(
+    null
+  );
   const [vehicleValue, setVehicleValue] = useState("");
   const [error, setError] = useState("");
 
-
-
   useEffect(() => {
     // Get the selected motor type from localStorage
-    const storedMotorType = localStorage.getItem('selectedMotorType');
+    const storedMotorType = localStorage.getItem("selectedMotorType");
     if (storedMotorType) {
       setSelectedMotorType(JSON.parse(storedMotorType));
     }
   }, []);
 
   const handleContinue = () => {
-    if (!vehicleValue || isNaN(Number(vehicleValue)) || Number(vehicleValue) <= 0) {
+    if (
+      !vehicleValue ||
+      isNaN(Number(vehicleValue)) ||
+      Number(vehicleValue) <= 0
+    ) {
       setError("Please enter a valid numeric value for your vehicle.");
       return;
     }
 
-    setError(""); 
-    
+    setError("");
+
     // Store the vehicle value in localStorage
-    localStorage.setItem('vehicleValue', vehicleValue);
-    
+    localStorage.setItem("vehicleValue", vehicleValue);
+
     router.push("/motor-subtype");
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-[#edf4f7] to-[#f4f9fb]">
+    <>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 bg-[#397397] text-white shadow-md z-50">
         <div className="flex items-center justify-between px-4 md:px-16 h-16">
-          <button onClick={() => router.back()} className="hover:underline font-medium">
+          <button
+            onClick={() => router.back()}
+            className="hover:underline font-medium"
+          >
             ← Go Back
           </button>
           <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
@@ -88,12 +94,8 @@ const Value: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <div className="mt-10">
-        <Footer />
-      </div>
-    </div>
+    </>
   );
 };
 
-export default Value; 
+export default VehicleValue;
