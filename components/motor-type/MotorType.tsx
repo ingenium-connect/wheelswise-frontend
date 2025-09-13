@@ -17,10 +17,7 @@ const SelectMotorType: React.FC = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const API_URL =
-    process.env.NODE_ENV === "development"
-      ? "/api/motor-type"
-      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/motor-type`;
+  const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/motor-type`;
 
   useEffect(() => {
     const fetchMotorTypes = async () => {
