@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface LoginForm {
   email: string;
@@ -14,9 +16,6 @@ const Login: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,7 +42,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Heading */}
-        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2" style={{ color: primary }}>
+        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2 text-priamry">
           Welcome Back
         </h2>
         <p className="text-center text-sm text-gray-600 mb-6">
@@ -90,39 +89,20 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full text-white py-2.5 rounded-lg font-semibold transition"
-            style={{ backgroundColor: primary }}
-            onMouseEnter={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = primaryDark;
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = primary;
-            }}
-          >
+          <Button type="submit" className="text-white transition w-full">
             Login
-          </button>
+          </Button>
 
           {/* Forgot Password */}
           <div className="text-center mt-1">
-            <button
-              type="button"
-              onClick={() => router.push("/forgot-password")}
-              className="text-sm hover:underline"
-              style={{ color: primary }}
-            >
+            <Link href="/forgot-password" className="text-sm hover:underline">
               Forgot Password?
-            </button>
+            </Link>
           </div>
         </form>
-
-    
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default Login;

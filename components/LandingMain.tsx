@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 const LandingMain: React.FC = () => {
   const [slide, setSlide] = useState(0);
   const cars = ["/car.jpeg", "/lorry.jpeg", "/psv.jpeg"];
   const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,65 +30,39 @@ const LandingMain: React.FC = () => {
           transition={{ duration: 1 }}
         >
           <div className="mb-6">
-            <h1
-              className="text-3xl md:text-4xl font-bold leading-tight mb-4"
-              style={{ color: "#1e3a5f" }}
-            >
-              Drive with <span style={{ color: primary }}>Confidence</span>.
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-[#1e3a5f]">
+              Drive with <span className="text-primary">Confidence</span>.
               <br />
-              Insure with <span style={{ color: primary }}>Ease</span>.
+              Insure with <span className="text-primary">Ease</span>.
             </h1>
             <p className="text-gray-700 text-base md:text-lg mb-4">
               At{" "}
               <strong>
-                <span style={{ color: primary }}>Wheelswise</span>
+                <span className="text-primary">Wheelswise</span>
               </strong>
-              , we provide <span style={{ color: primary }}>reliable</span> and{" "}
-              <span style={{ color: primary }}>affordable</span> motor insurance
+              , we provide <span className="text-primary">reliable</span> and{" "}
+              <span className="text-primary">affordable</span> motor insurance
               tailored to keep you and your vehicle protected on every journey.
               Get the coverage you need with simple,{" "}
-              <span style={{ color: primary }}>transparent plans</span> designed
+              <span className="text-primary">transparent plans</span> designed
               just for you.
             </p>
-            <p style={{ color: primary }} className="font-medium italic">
+            <p className="font-medium italic text-primary">
               Ready to protect your ride?
             </p>
           </div>
 
           <div className="flex gap-3 mt-4">
-            <Link
-              href="/motor-type"
-              className="text-white px-6 py-2 rounded-xl transition"
-              style={{ backgroundColor: primary }}
-              onMouseEnter={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = primaryDark;
-              }}
-              onMouseLeave={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = primary;
-              }}
+            <Button asChild className="text-white transition">
+              <Link href="/motor-type">Get Started</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="transition"
             >
-              Get Started
-            </Link>
-            <Link
-              href="/login"
-              className="bg-white px-5 py-2 rounded-xl border transition"
-              style={{
-                color: primary,
-                borderColor: primary,
-              }}
-              onMouseEnter={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = "#edf5f8";
-              }}
-              onMouseLeave={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.backgroundColor = "white";
-              }}
-            >
-              Login
-            </Link>
+              <Link href="/login">Login</Link>
+            </Button>
           </div>
         </motion.div>
 

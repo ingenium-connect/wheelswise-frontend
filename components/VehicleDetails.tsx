@@ -2,11 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Button } from "./ui/button";
 
 const VehicleDetails = () => {
   const router = useRouter();
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const [form, setForm] = useState({
     vehicleValue: "",
@@ -31,10 +30,7 @@ const VehicleDetails = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] flex items-center justify-center px-4">
       <div className="w-full max-w-2xl bg-white shadow-2xl p-8 rounded-tl-[40px] rounded-br-[40px]">
-        <h2
-          className="text-2xl md:text-3xl font-bold text-center mb-4"
-          style={{ color: primary }}
-        >
+        <h2 className="text-2xl md:text-3xl text-primary font-bold text-center mb-4">
           Vehicle Details
         </h2>
         {/* <p className="text-center text-sm text-gray-600 mb-6">Enter the vehicles details</p> */}
@@ -126,21 +122,9 @@ const VehicleDetails = () => {
           </select>
 
           <div className="md:col-span-2 flex justify-end">
-            <button
-              type="submit"
-              className="px-6 py-2 text-white rounded-lg font-semibold transition"
-              style={{ backgroundColor: primary }}
-              onMouseEnter={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primaryDark)
-              }
-              onMouseLeave={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primary)
-              }
-            >
+            <Button type="submit" className="text-white transition">
               Get Quote
-            </button>
+            </Button>
           </div>
         </form>
       </div>

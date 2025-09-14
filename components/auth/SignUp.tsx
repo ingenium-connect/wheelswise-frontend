@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface SignupForm {
   phoneNumber: string;
@@ -20,9 +21,6 @@ const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
-
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -114,21 +112,9 @@ const Signup: React.FC = () => {
         </div>
 
         {/* Save Button */}
-        <button
-          type="submit"
-          className="w-full text-white py-2.5 rounded-lg font-semibold transition"
-          style={{ backgroundColor: primary }}
-          onMouseEnter={(e) => {
-            const target = e.target as HTMLButtonElement;
-            target.style.backgroundColor = primaryDark;
-          }}
-          onMouseLeave={(e) => {
-            const target = e.target as HTMLButtonElement;
-            target.style.backgroundColor = primary;
-          }}
-        >
+        <Button type="submit" className="text-white transition">
           Save
-        </button>
+        </Button>
       </form>
     </>
   );

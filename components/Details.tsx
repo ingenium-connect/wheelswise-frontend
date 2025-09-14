@@ -2,11 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Button } from "./ui/button";
 
 const Details = () => {
   const router = useRouter();
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const [form, setForm] = useState({
     firstName: "",
@@ -30,10 +29,7 @@ const Details = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] px-4">
       <div className="bg-white w-full max-w-3xl p-8 rounded-tl-[40px] rounded-br-[40px] shadow-2xl">
-        <h2
-          className="text-2xl md:text-3xl font-bold text-center mb-6"
-          style={{ color: primary }}
-        >
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-primary">
           Personal Details
         </h2>
 
@@ -133,29 +129,17 @@ const Details = () => {
 
           {/* Buttons */}
           <div className="col-span-1 md:col-span-2 flex justify-between mt-6">
-            <button
-              type="button"
+            <Button
               onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+              variant="outline"
+              className="text-white transition"
             >
-              Go back
-            </button>
+              Go Back
+            </Button>
 
-            <button
-              type="submit"
-              className="px-8 py-3 text-white rounded-lg font-semibold transition"
-              style={{ backgroundColor: primary }}
-              onMouseEnter={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primaryDark)
-              }
-              onMouseLeave={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primary)
-              }
-            >
+            <Button type="submit" className="text-white transition">
               Next
-            </button>
+            </Button>
           </div>
         </form>
       </div>

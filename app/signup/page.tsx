@@ -26,10 +26,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Heading */}
-            <h2
-              className="text-2xl md:text-3xl font-extrabold text-center mb-2"
-              style={{ color: primary }}
-            >
+            <h2 className="text-2xl md:text-3xl font-extrabold text-center text-priamry mb-2">
               Create Account With Us
             </h2>
             <Signup />
@@ -37,7 +34,7 @@ export default function SignUpPage() {
             <p className="text-sm text-center text-gray-600 mt-6">
               Already have an account?{" "}
               <Link
-                className="text-blue-700 font-medium cursor-pointer hover:underline"
+                className="text-primary font-medium cursor-pointer hover:underline"
                 href="/login"
               >
                 Login
