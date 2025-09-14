@@ -1,9 +1,8 @@
 import Login from "@/components/auth/Login";
 
-export default function SignUpPage() {
+export default function Page() {
   return (
     <>
-      {/* Form Content */}
       <Login />
     </>
   );

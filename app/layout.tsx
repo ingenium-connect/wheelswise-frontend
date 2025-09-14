@@ -32,12 +32,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader color="#397397" />
-        <main className="flex flex-col min-h-screen bg-gradient-to-r from-[#d7e8ee] via-white to-white">
+        <main className="flex flex-col min-h-screen">
           <Header />
+
           {children}
           <Footer />
         </main>
-        <Toaster />
+        <Toaster richColors/>
       </body>
     </html>
   );

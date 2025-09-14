@@ -1,106 +1,188 @@
 "use client";
 
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
-import { Button } from "../ui/button";
-import Link from "next/link";
 
-interface LoginForm {
-  email: string;
-  password: string;
-}
+import Link from "next/link";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+import { loginFormSchema } from "@/lib/validation-schemas";
+import { PasswordInput } from "../forms/password-input";
+import { useState } from "react";
+import { loginSubmitHandler } from "@/utilities/api";
+import { Loader2 } from "lucide-react";
+import { setCookie } from "nookies";
+
+import { LoginPayload } from "@/types/data";
+import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "@/utilities/constants";
+
+const formSchema = loginFormSchema;
 
 const Login: React.FC = () => {
+  const [userDetails, setUserDetails] = useState<LoginPayload>({
+    national_identifier: "",
+    password: "",
+    user_type: "COMPREHENSIVE_CUSTOMER",
+  });
   const router = useRouter();
-  const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      national_identifier: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Logging in with", form);
-    router.push("/");
-  };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    setUserDetails(() => ({
+      ...userDetails,
+      national_identifier: values.national_identifier,
+      password: values.password,
+    }));
+    try {
+      const payload = {
+        ...values,
+        user_type: userDetails.user_type,
+      };
+      const response = await loginSubmitHandler({ ...payload });
+      if (response?.id) {
+        // Also store in cookies for backward compatibility
+        const userData = {
+          [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
+          [USER_ID]: response?.id,
+          [EMAIL]: response?.email,
+          [NAME]: response?.name,
+        };
+
+        // Set cookies with options to allow sending to backend (cross-site, secure, SameSite=None)
+        Object.entries(userData).forEach(([key, value]) =>
+          setCookie(null, key, value, {
+            maxAge: 60 * 60, // 1 hour
+            path: "/",
+            secure: process.env.NODE_ENV === "production", // Not using HTTPS locally
+            sameSite: "lax", // 'lax' is more permissive for local dev
+          })
+        );
+
+        toast.success("Successfully logged in!");
+        router.push("/");
+      } else {
+        toast.error("Submission Error", {
+          description: "Error in submitting request! Please try again.",
+        });
+      }
+      form.reset();
+    } catch (error) {
+      toast.error("Submission Error", {
+        description: (error as Error)?.message || "An error occurred.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
-    <div className="h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <Image
-            src="/logo.png"
-            alt="WheelsWise Logo"
-            width={112}
-            height={112}
-            className="h-24 md:h-28 w-auto object-contain"
-          />
-        </div>
-
-        {/* Heading */}
-        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2 text-priamry">
-          Welcome Back
-        </h2>
-        <p className="text-center text-sm text-gray-600 mb-6">
-          Login to continue managing your motor insurance.
-        </p>
-
-        {/* Login Form */}
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                placeholder="••••••••"
-              />
-              <span
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </span>
-            </div>
-          </div>
-
-          <Button type="submit" className="text-white transition w-full">
-            Login
-          </Button>
-
-          {/* Forgot Password */}
-          <div className="text-center mt-1">
-            <Link href="/forgot-password" className="text-sm hover:underline">
-              Forgot Password?
+    <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
+      <Card className="mx-auto mt-4 sm:mt-10 max-w-md w-full bg-white/80 backdrop-blur-sm shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl">Welcome Back</CardTitle>
+          <CardDescription>
+            Login to continue managing your motor insurance.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid gap-4">
+                <FormField
+                  control={form.control}
+                  name="national_identifier"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel htmlFor="national_identifier">
+                        National identifier
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          id="national_identifier"
+                          placeholder="******"
+                          type="text"
+                          required
+                          autoComplete="national_identifier"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <div className="flex justify-between items-center">
+                        <FormLabel htmlFor="password">Password</FormLabel>
+                        <Link
+                          href="/forgot-password"
+                          className="ml-auto inline-block text-sm underline"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <PasswordInput
+                          id="password"
+                          required
+                          placeholder="******"
+                          autoComplete="current-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Login
+                </Button>
+              </div>
+            </form>
+          </Form>
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="underline">
+              Sign up
             </Link>
           </div>
-        </form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
