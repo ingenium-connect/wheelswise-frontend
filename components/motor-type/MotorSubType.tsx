@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface MotorType {
   id: string;
@@ -38,9 +39,6 @@ const MotorSubtype: React.FC = () => {
   const [subtypes, setSubtypes] = useState<SubtypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const primaryColor = "#397397";
-  const primaryDark = "#2e5e74";
 
   useEffect(() => {
     // Get the selected motor type and vehicle value from localStorage
@@ -155,21 +153,12 @@ const MotorSubtype: React.FC = () => {
                   </div>
 
                   <div className="mt-4">
-                    <button
+                    <Button
                       onClick={() => handleSelect(item)}
-                      className="w-full text-white py-2 text-sm rounded-md font-medium transition"
-                      style={{ backgroundColor: primaryColor }}
-                      onMouseEnter={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = primaryDark;
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.backgroundColor = primaryColor;
-                      }}
+                      className="text-white transition"
                     >
                       Select
-                    </button>
+                    </Button>
                   </div>
                 </div>
               );

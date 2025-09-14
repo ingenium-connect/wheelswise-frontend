@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useRef, useState, FormEvent, ClipboardEvent, KeyboardEvent } from "react";
+import React, {
+  useRef,
+  useState,
+  FormEvent,
+  ClipboardEvent,
+  KeyboardEvent,
+} from "react";
 import StepNav from "./StepNav";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 const OtpVerify: React.FC = () => {
   const router = useRouter();
@@ -10,9 +17,6 @@ const OtpVerify: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const handleChange = (value: string, index: number) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -89,10 +93,7 @@ const OtpVerify: React.FC = () => {
       <div className="flex-grow flex items-center justify-center px-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
           {/* Heading */}
-          <h2
-            className="text-2xl md:text-3xl font-extrabold text-center mb-2"
-            style={{ color: primary }}
-          >
+          <h2 className="text-2xl md:text-3xl font-extrabold text-center text-primary mb-2">
             OTP Verification
           </h2>
           <p className="text-center text-sm text-gray-600 mb-6">
@@ -107,7 +108,9 @@ const OtpVerify: React.FC = () => {
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
-                  ref={(el) => { inputRefs.current[index] = el; }}
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
@@ -116,24 +119,13 @@ const OtpVerify: React.FC = () => {
               ))}
             </div>
 
-            {error && <p className="text-center text-red-600 text-sm">{error}</p>}
+            {error && (
+              <p className="text-center text-red-600 text-sm">{error}</p>
+            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full text-white py-2.5 rounded-lg font-semibold transition"
-              style={{ backgroundColor: primary }}
-              onMouseEnter={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primaryDark)
-              }
-              onMouseLeave={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primary)
-              }
-            >
+            <Button type="submit" className="text-white transition">
               {loading ? "Verifying..." : "Verify"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-sm text-center text-gray-600 mt-6">

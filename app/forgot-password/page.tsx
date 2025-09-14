@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const ForgotPassword: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
-
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const handleReset = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,17 +22,17 @@ const ForgotPassword: React.FC = () => {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <Image 
-            src="/logo.png" 
-            alt="WheelsWise Logo" 
+          <Image
+            src="/logo.png"
+            alt="WheelsWise Logo"
             width={96}
             height={96}
-            className="h-24 w-auto object-contain" 
+            className="h-24 w-auto object-contain"
           />
         </div>
 
         {/* Heading */}
-        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: primary }}>
+        <h2 className="text-2xl font-bold text-center mb-2 text-primary">
           Forgot Your Password?
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
@@ -51,41 +50,27 @@ const ForgotPassword: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ borderColor: primary }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-primary"
               placeholder="you@example.com"
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full text-white py-2.5 rounded-lg font-semibold transition"
-            style={{ backgroundColor: primary }}
-            onMouseEnter={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = primaryDark;
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLButtonElement;
-              target.style.backgroundColor = primary;
-            }}
-          >
+          <Button type="submit" className="w-full transition">
             Send Reset Link
-          </button>
+          </Button>
         </form>
 
         <p className="text-sm text-center text-gray-600 mt-6">
-          <span
-            onClick={() => router.push("/login")}
-            className="font-medium cursor-pointer hover:underline"
-            style={{ color: primary }}
+          <Link
+            href="/login"
+            className="font-medium cursor-pointer hover:underline text-primary"
           >
             Go back to Login
-          </span>
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default ForgotPassword; 
+export default ForgotPassword;

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { Button } from "./ui/button";
 
 const PaymentMethod = () => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
@@ -11,9 +12,6 @@ const PaymentMethod = () => {
     expiry: "",
     cvv: "",
   });
-
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
 
   const handleChoose = (method: string) => {
     setSelectedMethod(method);
@@ -30,10 +28,7 @@ const PaymentMethod = () => {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#f7f9fb]">
       {/* Top Navbar */}
-      <div
-        className="w-full sticky top-0 z-50 text-white text-lg font-semibold text-center py-4 shadow-md"
-        style={{ backgroundColor: primary }}
-      >
+      <div className="w-full sticky top-0 z-50 text-white text-lg font-semibold bg-primary text-center py-4 shadow-md">
         Choose a Payment Method
       </div>
 
@@ -69,15 +64,14 @@ const PaymentMethod = () => {
                 className="h-12 mb-2 object-contain"
               />
               <span className="font-medium">Mpesa</span>
-              <button
-                className={`mt-2 px-4 py-1 rounded-lg text-white text-sm`}
-                style={{
-                  backgroundColor:
-                    selectedMethod === "mpesa" ? primary : "#ccc",
-                }}
+
+              <Button
+                className={`text-white transition mt-2 ${
+                  selectedMethod === "mpesa" ? "bg-primary" : "bg-[#ccc]"
+                }`}
               >
                 Choose
-              </button>
+              </Button>
             </div>
 
             {/* Card */}
@@ -98,14 +92,13 @@ const PaymentMethod = () => {
               />
 
               <span className="font-medium">Card</span>
-              <button
-                className={`mt-2 px-4 py-1 rounded-lg text-white text-sm`}
-                style={{
-                  backgroundColor: selectedMethod === "card" ? primary : "#ccc",
-                }}
+              <Button
+                className={`text-white transition mt-2 ${
+                  selectedMethod === "card" ? "bg-primary" : "bg-[#ccc]"
+                }`}
               >
                 Choose
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -113,12 +106,7 @@ const PaymentMethod = () => {
         {/* Mpesa Form */}
         {selectedMethod === "mpesa" && (
           <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ color: primary }}
-            >
-              Mpesa
-            </h3>
+            <h3 className="text-lg font-semibold text-primary mb-2">Mpesa</h3>
             <p className="text-sm text-gray-600 mb-4">
               You will receive a push notification to your phone number.
             </p>
@@ -130,30 +118,19 @@ const PaymentMethod = () => {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="07XXXXXXXX"
-              className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring focus:border-[color:var(--tw-shadow-color)]"
-              style={{ borderColor: primary }}
+              className="w-full border border-primary rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring focus:border-[color:var(--tw-shadow-color)]"
             />
-            <button
-              onClick={handlePay}
-              className="w-full text-white py-2 rounded-lg font-medium mb-3"
-              style={{ backgroundColor: primary }}
-              onMouseEnter={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primaryDark)
-              }
-              onMouseLeave={(e) =>
-                ((e.target as HTMLButtonElement).style.backgroundColor =
-                  primary)
-              }
-            >
+
+            <Button onClick={handlePay} className="text-white transition mb-3">
               Pay
-            </button>
-            <button
-              className="w-full text-white py-2 rounded-lg font-medium"
-              style={{ backgroundColor: "#ccc" }}
+            </Button>
+
+            <Button
+              onClick={handlePay}
+              className="text-white transition bg-[#ccc]"
             >
               Confirm Payment
-            </button>
+            </Button>
           </div>
         )}
 
@@ -164,10 +141,7 @@ const PaymentMethod = () => {
               Card payments coming soon
             </div>
 
-            <h3
-              className="text-lg font-semibold mt-6 mb-2"
-              style={{ color: primary }}
-            >
+            <h3 className="text-lg font-semibold textr-primary mt-6 mb-2">
               Card Payment
             </h3>
             <p className="text-sm text-gray-600 mb-4">
@@ -212,20 +186,19 @@ const PaymentMethod = () => {
               </div>
             </div>
 
-            <button
+            <Button
               disabled
-              className="w-full text-white py-2 rounded-lg font-medium mb-3 cursor-not-allowed"
-              style={{ backgroundColor: primary }}
+              className="text-white w-full transition mb-3 cursor-not-allowed"
             >
               Pay
-            </button>
-            <button
+            </Button>
+
+            <Button
               disabled
-              className="w-full text-white py-2 rounded-lg font-medium cursor-not-allowed"
-              style={{ backgroundColor: primaryDark }}
+              className="text-white transition w-full cursor-not-allowed"
             >
               Confirm Payment
-            </button>
+            </Button>
           </div>
         )}
       </div>

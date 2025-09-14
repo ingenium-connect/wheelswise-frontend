@@ -4,9 +4,6 @@ import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 const PaymentSuccess = () => {
-  const primary = "#397397";
-  const primaryDark = "#2e5e74";
-
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#f7f9fb]">
       {/* Success Message */}
@@ -26,15 +23,7 @@ const PaymentSuccess = () => {
           </p>
           <Link
             href="/"
-            className="w-full py-2 px-4 rounded-lg text-white font-medium"
-            style={{ backgroundColor: primary }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLButtonElement).style.backgroundColor =
-                primaryDark;
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLButtonElement).style.backgroundColor = primary;
-            }}
+            className="w-full py-2 px-4 rounded-lg text-white font-medium bg-primary hover:bg-primary-dark active:bg-primary-dark transition"
           >
             Go to Dashboard
           </Link>

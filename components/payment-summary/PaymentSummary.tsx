@@ -19,9 +19,6 @@ const PaymentSummary: React.FC = () => {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState("one-time");
 
-  const primaryColor = "#397397";
-  const primaryDark = "#2e5e74";
-
   const paymentTypes: PaymentType[] = [
     {
       key: "one-time",
@@ -50,10 +47,7 @@ const PaymentSummary: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen justify-between bg-[#f7f9fb]">
       {/* Navbar */}
-      <div
-        className="w-full sticky top-0 z-50 text-white text-lg font-semibold text-center py-4 shadow-md flex items-center justify-between px-4"
-        style={{ backgroundColor: primaryColor }}
-      >
+      <div className="w-full sticky top-0 z-50 text-white text-lg bg-primary font-semibold text-center py-4 shadow-md flex items-center justify-between px-4">
         <button
           onClick={() => router.back()}
           className="text-sm bg-white text-gray-700 px-3 py-1 rounded-lg shadow"
@@ -67,10 +61,7 @@ const PaymentSummary: React.FC = () => {
       {/* Main content */}
       <div className="flex-grow px-4 py-10 flex flex-col items-center">
         {/* Page Title */}
-        <h2
-          className="text-2xl font-semibold text-center mb-2"
-          style={{ color: primaryDark }}
-        >
+        <h2 className="text-2xl font-semibold text-center mb-2 texrt-primary-dark">
           Payment Summary
         </h2>
         <p className="text-red-600 text-sm mb-6 text-center">
@@ -79,10 +70,7 @@ const PaymentSummary: React.FC = () => {
 
         {/* Payment Type Selection */}
         <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-xl mb-8">
-          <h3
-            className="text-lg font-semibold mb-4 text-center"
-            style={{ color: primaryDark }}
-          >
+          <h3 className="text-lg font-semibold mb-4 text-center text-primary-dark">
             Choose Your Payment Type
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -94,26 +82,17 @@ const PaymentSummary: React.FC = () => {
                   selectedType === type.key
                     ? "shadow-md border-[3px]"
                     : "border border-gray-300"
-                }`}
-                style={{
-                  borderColor:
-                    selectedType === type.key ? primaryColor : "#ccc",
-                }}
+                } ${selectedType === type.key ? "bg-primary" : "bg-[#ccc]"}`}
               >
                 <div
-                  className="w-5 h-5 mx-auto rounded-full mb-2"
-                  style={{
-                    backgroundColor:
-                      selectedType === type.key ? primaryColor : "#e5e7eb",
-                  }}
+                  className={`w-5 h-5 mx-auto rounded-full mb-2 ${
+                    selectedType === type.key ? "bg-primary" : "bg-[#e5e7eb]"
+                  }`}
                 />
                 <h4 className="font-medium text-gray-800">{type.label}</h4>
                 <p className="text-sm text-gray-600 mt-1">{type.description}</p>
                 {selectedType === type.key && (
-                  <div
-                    className="mt-2 font-semibold"
-                    style={{ color: primaryColor }}
-                  >
+                  <div className="mt-2 font-semibold text-primary">
                     Selected
                   </div>
                 )}
@@ -124,25 +103,15 @@ const PaymentSummary: React.FC = () => {
 
         {/* Plan Details */}
         <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-xl mb-8">
-          <h3
-            className="text-lg font-semibold mb-4 text-center"
-            style={{ color: primaryDark }}
-          >
+          <h3 className="text-lg font-semibold mb-4 text-center text-color-dark">
             Your Plan Details
           </h3>
           <div className="border-t pt-4">
-            <h4 className="font-semibold mb-2" style={{ color: primaryColor }}>
-              Added Benefits
-            </h4>
+            <h4 className="font-semibold mb-2 text-primary">Added Benefits</h4>
             {addedBenefits.map((item, idx) => (
               <div
                 key={idx}
-                className="flex justify-between px-4 py-2 rounded-lg mb-2"
-                style={{
-                  backgroundColor: "#e6f4f1",
-                  color: primaryDark,
-                  border: `1px solid ${primaryColor}`,
-                }}
+                className="flex justify-between px-4 py-2 rounded-lg mb-2 bg-[#e6f4f1] border-primary text-color-dark"
               >
                 <span>{item.label}</span>
                 <span>Ksh {item.amount.toLocaleString()}</span>
@@ -152,15 +121,9 @@ const PaymentSummary: React.FC = () => {
         </div>
 
         {/* Total Payment */}
-        <div
-          className="rounded-xl shadow-inner p-6 w-full max-w-xl text-center"
-          style={{ backgroundColor: "#ebf2f4" }}
-        >
+        <div className="rounded-xl shadow-inner p-6 w-full max-w-xl text-center bg-[#ebf2f4]">
           <h3 className="text-xl font-bold text-gray-700">TOTAL PAYMENT</h3>
-          <p
-            className="text-3xl font-extrabold mt-2"
-            style={{ color: primaryColor }}
-          >
+          <p className="text-3xl font-extrabold mt-2 text-priamry">
             KES {totalPayment.toLocaleString()}
           </p>
         </div>
