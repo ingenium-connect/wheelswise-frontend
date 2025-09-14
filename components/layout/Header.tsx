@@ -5,7 +5,7 @@ import React from "react";
 const Header = () => {
   return (
     <>
-      <header className="px-4 md:px-16 py-2 flex justify-start items-center">
+      <header className="px-4 md:px-16 py-2 flex justify-start items-center bg-gradient-to-r from-[#d7e8ee] via-white to-[#e5f0f3]">
         <Link href="/">
         
         <Image
