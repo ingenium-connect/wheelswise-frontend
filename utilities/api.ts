@@ -143,9 +143,8 @@ export const loginSubmitHandler = async ({
  *
  * @returns list of specified data
  */
-export const getData = async (ENDPOINT: string) => {
+export const getData = async (ENDPOINT: string, requiresAuth: boolean = true) => {
   try {
-    const requiresAuth = true;
     const url = SERVER_URL + ENDPOINT;
     return await apiHandler(url, requiresAuth);
   } catch (error) {

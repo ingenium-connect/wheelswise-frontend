@@ -1,48 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Footer from "../layout/Footer";
+import { MotorType, MotorTypesResponse } from "@/types/data";
 
-interface MotorType {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-}
+type Props = {
+  data: MotorTypesResponse;
+};
 
-const SelectMotorType: React.FC = () => {
-  const [motorTypes, setMotorTypes] = useState<MotorType[]>([]);
-  const [error, setError] = useState("");
+const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
-
-  const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/motor-type`;
-
-  useEffect(() => {
-    const fetchMotorTypes = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const result = await response.json();
-
-        if (!response.ok)
-          throw new Error(result.message || "Failed to load motor types");
-
-        setMotorTypes(result.motor_types || []);
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(errorMessage);
-      }
-    };
-
-    fetchMotorTypes();
-  }, [API_URL]);
 
   const handleSelect = (type: MotorType) => {
     // Store the selected motor type in localStorage or state management
     localStorage.setItem("selectedMotorType", JSON.stringify(type));
-    router.push("/value");
+    router.push("/vehicle-value");
   };
 
   return (
@@ -65,10 +38,8 @@ const SelectMotorType: React.FC = () => {
 
       {/* Main Content */}
       <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {motorTypes.map((type) => (
+          {(data?.motor_types ?? []).map((type) => (
             <div
               key={type.id}
               className="bg-white rounded-xl shadow-md hover:shadow-xl border border-gray-200 hover:border-[#397397] transition-transform transform hover:-translate-y-1 duration-300 flex flex-col overflow-hidden"
