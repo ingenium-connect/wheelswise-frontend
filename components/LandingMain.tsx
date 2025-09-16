@@ -9,7 +9,6 @@ import { Button } from "./ui/button";
 const LandingMain: React.FC = () => {
   const [slide, setSlide] = useState(0);
   const cars = ["/car.jpeg", "/lorry.jpeg", "/psv.jpeg"];
-  const primary = "#397397";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,7 +53,7 @@ const LandingMain: React.FC = () => {
 
           <div className="flex gap-3 mt-4">
             <Button asChild className="text-white transition">
-              <Link href="/motor-type">Get Started</Link>
+              <Link href="/cover-type">Get Started</Link>
             </Button>
             <Button
               asChild
