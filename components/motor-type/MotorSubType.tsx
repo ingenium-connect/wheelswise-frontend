@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
+import { postData, postHandler } from "@/utilities/api";
+import { json } from "zod";
 
 interface MotorType {
   id: string;
@@ -56,23 +58,12 @@ const MotorSubtype: React.FC = () => {
   useEffect(() => {
     if (!selectedMotorType || !vehicleValue) return;
 
-    const API_URL = `/api/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
+    const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
 
     const fetchSubtypes = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(data.message || "Failed to fetch motor subtypes");
-
-        setSubtypes(data.underwriter_products || []);
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+      const data = await postHandler(API_URL, false, {});
+      setSubtypes(data.underwriter_products || []);
+      setLoading(false);
     };
 
     fetchSubtypes();
