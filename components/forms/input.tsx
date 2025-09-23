@@ -10,6 +10,8 @@ import { Control } from "react-hook-form";
 import { Input } from "../ui/input";
 
 interface CustomFormFieldProps {
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>;
   name: string;
   label: string;

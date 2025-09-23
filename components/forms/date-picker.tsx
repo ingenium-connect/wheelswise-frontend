@@ -18,6 +18,7 @@ import { Calendar1Icon } from "lucide-react";
 import { Calendar } from "../ui/calendar";
 
 interface CustomFormFieldProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>;
   name: string;
   label: string;

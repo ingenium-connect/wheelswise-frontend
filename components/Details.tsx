@@ -16,11 +16,11 @@ const Details = () => {
     kraPin: "",
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleNext = (e: any) => {
+  const handleNext = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted:", form);
     router.push("/next-step");
