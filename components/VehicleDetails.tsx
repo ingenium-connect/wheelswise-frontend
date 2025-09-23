@@ -17,11 +17,11 @@ const VehicleDetails = () => {
     year: "",
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Vehicle Details Submitted:", form);
     router.push("/quote"); // Redirect or handle accordingly

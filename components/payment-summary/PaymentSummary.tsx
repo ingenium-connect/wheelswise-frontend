@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../layout/Footer";
 
 interface PaymentType {
   key: string;

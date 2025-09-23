@@ -25,6 +25,16 @@ const PaymentMethod = () => {
     }
   };
 
+  const handleCardDetailsChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+    setCardDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#f7f9fb]">
       {/* Top Navbar */}
@@ -155,6 +165,8 @@ const PaymentMethod = () => {
               type="text"
               placeholder="1234 5678 9012 3456"
               value={cardDetails.cardNumber}
+              name="cardNumber"
+              onChange={handleCardDetailsChange}
               disabled
               className="w-full border rounded-lg px-4 py-2 mb-4 bg-gray-100 text-gray-500"
             />
@@ -168,6 +180,8 @@ const PaymentMethod = () => {
                   type="text"
                   placeholder="MM/YY"
                   value={cardDetails.expiry}
+                  name="expiry"
+                  onChange={handleCardDetailsChange}
                   disabled
                   className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500"
                 />
@@ -180,6 +194,8 @@ const PaymentMethod = () => {
                   type="text"
                   placeholder="123"
                   value={cardDetails.cvv}
+                  name="cvv"
+                  onChange={handleCardDetailsChange}
                   disabled
                   className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500"
                 />

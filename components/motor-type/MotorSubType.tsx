@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { postData, postHandler } from "@/utilities/api";
-import { json } from "zod";
+import { postHandler } from "@/utilities/api";
 
 interface MotorType {
   id: string;
@@ -61,9 +60,15 @@ const MotorSubtype: React.FC = () => {
     const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
 
     const fetchSubtypes = async () => {
-      const data = await postHandler(API_URL, false, {});
-      setSubtypes(data.underwriter_products || []);
-      setLoading(false);
+      try { 
+        const data = await postHandler(API_URL, false, {});
+        setSubtypes(data.underwriter_products || []);
+        setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        setError(err);
+         setLoading(false);
+      }
     };
 
     fetchSubtypes();
