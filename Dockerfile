@@ -23,7 +23,6 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_BASE_URL=https://uat.wheelswise.ingeniumct.com/api/v1
 
 # Copy necessary files from builder
 COPY --from=builder /app/.next ./.next
