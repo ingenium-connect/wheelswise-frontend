@@ -1,45 +1,34 @@
-# Build stage
-FROM node:20-alpine AS builder
-
+# Build
+FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+# Enable pnpm
+RUN corepack enable
 
-# Install dependencies
-RUN npm install -g pnpm
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
 COPY . .
+RUN pnpm build
 
-# Build application
-RUN pnpm run build
-
-# Production stage
-FROM node:20-alpine AS runner
-
+# Run (standalone)
+FROM node:22-alpine AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
 
-# Copy necessary files from builder
-COPY --from=builder /app/.next ./.next
+# Create non-root user
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+
+# Copy build output before switching user
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Install production dependencies only
-RUN npm install -g pnpm
-RUN pnpm install --prod --frozen-lockfile
+# Ensure writable cache dir for Next.js images
+RUN mkdir -p /app/.next/cache && chown -R nextjs:nodejs /app
 
-# Add non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Drop privileges
 USER nextjs
 
 EXPOSE 3000
-
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
