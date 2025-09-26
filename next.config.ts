@@ -1,10 +1,16 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "standalone",
   images: {
-    domains: ['wheelwise-files.s3.amazonaws.com']
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "wheelwise-files.s3.amazonaws.com",
+        pathname: "**"
+      }
+    ]
   }
-};
+}
 
-export default nextConfig;
+export default nextConfig
