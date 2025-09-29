@@ -2,20 +2,23 @@ name: Linting and Testing
 
 on:
   push:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
 
 concurrency:
-  group: lint-and-test-${{ github.ref }}
+  group: lint-and-test-${{ github.ref }}-${{ github.run_id }}
 
 jobs:
   push_to_registry:
-    name: Build and push Docker image
+    name: Build and deploy
     runs-on: ubuntu-latest
+
     env:
       IMAGE_NAME: ingeniumconnect/wheelswise-frontend
       IMAGE_TAG: ${{ github.ref == 'refs/heads/develop' && 'uat-latest' || 'prod-latest' }}
+      ENVIRONMENT_NAME: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}  # develop->dev, main->prod
+
+    environment:
+      name: ${{ env.ENVIRONMENT_NAME }}
 
     steps:
       - name: Checkout
@@ -42,3 +45,25 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_EC2_PUBLIC_DNS }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            sudo docker stop ${{ secrets.APP_NAME }} || true
+            sudo docker rm ${{ secrets.APP_NAME }} || true
+
+            sudo docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            sudo docker image prune -a -f || true
+
+            sudo docker run -d \
+              --name ${{ secrets.APP_NAME }} \
+              --restart unless-stopped \
+              -p ${{ secrets.PORT }} \
+              --env-file ${{ secrets.ENV_FILE_PATH }} \
+              ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
