@@ -76,7 +76,14 @@ jobs:
             sudo docker stop ${{ secrets.APP_NAME }} || true
             sudo docker rm ${{ secrets.APP_NAME }} || true
 
-            sudo docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-            sudo docker image prune -a -f || true
+            # prune dangling images first, not after pull
+            sudo docker image prune -f || true
 
-            sudo docker run -d --name ${{ secrets.APP_NAME }} --restart unless-stopped -p ${{ secrets.PORT }} --env-file ${{ secrets.ENV_FILE_PATH }} ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            sudo docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+            sudo docker run -d \
+              --name ${{ secrets.APP_NAME }} \
+              --restart=unless-stopped \
+              -p "${{ secrets.PORT }}" \
+              --env-file "${{ secrets.ENV_FILE_PATH }}" \
+              "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
