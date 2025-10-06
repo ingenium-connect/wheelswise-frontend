@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
+import { useInsuranceStore } from "@/store/store";
 
 type Props = {
   data: CoverTypesResponse;
@@ -41,9 +42,10 @@ const CoverMappings: Record<
 
 const SelectCoverType = ({ data }: Props) => {
   const router = useRouter();
+  const selectCover = useInsuranceStore((state) => state.selectCover);
 
   const handleSelect = (type: string) => {
-    localStorage.setItem("selectedMotorType", JSON.stringify(type));
+    selectCover(type);
     router.push("/motor-type");
   };
 

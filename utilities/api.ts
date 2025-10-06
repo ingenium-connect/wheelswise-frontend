@@ -143,7 +143,10 @@ export const loginSubmitHandler = async ({
  *
  * @returns list of specified data
  */
-export const getData = async (ENDPOINT: string, requiresAuth: boolean = true) => {
+export const getData = async (
+  ENDPOINT: string,
+  requiresAuth: boolean = true
+) => {
   try {
     const url = SERVER_URL + ENDPOINT;
     return await apiHandler(url, requiresAuth);
@@ -151,6 +154,8 @@ export const getData = async (ENDPOINT: string, requiresAuth: boolean = true) =>
     return { results: [] };
   }
 };
+
+
 /**
  *
  * @returns list of specified data to support react query data fetch
@@ -178,3 +183,4 @@ export const postData = async (
     return {};
   }
 };
+

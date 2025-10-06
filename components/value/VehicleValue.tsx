@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useInsuranceStore } from "@/store/store";
 
 interface MotorType {
   id: string;
@@ -12,19 +13,10 @@ interface MotorType {
 
 const VehicleValue: React.FC = () => {
   const router = useRouter();
-  const [selectedMotorType, setSelectedMotorType] = useState<MotorType | null>(
-    null
-  );
-  const [vehicleValue, setVehicleValue] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    // Get the selected motor type from localStorage
-    const storedMotorType = localStorage.getItem("selectedMotorType");
-    if (storedMotorType) {
-      setSelectedMotorType(JSON.parse(storedMotorType));
-    }
-  }, []);
+  const selectedMotorType = useInsuranceStore((store) => store.motorType);
+  const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
+  const setVehicleValue = useInsuranceStore((state) => state.setVehicleValue);
 
   const handleContinue = () => {
     if (
@@ -37,9 +29,6 @@ const VehicleValue: React.FC = () => {
     }
 
     setError("");
-
-    // Store the vehicle value in localStorage
-    localStorage.setItem("vehicleValue", vehicleValue);
 
     router.push("/motor-subtype");
   };
@@ -79,8 +68,8 @@ const VehicleValue: React.FC = () => {
             <input
               type="number"
               placeholder="e.g. 800000"
-              value={vehicleValue}
-              onChange={(e) => setVehicleValue(e.target.value)}
+              defaultValue={vehicleValue}
+              onChange={(e) => setVehicleValue(Number(e.target.value))}
               className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
             />
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}

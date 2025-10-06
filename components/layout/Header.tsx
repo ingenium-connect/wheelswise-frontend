@@ -11,6 +11,7 @@ const Header = () => {
         <Image
           src="/logo.png"
           alt="Logo"
+          priority
           width={80}
           height={80}
           className="h-14 md:h-20 w-auto"
