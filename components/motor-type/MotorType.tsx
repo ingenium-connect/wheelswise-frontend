@@ -7,6 +7,8 @@ import { MotorType, MotorTypesResponse } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
 import { Select } from "../ui/select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 
 type Props = {
   data: MotorTypesResponse;
@@ -57,9 +59,19 @@ const SelectMotorType = ({ data }: Props) => {
       <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
         {selectedCover === "THIRD_PARTY" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md">
-              PRIVATE
-            </div>
+            <Card>
+              <Image
+                src="https://wheelwise-files.s3.amazonaws.com/motortype@c7ef95d2-2413-4271-845a-806700a446e3"
+                alt="Private Motor"
+                width={400}
+                height={200}
+                className="object-contain p-4"
+              />
+              <Button className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md">
+                PRIVATE
+              </Button>
+            </Card>
+            
             <div className="text-primary font-bold">
               <Select onValueChange={(value) => console.log(value)}>
                 <SelectTrigger className="border border-primary w-full p-4 rounded-md">

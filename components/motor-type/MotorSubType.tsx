@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { postHandler } from "@/utilities/api";
-
-interface MotorType {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-}
+import { useInsuranceStore } from "@/store/store";
 
 interface ProductRate {
   rate: number;
@@ -33,51 +27,35 @@ interface SubtypeItem {
 
 const MotorSubtype: React.FC = () => {
   const router = useRouter();
-  const [selectedMotorType, setSelectedMotorType] = useState<MotorType | null>(
-    null
-  );
-  const [vehicleValue, setVehicleValue] = useState<string>("");
   const [subtypes, setSubtypes] = useState<SubtypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const vehicleValue = useInsuranceStore((state) => state.vehicleValue);
+  const motorType = useInsuranceStore((state) => state.motorType);
+  const setVehicleSubType = useInsuranceStore((state) => state.setVehicleSubType)
 
   useEffect(() => {
-    // Get the selected motor type and vehicle value from localStorage
-    const storedMotorType = localStorage.getItem("selectedMotorType");
-    const storedVehicleValue = localStorage.getItem("vehicleValue");
-
-    if (storedMotorType) {
-      setSelectedMotorType(JSON.parse(storedMotorType));
-    }
-    if (storedVehicleValue) {
-      setVehicleValue(storedVehicleValue);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!selectedMotorType || !vehicleValue) return;
-
-    const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
+    const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${motorType?.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
 
     const fetchSubtypes = async () => {
-      try { 
+      try {
         const data = await postHandler(API_URL, false, {});
         setSubtypes(data.underwriter_products || []);
         setLoading(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err);
-         setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchSubtypes();
-  }, [selectedMotorType, vehicleValue]);
+  }, [motorType?.name, vehicleValue]);
 
   const handleSelect = (product: SubtypeItem) => {
-    alert(`Selected subtype: ${product.underwriter_product.name}`);
+    setVehicleSubType(product);
+    router.push("/vehicle-details");
     // Store the selected product in localStorage
-    localStorage.setItem("selectedProduct", JSON.stringify(product));
     // navigate("/next-step", { state: { motorType: selectedMotorType, vehicleValue, selectedProduct: product } });
   };
 
