@@ -8,11 +8,12 @@ type InsuranceStoreState = {
   cover: string | null;
   motorType: MotorType | null;
   vehicleValue: number;
-  //   motorSubtype: string | null;
+    motorSubtype: string | null;
   // Actions
   selectCover: (coverType: string) => void;
   setMotorType: (type: MotorType) => void;
   setVehicleValue: (value: number) => void;
+  setVehicleSubType: (subtype: any) => void;
 };
 
 /**
@@ -25,11 +26,13 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       cover: null,
       motorType: null,
       vehicleValue: 0,
+      motorSubtype: null,
 
       // Actions
       selectCover: (coverType) => set({ cover: coverType }),
       setMotorType: (type) => set({ motorType: type }),
       setVehicleValue: (value) => set({ vehicleValue: value}),
+      setVehicleSubType: (subtype) => set({ motorSubtype: subtype }),
     }),
     {
       name: "motor-insurance-details",

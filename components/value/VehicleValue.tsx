@@ -4,13 +4,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/store/store";
 
-interface MotorType {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-}
-
 const VehicleValue: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState("");
