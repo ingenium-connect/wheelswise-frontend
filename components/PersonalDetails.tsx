@@ -4,17 +4,16 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 
-const VehicleDetails = () => {
+const PersonalDetails = () => {
   const router = useRouter();
 
   const [form, setForm] = useState({
-    vehicleValue: "",
-    engineCapacity: "",
-    vehicleNumber: "",
-    chassisNumber: "",
-    make: "",
-    model: "",
-    year: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    idNumber: "",
+    kraPin: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -23,7 +22,7 @@ const VehicleDetails = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/personal-details");
+    router.push("/signup");
   };
 
   return (
@@ -38,7 +37,7 @@ const VehicleDetails = () => {
             ← Go Back
           </button>
           <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
-            Step Four: Enter vehicle details
+            Step Five: Enter Personal details
           </h1>
           <div className="w-24" />
         </div>
@@ -46,7 +45,7 @@ const VehicleDetails = () => {
 
       <div className="w-full max-w-2xl bg-white shadow-2xl p-8 rounded-tl-[40px] rounded-br-[40px]">
         <h2 className="text-2xl md:text-3xl text-primary font-bold text-center mb-4">
-          Vehicle Details
+          Personal Details
         </h2>
         {/* <p className="text-center text-sm text-gray-600 mb-6">Enter the vehicles details</p> */}
 
@@ -55,86 +54,64 @@ const VehicleDetails = () => {
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           <input
-            type="number"
-            name="vehicleValue"
-            value={form.vehicleValue}
+            type="text"
+            name="firstName"
+            value={form.firstName}
             onChange={handleChange}
-            placeholder="Vehicle Value"
+            placeholder="First Name"
             required
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           />
 
           <input
             type="text"
-            name="engineCapacity"
-            value={form.engineCapacity}
+            name="lastName"
+            value={form.lastName}
             onChange={handleChange}
-            placeholder="Enter the Engine cc e.g. 1800CC"
+            placeholder="Last Name"
             required
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           />
 
           <input
             type="text"
-            name="vehicleNumber"
-            value={form.vehicleNumber}
+            name="phoneNumber"
+            value={form.phoneNumber}
             onChange={handleChange}
-            placeholder="Vehicle Number"
+            placeholder="Phone Number"
+            required
+            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
+          />
+
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            required
+            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
+          />
+
+           <input
+            type="text"
+            name="kraPin"
+            value={form.kraPin}
+            onChange={handleChange}
+            placeholder="KRA PIN"
             required
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           />
 
           <input
             type="text"
-            name="chassisNumber"
-            value={form.chassisNumber}
+            name="idNumber"
+            value={form.idNumber}
             onChange={handleChange}
-            placeholder="Chassis Number"
+            placeholder="ID Number"
             required
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           />
-
-          <select
-            name="make"
-            value={form.make}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          >
-            <option value="">Select Make</option>
-            <option value="Nissan">Nissan</option>
-            <option value="Toyota">Toyota</option>
-            <option value="Mazda">Mazda</option>
-            <option value="Subaru">Subaru</option>
-          </select>
-
-          <input
-            type="text"
-            name="model"
-            value={form.model}
-            onChange={handleChange}
-            placeholder="Vehicle Model"
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
-
-          <select
-            name="year"
-            value={form.year}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          >
-            <option value="">Year of Manufacture</option>
-            {Array.from({ length: 30 }, (_, i) => {
-              const year = new Date().getFullYear() - i;
-              return (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              );
-            })}
-          </select>
 
           <div className="md:col-span-2 flex justify-end">
             <Button type="submit" className="text-white transition">
@@ -147,4 +124,4 @@ const VehicleDetails = () => {
   );
 };
 
-export default VehicleDetails;
+export default PersonalDetails;
