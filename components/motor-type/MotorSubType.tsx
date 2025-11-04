@@ -55,8 +55,6 @@ const MotorSubtype: React.FC = () => {
   const handleSelect = (product: SubtypeItem) => {
     setVehicleSubType(product);
     router.push("/vehicle-details");
-    // Store the selected product in localStorage
-    // navigate("/next-step", { state: { motorType: selectedMotorType, vehicleValue, selectedProduct: product } });
   };
 
   return (
