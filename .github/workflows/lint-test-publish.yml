@@ -55,7 +55,7 @@ jobs:
       IMAGE_TAG: ${{ github.ref == 'refs/heads/develop' && 'uat-latest' || github.ref == 'refs/heads/staging' && 'staging-latest' || 'prod-latest' }}
     steps:
       - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.AWS_EC2_PUBLIC_DNS }}
           username: ${{ secrets.AWS_USERNAME }}
