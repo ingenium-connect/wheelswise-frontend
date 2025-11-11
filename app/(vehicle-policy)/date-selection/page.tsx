@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "../../components/layout/Footer";
 
 const DateSelection: React.FC = () => {
   const router = useRouter();
@@ -69,9 +68,6 @@ const DateSelection: React.FC = () => {
           Next
         </button>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };
