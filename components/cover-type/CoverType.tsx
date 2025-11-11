@@ -2,11 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { CoverTypesResponse } from "@/types/data";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 import { useInsuranceStore } from "@/store/store";
+import { useEffect } from "react";
 
 type Props = {
   data: CoverTypesResponse;
@@ -14,17 +21,18 @@ type Props = {
 
 const CoverMappings: Record<
   string,
-  { features: string[]; description: string, path: string }
+  { features: string[]; description: string; path: string }
 > = {
   THIRD_PARTY: {
-    description: "Essential coverage that protects against third-party damages.",
+    description:
+      "Essential coverage that protects against third-party damages.",
     features: [
       "Covers damage to other vehicles",
       "Covers injury to third parties",
       "Meets legal requirements",
       "Budget-friendly premiums",
     ],
-    path: '/motor-type'
+    path: "/motor-type",
   },
   COMPREHENSIVE: {
     description:
@@ -35,14 +43,18 @@ const CoverMappings: Record<
       "Personal accident protection",
       "Covers natural disasters (flood, storm, etc.)",
     ],
-    path: '/motor-type'
-
+    path: "/motor-type",
   },
 };
 
 const SelectCoverType = ({ data }: Props) => {
   const router = useRouter();
   const selectCover = useInsuranceStore((state) => state.selectCover);
+  const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
+  useEffect(() => {
+    setCoverStep(0);
+  }, []);
 
   const handleSelect = (type: string) => {
     selectCover(type);

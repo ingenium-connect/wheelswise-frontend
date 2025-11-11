@@ -1,12 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MotorType, MotorTypesResponse } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
 import { Select } from "../ui/select";
-import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 
@@ -18,19 +23,24 @@ const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
-  
+  const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
+  useEffect(() => {
+    setCoverStep(1);
+  }, []);
+
   const commercialOptions = [
-    'Own goods',
-    'General cartage',
-    'General cartage tankers',
-    'Motor Advantage',
-    'Special types',
-    'Psv private hire',
-    'Psv taxis',
-    'Contigent liability',
-    'Institutional vehicles',
-    'Driving school vehicles'
-  ]
+    "Own goods",
+    "General cartage",
+    "General cartage tankers",
+    "Motor Advantage",
+    "Special types",
+    "Psv private hire",
+    "Psv taxis",
+    "Contigent liability",
+    "Institutional vehicles",
+    "Driving school vehicles",
+  ];
   const handleSelect = (type: MotorType) => {
     // Store the selected motor type in localStorage or state management
     setMotorType(type);
@@ -39,22 +49,6 @@ const SelectMotorType = ({ data }: Props) => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 text-white shadow-md z-50 bg-[#397397]">
-        <div className="flex items-center justify-between px-4 md:px-16 h-16">
-          <button
-            onClick={() => router.back()}
-            className="text-white hover:underline font-medium"
-          >
-            ← Go Back
-          </button>
-          <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
-            Step One: Choose a Motor Type
-          </h1>
-          <div className="w-24" />
-        </div>
-      </nav>
-
       {/* Main Content */}
       <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
         {selectedCover === "THIRD_PARTY" && (
@@ -71,18 +65,22 @@ const SelectMotorType = ({ data }: Props) => {
                 PRIVATE
               </Button>
             </Card>
-            
+
             <div className="text-primary font-bold">
               <Select onValueChange={(value) => console.log(value)}>
                 <SelectTrigger className="border border-primary w-full p-4 rounded-md">
                   <SelectValue placeholder="COMMERCIAL" />
                 </SelectTrigger>
                 <SelectContent className="shadow-md border w-full text-white bg-primary">
-                  {
-                    commercialOptions.map((option) => (
-                      <SelectItem className="hover:bg-accent hover:text-primary px-4 py-2 cursor-pointer" key={option} value={option}>{option}</SelectItem>
-                    ))
-                  }
+                  {commercialOptions.map((option) => (
+                    <SelectItem
+                      className="hover:bg-accent hover:text-primary px-4 py-2 cursor-pointer"
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

@@ -1,14 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { useInsuranceStore } from "@/store/store";
 
 const VehicleDetails = () => {
   const router = useRouter();
+  const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
+  const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   const [form, setForm] = useState({
-    vehicleValue: "",
+    vehicleValue: vehicleValue,
     engineCapacity: "",
     vehicleNumber: "",
     chassisNumber: "",
@@ -17,7 +20,13 @@ const VehicleDetails = () => {
     year: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  useEffect(() => {
+    setCoverStep(4);
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -28,27 +37,10 @@ const VehicleDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] flex items-center justify-center px-4">
-      {/* navbar */}
-      <nav className="fixed top-0 left-0 right-0 bg-[#397397] text-white shadow-md z-50">
-        <div className="flex items-center justify-between px-4 md:px-16 h-16">
-          <button
-            onClick={() => router.back()}
-            className="hover:underline font-medium"
-          >
-            ← Go Back
-          </button>
-          <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
-            Step Four: Enter vehicle details
-          </h1>
-          <div className="w-24" />
-        </div>
-      </nav>
-
       <div className="w-full max-w-2xl bg-white shadow-2xl p-8 rounded-tl-[40px] rounded-br-[40px]">
         <h2 className="text-2xl md:text-3xl text-primary font-bold text-center mb-4">
           Vehicle Details
         </h2>
-        {/* <p className="text-center text-sm text-gray-600 mb-6">Enter the vehicles details</p> */}
 
         <form
           onSubmit={handleSubmit}

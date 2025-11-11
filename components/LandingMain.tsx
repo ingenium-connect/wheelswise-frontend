@@ -86,7 +86,7 @@ const LandingMain: React.FC = () => {
                   src={src}
                   alt={`Car ${index}`}
                   fill
-                  className="object-contain"
+                  className="object-contain w-full"
                 />
               </motion.div>
             ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/store/store";
 
@@ -10,6 +10,11 @@ const VehicleValue: React.FC = () => {
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
   const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
   const setVehicleValue = useInsuranceStore((state) => state.setVehicleValue);
+  const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
+  useEffect(() => {
+    setCoverStep(2);
+  }, []);
 
   const handleContinue = () => {
     if (
@@ -28,23 +33,6 @@ const VehicleValue: React.FC = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 bg-[#397397] text-white shadow-md z-50">
-        <div className="flex items-center justify-between px-4 md:px-16 h-16">
-          <button
-            onClick={() => router.back()}
-            className="hover:underline font-medium"
-          >
-            ← Go Back
-          </button>
-          <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
-            Step Two: Enter Motor Vehicle Value
-          </h1>
-          <div className="w-24" />
-        </div>
-      </nav>
-
-      {/* Card */}
       <div className="pt-24 pb-20 flex-grow flex justify-center items-center px-4">
         <div className="w-[384px] h-[192px] bg-white rounded-2xl shadow-md p-6 flex flex-col justify-center">
           {selectedMotorType && (

@@ -32,7 +32,10 @@ const MotorSubtype: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const vehicleValue = useInsuranceStore((state) => state.vehicleValue);
   const motorType = useInsuranceStore((state) => state.motorType);
-  const setVehicleSubType = useInsuranceStore((state) => state.setVehicleSubType)
+  const setVehicleSubType = useInsuranceStore(
+    (state) => state.setVehicleSubType
+  );
+  const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   useEffect(() => {
     const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${motorType?.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
@@ -50,6 +53,7 @@ const MotorSubtype: React.FC = () => {
     };
 
     fetchSubtypes();
+    setCoverStep(3);
   }, [motorType?.name, vehicleValue]);
 
   const handleSelect = (product: SubtypeItem) => {
@@ -59,23 +63,6 @@ const MotorSubtype: React.FC = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 bg-[#397397] text-white shadow-md z-50">
-        <div className="flex items-center justify-between px-4 md:px-16 h-16">
-          <button
-            onClick={() => router.back()}
-            className="hover:underline font-medium"
-          >
-            ← Go Back
-          </button>
-          <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-center">
-            Step Three: Choose Motor Subtype
-          </h1>
-          <div className="w-24" />
-        </div>
-      </nav>
-
-      {/* Main Content */}
       <div className="pt-24 pb-20 px-4 md:px-16 flex-grow">
         {loading ? (
           <p className="text-center text-gray-600">Loading motor subtypes...</p>
