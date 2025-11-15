@@ -1,6 +1,4 @@
-import VehicleValue from "@/components/value/VehicleValue";
-import { MotorType } from "@/types/data";
-import { stat } from "fs";
+import { MotorSubTypeItem, MotorType } from "@/types/data";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -9,16 +7,18 @@ type InsuranceStoreState = {
   cover: string | null;
   motorType: MotorType | null;
   vehicleValue: number;
-  motorSubtype: string | null;
+  motorSubtype: MotorSubTypeItem | null;
   coverStep: number;
+  tpoOption: string;
   // Actions
   selectCover: (coverType: string) => void;
   setMotorType: (type: MotorType) => void;
   setVehicleValue: (value: number) => void;
-  setVehicleSubType: (subtype: any) => void;
+  setVehicleSubType: (subtype: MotorSubTypeItem) => void;
   nextCoverStep: () => void;
   previousCoverStep: () => void;
   setCoverStep: (step: number) => void;
+  setTpoOption: (option: string) => void;
 };
 
 /**
@@ -33,6 +33,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       vehicleValue: 0,
       motorSubtype: null,
       coverStep: 0,
+      tpoOption: "",
 
       // Actions
       selectCover: (coverType) => set({ cover: coverType }),
@@ -43,6 +44,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       previousCoverStep: () =>
         set((state) => ({ coverStep: state.coverStep - 1 })),
       setCoverStep: (step) => set({ coverStep: step }),
+      setTpoOption: (option) => set({ tpoOption: option }),
     }),
     {
       name: "motor-insurance-details",

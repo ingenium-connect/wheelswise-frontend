@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MotorType, MotorTypesResponse } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
-import { Select } from "../ui/select";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@radix-ui/react-select";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 
@@ -21,30 +14,53 @@ type Props = {
 
 const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
+  const [selectedOption, setSelectedOption] = useState<string | undefined>(
+    undefined
+  );
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+  const setTpoOption = useInsuranceStore((state) => state.setTpoOption);
 
   useEffect(() => {
     setCoverStep(1);
   }, []);
 
-  const commercialOptions = [
-    "Own goods",
-    "General cartage",
-    "General cartage tankers",
-    "Motor Advantage",
-    "Special types",
-    "Psv private hire",
-    "Psv taxis",
-    "Contigent liability",
-    "Institutional vehicles",
-    "Driving school vehicles",
+  const commercialOptions: { value: string; enum: string }[] = [
+    { value: "Own goods", enum: "COMMERCIAL_OWN_GOODS" },
+    { value: "General cartage", enum: "COMMERCIAL_GENERAL_CARTAGE" },
+    { value: "General cartage tankers", enum: "GENERAL_CARTAGE_TANKERS" },
+    { value: "Motor Advantage", enum: "MOTOR_ADVANTAGE" },
+    { value: "Special types", enum: "COMMERCIAL_SPECIAL_TYPES" },
+    { value: "Psv private hire", enum: "PSV_PRIVATE_HIRE" },
+    { value: "Psv taxis", enum: "PSV_TAXIS" },
+    { value: "Contigent liability", enum: "CONTINGENT_LIABILITY" },
+    {
+      value: "Institutional vehicles",
+      enum: "COMMERCIAL_INSTITUTIONAL_VEHICLES",
+    },
+    {
+      value: "Driving school vehicles",
+      enum: "COMMERCIAL_DRIVING_SCHOOL_VEHICLES",
+    },
   ];
   const handleSelect = (type: MotorType) => {
-    // Store the selected motor type in localStorage or state management
     setMotorType(type);
     router.push("/vehicle-value");
+  };
+
+  const handleTPO = (tpoCategory: string) => {
+    setTpoOption(tpoCategory);
+    router.push("/motor-subtype");
+  };
+
+  const handleSelectComOption = (event: ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value && value !== "") {
+      setSelectedOption(value);
+      return;
+    }
+    setSelectedOption(undefined)
   };
 
   return (
@@ -52,8 +68,9 @@ const SelectMotorType = ({ data }: Props) => {
       {/* Main Content */}
       <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
         {selectedCover === "THIRD_PARTY" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,400px))] gap-4">
+            <Card className="p-4">
+              <p className="font-bold text-primary text-center">PRIVATE</p>
               <Image
                 src="https://wheelwise-files.s3.amazonaws.com/motortype@c7ef95d2-2413-4271-845a-806700a446e3"
                 alt="Private Motor"
@@ -61,29 +78,44 @@ const SelectMotorType = ({ data }: Props) => {
                 height={200}
                 className="object-contain p-4"
               />
-              <Button className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md">
-                PRIVATE
+              <Button
+                onClick={() => handleTPO("PRIVATE")}
+                className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
+              >
+                Select
               </Button>
             </Card>
 
-            <div className="text-primary font-bold">
-              <Select onValueChange={(value) => console.log(value)}>
-                <SelectTrigger className="border border-primary w-full p-4 rounded-md">
-                  <SelectValue placeholder="COMMERCIAL" />
-                </SelectTrigger>
-                <SelectContent className="shadow-md border w-full text-white bg-primary">
-                  {commercialOptions.map((option) => (
-                    <SelectItem
-                      className="hover:bg-accent hover:text-primary px-4 py-2 cursor-pointer"
-                      key={option}
-                      value={option}
-                    >
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Card className="p-4">
+              <p className="font-bold text-primary text-center">COMMERCIAL</p>
+              <Image
+                src="https://wheelwise-files.s3.amazonaws.com/motortype@c0e45828-06f2-44fa-a491-df12d50063e5"
+                alt="Commercial option"
+                width={400}
+                height={200}
+              ></Image>
+              <select
+                name="tpoCategory"
+                onChange={handleSelectComOption}
+                value={selectedOption}
+                className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
+              >
+                <option value="">Select commercial option</option>
+                {commercialOptions.map((option) => (
+                  <option key={option.enum} value={option.enum}>
+                    {option.value}
+                  </option>
+                ))}
+              </select>
+              {selectedOption && (
+                <Button
+                  onClick={() => handleTPO(selectedOption)}
+                  className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
+                >
+                  Continue
+                </Button>
+              )}
+            </Card>
           </div>
         )}
         {selectedCover === "COMPREHENSIVE" && (

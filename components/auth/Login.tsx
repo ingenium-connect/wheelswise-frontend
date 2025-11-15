@@ -166,7 +166,7 @@ const Login: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <Button type="submit" disabled={isLoading} className="w-full cursor-pointer">
                   {isLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
@@ -177,7 +177,7 @@ const Login: React.FC = () => {
           </Form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline">
+            <Link href="/signup" className="text-primary font-medium cursor-pointer hover:underline">
               Sign up
             </Link>
           </div>

@@ -5,40 +5,27 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { postHandler } from "@/utilities/api";
 import { useInsuranceStore } from "@/store/store";
-
-interface ProductRate {
-  rate: number;
-}
-
-interface UnderwriterProduct {
-  name: string;
-  description: string;
-  subtype: string;
-  premium_amount: {
-    one_time_payment: number;
-  };
-  tonnes: string[];
-}
-
-interface SubtypeItem {
-  underwriter_product: UnderwriterProduct;
-  product_rate: ProductRate;
-}
+import { MotorSubTypeItem } from "@/types/data";
 
 const MotorSubtype: React.FC = () => {
   const router = useRouter();
-  const [subtypes, setSubtypes] = useState<SubtypeItem[]>([]);
+  const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const vehicleValue = useInsuranceStore((state) => state.vehicleValue);
   const motorType = useInsuranceStore((state) => state.motorType);
+  const selectedCover = useInsuranceStore((state) => state.cover);
+  const tpoCategory = useInsuranceStore((state) => state.tpoOption);
   const setVehicleSubType = useInsuranceStore(
     (state) => state.setVehicleSubType
   );
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   useEffect(() => {
-    const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${motorType?.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
+    const API_URL =
+      selectedCover === "THIRD_PARTY"
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/PRIVATE?product_type=THIRD_PARTY&tpo_category=${tpoCategory}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${motorType?.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}`;
 
     const fetchSubtypes = async () => {
       try {
@@ -56,14 +43,14 @@ const MotorSubtype: React.FC = () => {
     setCoverStep(3);
   }, [motorType?.name, vehicleValue]);
 
-  const handleSelect = (product: SubtypeItem) => {
+  const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
     router.push("/vehicle-details");
   };
 
   return (
     <>
-      <div className="pt-24 pb-20 px-4 md:px-16 flex-grow">
+      <div className="pt-24 pb-20 px-4 flex-grow">
         {loading ? (
           <p className="text-center text-gray-600">Loading motor subtypes...</p>
         ) : error ? (
@@ -73,7 +60,7 @@ const MotorSubtype: React.FC = () => {
             No motor subtypes available.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(200px,400px))]">
             {subtypes.map((item, index) => {
               const product = item.underwriter_product;
               const rate = item.product_rate;
@@ -102,12 +89,12 @@ const MotorSubtype: React.FC = () => {
                         <strong>Premium:</strong> KES{" "}
                         {product.premium_amount?.one_time_payment.toLocaleString()}
                       </li>
-                      {product.tonnes?.length > 0 && (
+                      {/* {product.tonnes?.length > 0 && (
                         <li>
                           <strong>Tonnage:</strong> {product.tonnes.join(", ")}{" "}
                           tons
                         </li>
-                      )}
+                      )} */}
                     </ul>
                   </div>
 

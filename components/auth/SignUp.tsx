@@ -112,7 +112,7 @@ const Signup: React.FC = () => {
         </div>
 
         {/* Save Button */}
-        <Button type="submit" className="text-white transition">
+        <Button type="submit" className="text-white transition w-full cursor-pointer">
           Save
         </Button>
       </form>
