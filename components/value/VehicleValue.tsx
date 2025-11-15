@@ -33,7 +33,7 @@ const VehicleValue: React.FC = () => {
 
   return (
     <>
-      <div className="pt-24 pb-20 flex-grow flex justify-center items-center px-4">
+      <div className="flex-grow flex justify-center items-center px-4">
         <div className="w-[384px] h-[192px] bg-white rounded-2xl shadow-md p-6 flex flex-col justify-center">
           {selectedMotorType && (
             <div className="text-center text-gray-700 text-sm mb-3">

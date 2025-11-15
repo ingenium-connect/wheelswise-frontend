@@ -5,10 +5,16 @@ import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { useInsuranceStore } from "@/store/store";
 
-const VehicleDetails = () => {
+const VehicleDetails = ({
+  modelMakeMap,
+}: {
+  modelMakeMap: { make: string; models: string[] }[];
+}) => {
   const router = useRouter();
   const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
+  const motorSubType = useInsuranceStore((Store) => Store.motorSubtype)
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+  const [models, setModels] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     vehicleValue: vehicleValue,
@@ -28,6 +34,13 @@ const VehicleDetails = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "make") {
+      const modelMake = modelMakeMap.find(
+        (modelMake) => modelMake.make === e.target.value
+      );
+      const models = modelMake?.models ?? [];
+      setModels(models);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,15 +59,16 @@ const VehicleDetails = () => {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-          <input
-            type="number"
-            name="vehicleValue"
-            value={form.vehicleValue}
-            onChange={handleChange}
-            placeholder="Vehicle Value"
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
+          <div>
+            <label>Vehicle value</label>
+            <input
+              type="number"
+              name="vehicleValue"
+              value={form.vehicleValue}
+              readOnly
+              className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
+            />
+          </div>
 
           <input
             type="text"
@@ -94,21 +108,27 @@ const VehicleDetails = () => {
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           >
             <option value="">Select Make</option>
-            <option value="Nissan">Nissan</option>
-            <option value="Toyota">Toyota</option>
-            <option value="Mazda">Mazda</option>
-            <option value="Subaru">Subaru</option>
+            {modelMakeMap.map((modelMake) => (
+              <option value={modelMake.make} key={modelMake.make}>
+                {modelMake.make}
+              </option>
+            ))}
           </select>
 
-          <input
-            type="text"
+          <select
             name="model"
             value={form.model}
             onChange={handleChange}
-            placeholder="Vehicle Model"
             required
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
+          >
+            <option value="">Select Model</option>
+            {models.map((model) => (
+              <option value={model} key={model}>
+                {model}
+              </option>
+            ))}
+          </select>
 
           <select
             name="year"
@@ -118,7 +138,7 @@ const VehicleDetails = () => {
             className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
           >
             <option value="">Year of Manufacture</option>
-            {Array.from({ length: 30 }, (_, i) => {
+            {Array.from({ length: motorSubType?.underwriter_product.yom_range ?? 0 }, (_, i) => {
               const year = new Date().getFullYear() - i;
               return (
                 <option key={year} value={year}>
