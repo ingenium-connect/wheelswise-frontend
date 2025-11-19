@@ -17,14 +17,28 @@ const VehicleValue: React.FC = () => {
   }, []);
 
   const handleContinue = () => {
+    let isValid = true;
+
     if (
       !vehicleValue ||
       isNaN(Number(vehicleValue)) ||
       Number(vehicleValue) <= 0
     ) {
+      isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
-      return;
-    }
+    } 
+    // else if (motor_type === "PSV" && (!seating_capacity || Number(seating_capacity) <= 0)) {
+    //   isValid = false;
+    //   setError("Please enter a valid seating capacity.");
+    // } else if (
+    //   motor_type === "COMMERCIAL" &&
+    //   (!tonnage || Number(tonnage) <= 0)
+    // ) {
+    //   isValid = false;
+    //   setError("Please enter a valid tonnage.");
+    // }
+
+    if (!isValid) return;
 
     setError("");
 
