@@ -56,20 +56,14 @@ const SelectCoverType = ({ data }: Props) => {
     setCoverStep(0);
   }, []);
 
-  const handleSelect = (type: string) => {
+  const handleSelect = (type: string, path: string) => {
     selectCover(type);
-    router.push("/motor-type");
+
+    +router.push(`${path}/${type}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h2 className="text-4xl font-bold text-[#2e5e74]">Choose Your Cover</h2>
-        <p className="text-muted-foreground mt-2">
-          Select the motor insurance plan that best fits your needs.
-        </p>
-      </div>
-
+    <>
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {(data?.coverTypes ?? []).map((type) => {
           const mapping = CoverMappings[type.type];
@@ -100,7 +94,7 @@ const SelectCoverType = ({ data }: Props) => {
                 <Button
                   size="lg"
                   className="w-full bg-primary hover:bg-[#2e5e74] text-white font-semibold rounded-lg"
-                  onClick={() => handleSelect(type.type)}
+                  onClick={() => handleSelect(type.type, mapping.path)}
                 >
                   Select {type.name}
                 </Button>
@@ -115,7 +109,7 @@ const SelectCoverType = ({ data }: Props) => {
           Secure your vehicle with trusted coverage
         </Badge>
       </div>
-    </div>
+    </>
   );
 };
 

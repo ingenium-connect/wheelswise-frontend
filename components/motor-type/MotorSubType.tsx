@@ -7,7 +7,15 @@ import { postHandler } from "@/utilities/api";
 import { useInsuranceStore } from "@/store/store";
 import { MotorSubTypeItem } from "@/types/data";
 
-const MotorSubtype: React.FC = () => {
+type Props = {
+  motor_type: string | undefined;
+  product_type: string | undefined;
+};
+
+const MotorSubtype: React.FC<Props> = ({ product_type, motor_type }: Props) => {
+
+
+  
   const router = useRouter();
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
@@ -22,6 +30,28 @@ const MotorSubtype: React.FC = () => {
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   useEffect(() => {
+
+    // const BASE_URL = `${POLICY_ENDPOINT}/products/subtype/${motor_type}?product_type=${product_type}`;
+
+    // if (product_type === "COMPREHENSIVE") {
+    //   const urlString =
+    //     motor_type === "PSV"
+    //       ? `&seating_capacity=${seating_capacity}`
+    //       : motor_type === "COMMERCIAL"
+    //       ? `&tonnage=${tonnage}`
+    //       : "";
+    //   API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}&year_of_manufacture=2023${urlString}`;
+    // }
+ 
+    // const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
+    // if (product_type === "THIRD_PARTY") {
+    //   console.log(tpo_category, 'tpo_category')
+    //   const urlString = `&tpo_category=${tpo_category}`;
+    //   API_URL = `${BASE_URL}${urlString}`;
+    // }
+
+
+
     const API_URL =
       selectedCover === "THIRD_PARTY"
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/PRIVATE?product_type=THIRD_PARTY&tpo_category=${tpoCategory}`
