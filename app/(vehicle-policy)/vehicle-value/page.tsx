@@ -15,7 +15,7 @@ export default async function Page({
     { name: "Cover Type", href: "/cover-type", isActive: false },
     {
       name: "Motor Type",
-      href: `/motor-type/${product_type}`,
+      href: `/motor-type`,
       isActive: false,
     },
     { name: "Vehicle Value", href: "/vehicle-value", isActive: true },

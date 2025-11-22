@@ -1,12 +1,12 @@
 import SelectMotorType from "@/components/motor-type/MotorType";
 import { PageBreadCrumb } from "@/components/PageBreadCrumb";
-import { MotorType, MotorTypesResponse } from "@/types/data";
+import { MotorTypesResponse } from "@/types/data";
 import { retrieve } from "@/utilities/api-client";
 import { MOTOR_TYPES_ENDPOINT } from "@/utilities/endpoints";
 
 export const dynamic = "force-dynamic";
 
-export default async function MotorTypePage({params}: {params: Promise<{product_type: string}>}) {
+export default async function MotorTypePage() {
   const response = await retrieve<MotorTypesResponse>(
     MOTOR_TYPES_ENDPOINT,
     false
@@ -15,19 +15,6 @@ export default async function MotorTypePage({params}: {params: Promise<{product_
   if (response.error || !response.data) {
     return <div>Failed to load motor types.</div>;
   }
-
-  const {product_type} = await params;
-
-
-  const filteredResponse: MotorTypesResponse =
-    product_type === "THIRD_PARTY"
-      ? {
-          ...response.data,
-          motor_types: response.data.motor_types.filter((mt: MotorType) =>
-            ["PRIVATE", "COMMERCIAL"].includes(mt.name.toUpperCase())
-          ),
-        }
-      : response.data;
 
   const pages = [
     { name: "Home", href: "/", isActive: false },
@@ -43,7 +30,7 @@ export default async function MotorTypePage({params}: {params: Promise<{product_
           <h2 className="text-4xl font-bold text-[#2e5e74]">Step One</h2>
           <p className="text-muted-foreground mt-2">Choose a Motor Type</p>
         </div>
-        <SelectMotorType data={filteredResponse} />
+        <SelectMotorType data={response.data} />
       </section>
     </>
   );

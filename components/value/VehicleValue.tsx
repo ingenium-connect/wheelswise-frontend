@@ -3,14 +3,18 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/store/store";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
-const VehicleValue: React.FC = () => {
+const VehicleValue = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
   const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
   const setVehicleValue = useInsuranceStore((state) => state.setVehicleValue);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
+  const { seating_capacity, tonnage, setSeatingCapacity, setTonnage } =
+    useVehicleStore();
 
   useEffect(() => {
     setCoverStep(2);
@@ -25,18 +29,21 @@ const VehicleValue: React.FC = () => {
       Number(vehicleValue) <= 0
     ) {
       isValid = false;
+      isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
-    } 
-    // else if (motor_type === "PSV" && (!seating_capacity || Number(seating_capacity) <= 0)) {
-    //   isValid = false;
-    //   setError("Please enter a valid seating capacity.");
-    // } else if (
-    //   motor_type === "COMMERCIAL" &&
-    //   (!tonnage || Number(tonnage) <= 0)
-    // ) {
-    //   isValid = false;
-    //   setError("Please enter a valid tonnage.");
-    // }
+    } else if (
+      selectedMotorType?.name === "PSV" &&
+      (!seating_capacity || Number(seating_capacity) <= 0)
+    ) {
+      isValid = false;
+      setError("Please enter a valid seating capacity.");
+    } else if (
+      selectedMotorType?.name === "COMMERCIAL" &&
+      (!tonnage || Number(tonnage) <= 0)
+    ) {
+      isValid = false;
+      setError("Please enter a valid tonnage.");
+    }
 
     if (!isValid) return;
 
@@ -67,6 +74,36 @@ const VehicleValue: React.FC = () => {
               onChange={(e) => setVehicleValue(Number(e.target.value))}
               className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
             />
+
+            {/* Conditional Inputs */}
+            {selectedMotorType?.name === "PSV" && (
+              <div>
+                <label className="text-sm text-gray-700 mb-2 font-medium">
+                  Enter your vehicle capacity
+                </label>
+                <input
+                  type="number"
+                  placeholder="e.g. 800"
+                  value={seating_capacity}
+                  onChange={(e) => setSeatingCapacity(e.target.value)}
+                  className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
+                />
+              </div>
+            )}
+            {selectedMotorType?.name === "COMMERCIAL" && (
+              <div className="mt-2">
+                <label className="text-sm text-gray-700 mb-2 font-medium">
+                  Enter your vehicle tonnage
+                </label>
+                <input
+                  type="number"
+                  placeholder="e.g. 800"
+                  value={tonnage}
+                  onChange={(e) => setTonnage(e.target.value)}
+                  className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
+                />
+              </div>
+            )}
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
 
             <button

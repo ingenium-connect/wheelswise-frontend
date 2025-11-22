@@ -3,17 +3,28 @@ import { PageBreadCrumb } from "@/components/PageBreadCrumb";
 
 export const dynamic = "force-dynamic";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ motor_type?: string }>;
+}) {
+  const params = await searchParams;
+  const motor_type = params?.motor_type || "PRIVATE";
 
   const pages = [
     { name: "Home", href: "/", isActive: false },
     { name: "Cover Type", href: "/cover-type", isActive: false },
     {
       name: "Motor Type",
-      href: `/motor-type/`,
+      href: `/motor-type`,
       isActive: false,
     },
-    { name: "Motor Subtype", href: "/vehicle-value", isActive: true },
+    {
+      name: "Vehicle Value",
+      href: `/vehicle-value?motor_type=${motor_type}`,
+      isActive: false,
+    },
+    { name: "Motor Subtype", href: "/motor-subtype", isActive: true },
   ];
 
   return (
@@ -23,7 +34,7 @@ export default async function Page() {
         <h2 className="text-4xl font-bold text-[#2e5e74]">Step Three</h2>
         <p className="text-muted-foreground mt-2">Choose Motor Subtype</p>
       </div>
-      <MotorSubtype />
+      <MotorSubtype motor_type={motor_type} />
     </section>
   );
 }

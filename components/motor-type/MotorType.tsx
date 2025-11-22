@@ -10,15 +10,13 @@ import { Card } from "../ui/card";
 
 type Props = {
   data: MotorTypesResponse;
-  product_type: string | undefined;
 };
 
-const SelectMotorType = ({ data, product_type }: Props) => {
+const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
   );
-  const [selectedCategory, setCategory] = useState<string>("");
 
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
@@ -49,17 +47,6 @@ const SelectMotorType = ({ data, product_type }: Props) => {
   ];
   const handleSelect = (type: MotorType) => {
     setMotorType(type);
-    // let path = "/motor-subtype";
-    // if (product_type === "COMPREHENSIVE") {
-    //   path = "/vehicle-value";
-    // }
-
-    // if (product_type === "THIRD_PARTY") {
-    //   const category =
-    //     type.name.toLowerCase() === "private" ? "PRIVATE" : selectedCategory;
-    //   // setTpoCategory(category);
-    // }
-    // router.push(`${path}?product_type=${product_type}&motor_type=${type.name}`);
 
     router.push("/vehicle-value");
   };
@@ -75,6 +62,7 @@ const SelectMotorType = ({ data, product_type }: Props) => {
       setSelectedOption(value);
       return;
     }
+    setSelectedOption(undefined);
     setSelectedOption(undefined);
   };
 
