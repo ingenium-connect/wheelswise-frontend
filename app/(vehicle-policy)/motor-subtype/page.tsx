@@ -6,10 +6,11 @@ export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ motor_type?: string }>;
+  searchParams: Promise<{ motor_type?: string, product_type: string }>;
 }) {
   const params = await searchParams;
   const motor_type = params?.motor_type || "PRIVATE";
+  const product_type = params.product_type || "COMPREHENSIVE"
 
   const pages = [
     { name: "Home", href: "/", isActive: false },
@@ -24,7 +25,16 @@ export default async function Page({
       href: `/vehicle-value?motor_type=${motor_type}`,
       isActive: false,
     },
-    { name: "Motor Subtype", href: "/motor-subtype", isActive: true },
+    ...(product_type === "COMPREHENSIVE"
+      ? [
+          {
+            name: "Vehicle Value",
+            href: `/vehicle-value?product_type=${product_type}&motor_type=${motor_type}`,
+            isActive: false,
+          },
+        ]
+      : []),
+    { name: "Motor Subtype", href: "/vehicle-value", isActive: true },
   ];
 
   return (
