@@ -9,13 +9,9 @@ import { MotorSubTypeItem } from "@/types/data";
 
 type Props = {
   motor_type: string | undefined;
-  product_type: string | undefined;
 };
 
-const MotorSubtype: React.FC = () => {
-
-
-  
+const MotorSubtype: React.FC<Props> = ({ motor_type }: Props) => {
   const router = useRouter();
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
@@ -60,6 +56,7 @@ const MotorSubtype: React.FC = () => {
     const fetchSubtypes = async () => {
       try {
         const data = await postHandler(API_URL, false, {});
+        console.log(data, "motor subtypes response");
         setSubtypes(data.underwriter_products || []);
         setLoading(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

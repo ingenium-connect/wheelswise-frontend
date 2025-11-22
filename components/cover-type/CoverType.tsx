@@ -59,7 +59,7 @@ const SelectCoverType = ({ data }: Props) => {
   const handleSelect = (type: string, path: string) => {
     selectCover(type);
 
-    +router.push(`${path}/${type}`);
+    router.push(`${path}`);
   };
 
   return (
