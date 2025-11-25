@@ -19,18 +19,20 @@ export function PageBreadCrumb({
       <Breadcrumb>
         <BreadcrumbList>
           {pages.map((page, index) => (
-            <BreadcrumbItem key={page.href}>
+            <div key={page.href}>
               {!page.isActive ? (
-                <>
-                  <BreadcrumbLink asChild>
-                    <Link href={page.href}>{page.name}</Link>
-                  </BreadcrumbLink>
+                <div className="flex items-center gap-1">
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href={page.href}>{page.name}</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
                   {index < pages.length - 1 && <BreadcrumbSeparator />}
-                </>
+                </div>
               ) : (
                 <BreadcrumbPage>{page.name}</BreadcrumbPage>
               )}
-            </BreadcrumbItem>
+            </div>
           ))}
         </BreadcrumbList>
       </Breadcrumb>

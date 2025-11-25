@@ -4,7 +4,7 @@ import VehicleValue from "@/components/value/VehicleValue";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { product_type?: string; motor_type?: string };
+  searchParams: Promise<{ product_type?: string; motor_type?: string }>;
 }) {
   const params = await searchParams;
   const product_type = params?.product_type || "COMPREHENSIVE";
@@ -30,7 +30,7 @@ export default async function Page({
             Enter Motor Vehicle Value
           </p>
         </div>
-        <VehicleValue product_type={product_type} motor_type={motor_type} />
+        <VehicleValue />
       </section>
     </>
   );
