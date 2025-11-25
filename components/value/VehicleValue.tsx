@@ -14,7 +14,7 @@ const VehicleValue: React.FC = () => {
 
   useEffect(() => {
     setCoverStep(2);
-  }, []);
+  }, [setCoverStep]);
 
   const handleContinue = () => {
     let isValid = true;

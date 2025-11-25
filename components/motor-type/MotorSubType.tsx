@@ -12,7 +12,7 @@ type Props = {
   product_type: string | undefined;
 };
 
-const MotorSubtype: React.FC<Props> = ({ product_type, motor_type }: Props) => {
+const MotorSubtype: React.FC = () => {
 
 
   

@@ -6,11 +6,7 @@ import { MOTOR_TYPES_ENDPOINT } from "@/utilities/endpoints";
 
 export const dynamic = "force-dynamic";
 
-export default async function MotorTypePage({
-  params,
-}: {
-  params: { product_type?: string };
-}) {
+export default async function MotorTypePage({params}: {params: Promise<{product_type: string}>}) {
   const response = await retrieve<MotorTypesResponse>(
     MOTOR_TYPES_ENDPOINT,
     false
@@ -20,10 +16,9 @@ export default async function MotorTypePage({
     return <div>Failed to load motor types.</div>;
   }
 
-  const paramsValues = await params;
-  const product_type = paramsValues.product_type || "COMPREHENSIVE";
+  const {product_type} = await params;
 
-  // Filter motor types if THIRD_PARTY
+
   const filteredResponse: MotorTypesResponse =
     product_type === "THIRD_PARTY"
       ? {
