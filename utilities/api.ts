@@ -57,11 +57,11 @@ export const apiHandler = async (url: string, requiresAuth: boolean = true) => {
 
 /**
  * Reusable function used to resolve data posting promise and handle errors
- * @param url URL endpoint
+ * @param ENDPOINT URL endpoint
  * @returns data fetch promise
  */
 export const postHandler = async (
-  url: string,
+  ENDPOINT: string,
   requiresAuth: boolean = true,
   payload: PayloadT,
   method: string = "POST"
@@ -70,6 +70,8 @@ export const postHandler = async (
 
   const authHeaderValue = requiresAuth ? `Bearer ${token}` : "";
   try {
+    const url = SERVER_URL + ENDPOINT;
+
     const response = await fetch(url, {
       method: method,
       cache: "no-cache",
@@ -155,7 +157,6 @@ export const getData = async (
   }
 };
 
-
 /**
  *
  * @returns list of specified data to support react query data fetch
@@ -177,10 +178,8 @@ export const postData = async (
 ) => {
   try {
     const requiresAuth = true;
-    const url = SERVER_URL + ENDPOINT;
-    return await postHandler(url, requiresAuth, payload, method);
+    return await postHandler(ENDPOINT, requiresAuth, payload, method);
   } catch (error) {
     return {};
   }
 };
-

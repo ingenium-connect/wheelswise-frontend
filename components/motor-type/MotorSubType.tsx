@@ -6,12 +6,15 @@ import { Button } from "../ui/button";
 import { postHandler } from "@/utilities/api";
 import { useInsuranceStore } from "@/store/store";
 import { MotorSubTypeItem } from "@/types/data";
+import { POLICY_ENDPOINT } from "@/utilities/endpoints";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
 type Props = {
   motor_type: string | undefined;
+  product_type: string | undefined;
 };
 
-const MotorSubtype: React.FC<Props> = ({ motor_type }: Props) => {
+const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const router = useRouter();
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
@@ -23,45 +26,43 @@ const MotorSubtype: React.FC<Props> = ({ motor_type }: Props) => {
   const setVehicleSubType = useInsuranceStore(
     (state) => state.setVehicleSubType
   );
+  const { seating_capacity, tonnage } = useVehicleStore();
+
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   useEffect(() => {
+    let API_URL = "";
 
-    // const BASE_URL = `${POLICY_ENDPOINT}/products/subtype/${motor_type}?product_type=${product_type}`;
+    const BASE_URL = `${POLICY_ENDPOINT}/products/subtype/${motorType?.name}?product_type=${product_type}`;
 
-    // if (product_type === "COMPREHENSIVE") {
-    //   const urlString =
-    //     motor_type === "PSV"
-    //       ? `&seating_capacity=${seating_capacity}`
-    //       : motor_type === "COMMERCIAL"
-    //       ? `&tonnage=${tonnage}`
-    //       : "";
-    //   API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}&year_of_manufacture=2023${urlString}`;
-    // }
- 
-    // const API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${selectedMotorType.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}&year_of_manufacture=2023`;
-    // if (product_type === "THIRD_PARTY") {
-    //   console.log(tpo_category, 'tpo_category')
-    //   const urlString = `&tpo_category=${tpo_category}`;
-    //   API_URL = `${BASE_URL}${urlString}`;
-    // }
+    if (product_type === "COMPREHENSIVE" && motorType?.name) {
+      const urlString =
+        motor_type === "PSV"
+          ? `seating_capacity=${seating_capacity}`
+          : ["COMMERCIAL", "PRIME COMMERCIAL VEHICLES"].includes(motorType.name)
+          ? `tonnage=${tonnage}`
+          : "";
+      API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}&${urlString}`;
+    }
 
-
-
-    const API_URL =
-      selectedCover === "THIRD_PARTY"
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/PRIVATE?product_type=THIRD_PARTY&tpo_category=${tpoCategory}`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/policies/products/subtype/${motorType?.name}?product_type=COMPREHENSIVE&vehicle_value=${vehicleValue}`;
+    if (selectedCover === "THIRD_PARTY") {
+      const urlString = `&tpo_category=${tpoCategory}`;
+      API_URL = `${BASE_URL}${urlString}`;
+    }
 
     const fetchSubtypes = async () => {
       try {
-        const data = await postHandler(API_URL, false, {});
-        console.log(data, "motor subtypes response");
+        const data = await postHandler(API_URL, false, {
+          additional_benefits: [],
+        });
+
         setSubtypes(data.underwriter_products || []);
-        setLoading(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        setError(err);
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      } finally {
         setLoading(false);
       }
     };
@@ -116,12 +117,6 @@ const MotorSubtype: React.FC<Props> = ({ motor_type }: Props) => {
                         <strong>Premium:</strong> KES{" "}
                         {product.premium_amount?.one_time_payment.toLocaleString()}
                       </li>
-                      {/* {product.tonnes?.length > 0 && (
-                        <li>
-                          <strong>Tonnage:</strong> {product.tonnes.join(", ")}{" "}
-                          tons
-                        </li>
-                      )} */}
                     </ul>
                   </div>
 

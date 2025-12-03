@@ -48,12 +48,16 @@ const SelectMotorType = ({ data }: Props) => {
   const handleSelect = (type: MotorType) => {
     setMotorType(type);
 
-    router.push("/vehicle-value");
+    router.push(
+      `/vehicle-value?product_type=${selectedCover}&motor_type=${type.name}`
+    );
   };
 
   const handleTPO = (tpoCategory: string) => {
     setTpoOption(tpoCategory);
-    router.push("/motor-subtype");
+    router.push(
+      `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}`
+    );
   };
 
   const handleSelectComOption = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -62,7 +66,6 @@ const SelectMotorType = ({ data }: Props) => {
       setSelectedOption(value);
       return;
     }
-    setSelectedOption(undefined);
     setSelectedOption(undefined);
   };
 
