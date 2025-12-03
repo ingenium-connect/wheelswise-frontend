@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/store/store";
 import { useVehicleStore } from "@/stores/vehicleStore";
 
-const VehicleValue = () => {
+type Props = {
+  motor_type: string | undefined;
+  product_type: string | undefined;
+};
+
+const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const router = useRouter();
   const [error, setError] = useState("");
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
@@ -29,7 +34,6 @@ const VehicleValue = () => {
       Number(vehicleValue) <= 0
     ) {
       isValid = false;
-      isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
     } else if (
       selectedMotorType?.name === "PSV" &&
@@ -49,7 +53,9 @@ const VehicleValue = () => {
 
     setError("");
 
-    router.push("/motor-subtype");
+    router.push(
+      `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`
+    );
   };
 
   return (
@@ -83,27 +89,30 @@ const VehicleValue = () => {
                 </label>
                 <input
                   type="number"
-                  placeholder="e.g. 800"
+                  placeholder="e.g. 14"
                   value={seating_capacity}
                   onChange={(e) => setSeatingCapacity(e.target.value)}
                   className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
                 />
               </div>
             )}
-            {selectedMotorType?.name === "COMMERCIAL" && (
-              <div className="mt-2">
-                <label className="text-sm text-gray-700 mb-2 font-medium">
-                  Enter your vehicle tonnage
-                </label>
-                <input
-                  type="number"
-                  placeholder="e.g. 800"
-                  value={tonnage}
-                  onChange={(e) => setTonnage(e.target.value)}
-                  className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
-                />
-              </div>
-            )}
+            {selectedMotorType?.name &&
+              ["COMMERCIAL", "PRIME COMMERCIAL VEHICLES"].includes(
+                selectedMotorType.name
+              ) && (
+                <div className="mt-2">
+                  <label className="text-sm text-gray-700 mb-2 font-medium">
+                    Enter your vehicle tonnage
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 800"
+                    value={tonnage}
+                    onChange={(e) => setTonnage(e.target.value)}
+                    className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
+                  />
+                </div>
+              )}
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
 
             <button

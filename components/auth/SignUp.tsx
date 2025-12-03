@@ -36,7 +36,7 @@ const Signup: React.FC = () => {
 
     console.log("Saving step data:", form);
     setError("");
-    router.push("/next-step");
+    router.push("/otp-verify");
   };
 
   return (

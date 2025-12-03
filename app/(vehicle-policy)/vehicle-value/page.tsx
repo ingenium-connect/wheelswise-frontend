@@ -15,7 +15,7 @@ export default async function Page({
     { name: "Cover Type", href: "/cover-type", isActive: false },
     {
       name: "Motor Type",
-      href: `/motor-type`,
+      href: `/motor-type/${product_type}`,
       isActive: false,
     },
     { name: "Vehicle Value", href: "/vehicle-value", isActive: true },
@@ -30,7 +30,7 @@ export default async function Page({
             Enter Motor Vehicle Value
           </p>
         </div>
-        <VehicleValue />
+        <VehicleValue product_type={product_type} motor_type={motor_type} />
       </section>
     </>
   );
