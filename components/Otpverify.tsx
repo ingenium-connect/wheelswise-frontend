@@ -1,60 +1,61 @@
 "use client";
 
-import React, {
-  useRef,
-  useState,
-  FormEvent,
-  ClipboardEvent,
-  KeyboardEvent,
-} from "react";
-import StepNav from "./StepNav";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+
+// Optional – tiny shake animation
+const shakeClass =
+  "animate-[shake_0.3s_ease-in-out] @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}";
+
 const OtpVerify: React.FC = () => {
   const router = useRouter();
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (value: string, index: number) => {
-    if (!/^[0-9]?$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+  // Resend timer
+  const [timer, setTimer] = useState(60);
+  const [allowResend, setAllowResend] = useState(false);
 
-    if (value && index < otp.length - 1) {
-      inputRefs.current[index + 1]?.focus();
+  // Shake animation state
+  const [shake, setShake] = useState(false);
+
+  useEffect(() => {
+    if (timer === 0) {
+      setAllowResend(true);
+      return;
     }
-  };
 
-  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
-    const pasteData = e.clipboardData.getData("text").replace(/\D/g, "");
-    if (pasteData.length === 6) {
-      const pasteArray = pasteData.split("").slice(0, 6);
-      setOtp(pasteArray);
-      pasteArray.forEach((digit, i) => {
-        if (inputRefs.current[i]) {
-          inputRefs.current[i]!.value = digit;
-        }
-      });
-      inputRefs.current[5]?.focus();
-    }
-  };
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const resendOtp = () => {
+    setAllowResend(false);
+    setTimer(60);
+    console.log("Resend OTP");
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const enteredOtp = otp.join("");
 
-    if (enteredOtp.length < 6) {
+    if (otp.length < 6) {
       setError("Please enter all 6 digits.");
+
+      // Trigger shake animation
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
+
       return;
     }
 
@@ -67,19 +68,21 @@ const OtpVerify: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ otp: enteredOtp }),
+        body: JSON.stringify({ otp }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        console.log("OTP verified:", result);
-        router.push("/"); // ✅ fixed redirect
+        router.push("/");
       } else {
         setError(result.message || "Invalid OTP");
+
+        // Trigger shake animation for invalid OTP
+        setShake(true);
+        setTimeout(() => setShake(false), 300);
       }
     } catch (err) {
-      console.error("Error verifying OTP:", err);
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -87,12 +90,9 @@ const OtpVerify: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3]">
-      <StepNav />
-
+    <div className="">
       <div className="flex-grow flex items-center justify-center px-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-          {/* Heading */}
           <h2 className="text-2xl md:text-3xl font-extrabold text-center text-primary mb-2">
             OTP Verification
           </h2>
@@ -101,40 +101,73 @@ const OtpVerify: React.FC = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex justify-between gap-2" onPaste={handlePaste}>
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  ref={(el) => {
-                    inputRefs.current[index] = el;
-                  }}
-                  value={digit}
-                  onChange={(e) => handleChange(e.target.value, index)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-12 h-12 text-center text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                />
-              ))}
+            <div className={`flex justify-center ${shake ? shakeClass : ""}`}>
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(val) => {
+                  setOtp(val);
+                  if (error) setError("");
+                }}
+              >
+                <InputOTPGroup>
+                  {[0, 1, 2].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+
+                <InputOTPGroup>
+                  {[3, 4, 5].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
             </div>
 
             {error && (
               <p className="text-center text-red-600 text-sm">{error}</p>
             )}
 
-            <Button type="submit" className="text-white transition">
-              {loading ? "Verifying..." : "Verify"}
+            {/* Button skeleton loading */}
+            <Button
+              type="submit"
+              className="w-full text-white"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="animate-pulse flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                </div>
+              ) : (
+                "Verify"
+              )}
             </Button>
           </form>
 
-          <p className="text-sm text-center text-gray-600 mt-6">
+          {/* Resend Timer */}
+          <p className="text-sm text-center text-gray-600 mt-4">
             Didn’t receive code?{" "}
+            {allowResend ? (
+              <span
+                className="text-blue-700 font-medium cursor-pointer hover:underline"
+                onClick={resendOtp}
+              >
+                Resend
+              </span>
+            ) : (
+              <span className="text-gray-400">Resend in {timer}s</span>
+            )}
+          </p>
+
+          {/* Alternative verification */}
+          <p className="text-center mt-4 text-sm">
             <span
-              className="text-blue-700 font-medium cursor-pointer hover:underline"
-              onClick={() => console.log("Resend OTP")}
+              className="text-primary cursor-pointer hover:underline"
+              onClick={() => router.push("/verify-email")}
             >
-              Resend
+              Verify using Email instead
             </span>
           </p>
         </div>

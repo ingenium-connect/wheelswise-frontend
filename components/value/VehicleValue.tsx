@@ -5,6 +5,18 @@ import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/store/store";
 import { useVehicleStore } from "@/stores/vehicleStore";
 
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+
 type Props = {
   motor_type: string | undefined;
   product_type: string | undefined;
@@ -60,59 +72,49 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
 
   return (
     <>
-      <div className="flex-grow flex justify-center items-center px-4">
-        <div className="w-[384px] h-[192px] bg-white rounded-2xl shadow-md p-6 flex flex-col justify-center">
-          {selectedMotorType && (
-            <div className="text-center text-gray-700 text-sm mb-3">
-              Selected: <strong>{selectedMotorType.name}</strong>
-            </div>
-          )}
+      <div className="w-full">
+        <Card>
+          <CardContent>
+            <FieldGroup>
+              <FieldSet>
+                <FieldLegend>Vehicle Value</FieldLegend>
+                <FieldDescription>
+                  {selectedMotorType && (
+                    <span className="text-center text-gray-700 text-sm mb-3">
+                      Selected: <strong>{selectedMotorType.name}</strong>
+                    </span>
+                  )}
+                </FieldDescription>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="vehicleValue">
+                      Vehicle Value
+                    </FieldLabel>
+                    <Input
+                      id="vehicleValue"
+                      type="number"
+                      placeholder="e.g. 800000"
+                      defaultValue={vehicleValue}
+                      onChange={(e) => setVehicleValue(Number(e.target.value))}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="seatingCapacity">
+                      Seating Capacity
+                    </FieldLabel>
+                    <Input
+                      id="seatingCapacity"
+                      type="number"
+                      placeholder="e.g. 14"
+                      value={seating_capacity}
+                      onChange={(e) => setSeatingCapacity(e.target.value)}
+                      required
+                    />
+                  </Field>
+                </FieldGroup>
+              </FieldSet>
+            </FieldGroup>
 
-          {/* Input Group */}
-          <div className="flex flex-col items-center">
-            <label className="text-sm text-gray-700 mb-2 font-medium">
-              Enter your vehicle value
-            </label>
-            <input
-              type="number"
-              placeholder="e.g. 800000"
-              defaultValue={vehicleValue}
-              onChange={(e) => setVehicleValue(Number(e.target.value))}
-              className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
-            />
-
-            {/* Conditional Inputs */}
-            {selectedMotorType?.name === "PSV" && (
-              <div>
-                <label className="text-sm text-gray-700 mb-2 font-medium">
-                  Enter your vehicle capacity
-                </label>
-                <input
-                  type="number"
-                  placeholder="e.g. 14"
-                  value={seating_capacity}
-                  onChange={(e) => setSeatingCapacity(e.target.value)}
-                  className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
-                />
-              </div>
-            )}
-            {selectedMotorType?.name &&
-              ["COMMERCIAL", "PRIME COMMERCIAL VEHICLES"].includes(
-                selectedMotorType.name
-              ) && (
-                <div className="mt-2">
-                  <label className="text-sm text-gray-700 mb-2 font-medium">
-                    Enter your vehicle tonnage
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 800"
-                    value={tonnage}
-                    onChange={(e) => setTonnage(e.target.value)}
-                    className="border rounded-lg px-4 py-2 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#397397]"
-                  />
-                </div>
-              )}
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
 
             <button
@@ -121,8 +123,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
             >
               Continue
             </button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );

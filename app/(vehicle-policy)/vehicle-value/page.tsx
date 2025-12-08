@@ -30,7 +30,11 @@ export default async function Page({
             Enter Motor Vehicle Value
           </p>
         </div>
-        <VehicleValue product_type={product_type} motor_type={motor_type} />
+        <div className="flex-grow flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-md">
+            <VehicleValue product_type={product_type} motor_type={motor_type} />
+          </div>
+        </div>
       </section>
     </>
   );
