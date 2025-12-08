@@ -1,19 +1,39 @@
 "use client";
-
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import { useInsuranceStore } from "@/store/store";
 
-const VehicleDetails = ({
-  modelMakeMap,
-}: {
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
+import { Card, CardContent } from "./ui/card";
+
+type Props = {
+  motor_type: string | undefined;
+  product_type: string | undefined;
   modelMakeMap: { make: string; models: string[] }[];
-}) => {
+};
+
+const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const router = useRouter();
   const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
-  const motorSubType = useInsuranceStore((Store) => Store.motorSubtype)
+  const motorSubType = useInsuranceStore((store) => store.motorSubtype);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
   const [models, setModels] = useState<string[]>([]);
 
   const [form, setForm] = useState({
@@ -34,127 +54,182 @@ const VehicleDetails = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+
+    // update model list when make changes
     if (e.target.name === "make") {
-      const modelMake = modelMakeMap.find(
-        (modelMake) => modelMake.make === e.target.value
-      );
-      const models = modelMake?.models ?? [];
-      setModels(models);
+      const modelMake = modelMakeMap.find((m) => m.make === e.target.value);
+      setModels(modelMake?.models ?? []);
     }
+  };
+
+  // shadcn Select handler
+  const handleSelectChange = (name: string, value: string) => {
+    const syntheticEvent = {
+      target: { name, value },
+    } as React.ChangeEvent<HTMLSelectElement>;
+    handleChange(syntheticEvent);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/personal-details");
+    router.push(
+      `/personal-details?product_type=${product_type}&motor_type=${motor_type}`
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl bg-white shadow-2xl p-8 rounded-tl-[40px] rounded-br-[40px]">
-        <h2 className="text-2xl md:text-3xl text-primary font-bold text-center mb-4">
-          Vehicle Details
-        </h2>
+    <div className="w-full">
+      <Card>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <FieldSet>
+                <FieldLegend>Vehicle Details</FieldLegend>
+                <FieldDescription>
+                  We need your vehicle details.
+                </FieldDescription>
+                <FieldGroup>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="vehicleValue">
+                        Vehicle Value
+                      </FieldLabel>
+                      <Input
+                        id="vehicleValue"
+                        name="vehicleValue"
+                        value={form.vehicleValue}
+                        readOnly
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="engineCapacity">
+                        Engine Capacity
+                      </FieldLabel>
+                      <Input
+                        id="engineCapacity"
+                        type="text"
+                        name="engineCapacity"
+                        value={form.engineCapacity}
+                        onChange={handleChange}
+                        placeholder="Enter Engine cc e.g. 1800CC"
+                        required
+                      />
+                    </Field>
+                  </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          <div>
-            <label>Vehicle value</label>
-            <input
-              type="number"
-              name="vehicleValue"
-              value={form.vehicleValue}
-              readOnly
-              className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-            />
-          </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="vehicleNumber">
+                        Vehicle Number
+                      </FieldLabel>
+                      <Input
+                        id="vehicleNumber"
+                        type="text"
+                        name="vehicleNumber"
+                        value={form.vehicleNumber}
+                        onChange={handleChange}
+                        placeholder="Vehicle Number"
+                        required
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="chassisNumber">
+                        Chassis Number
+                      </FieldLabel>
+                      <Input
+                        id="chassisNumber"
+                        type="text"
+                        name="chassisNumber"
+                        value={form.chassisNumber}
+                        onChange={handleChange}
+                        placeholder="Chassis Number"
+                        required
+                      />
+                    </Field>
+                  </div>
 
-          <input
-            type="text"
-            name="engineCapacity"
-            value={form.engineCapacity}
-            onChange={handleChange}
-            placeholder="Enter the Engine cc e.g. 1800CC"
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
-
-          <input
-            type="text"
-            name="vehicleNumber"
-            value={form.vehicleNumber}
-            onChange={handleChange}
-            placeholder="Vehicle Number"
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
-
-          <input
-            type="text"
-            name="chassisNumber"
-            value={form.chassisNumber}
-            onChange={handleChange}
-            placeholder="Chassis Number"
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          />
-
-          <select
-            name="make"
-            value={form.make}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          >
-            <option value="">Select Make</option>
-            {modelMakeMap.map((modelMake) => (
-              <option value={modelMake.make} key={modelMake.make}>
-                {modelMake.make}
-              </option>
-            ))}
-          </select>
-
-          <select
-            name="model"
-            value={form.model}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          >
-            <option value="">Select Model</option>
-            {models.map((model) => (
-              <option value={model} key={model}>
-                {model}
-              </option>
-            ))}
-          </select>
-
-          <select
-            name="year"
-            value={form.year}
-            onChange={handleChange}
-            required
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
-          >
-            <option value="">Year of Manufacture</option>
-            {Array.from({ length: motorSubType?.underwriter_product.yom_range ?? 0 }, (_, i) => {
-              const year = new Date().getFullYear() - i;
-              return (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              );
-            })}
-          </select>
-
-          <div className="md:col-span-2 flex justify-end">
-            <Button type="submit" className="text-white transition">
-              Next
-            </Button>
-          </div>
-        </form>
-      </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="vehicleMake">Select Make</FieldLabel>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("make", v)}
+                        value={form.make}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Make" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {modelMakeMap.map((m) => (
+                            <SelectItem key={m.make} value={m.make}>
+                              {m.make}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="vehicleModel">
+                        Vehicle Model
+                      </FieldLabel>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("model", v)}
+                        value={form.model}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {models.map((model) => (
+                            <SelectItem key={model} value={model}>
+                              {model}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="yearOfManufacture">
+                        Year of Manufacture
+                      </FieldLabel>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("year", v)}
+                        value={form.year}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Year of manufacture" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from(
+                            {
+                              length:
+                                motorSubType?.underwriter_product.yom_range ??
+                                0,
+                            },
+                            (_, i) => {
+                              const year = new Date().getFullYear() - i;
+                              return (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
+                                </SelectItem>
+                              );
+                            }
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </div>
+                  <Field orientation="horizontal">
+                    <Button type="submit">Submit</Button>
+                    <Button variant="outline" type="button">
+                      Cancel
+                    </Button>
+                  </Field>
+                </FieldGroup>
+              </FieldSet>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
