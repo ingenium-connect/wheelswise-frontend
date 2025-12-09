@@ -60,7 +60,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
               <FieldSet>
                 <FieldLegend>Personal Details</FieldLegend>
                 <FieldDescription>
-                  We need your personal details.
+                  Please provide your personal details.
                 </FieldDescription>
                 <FieldGroup>
                   <div className="grid grid-cols-2 gap-4">

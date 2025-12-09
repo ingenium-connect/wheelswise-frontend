@@ -86,7 +86,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
               <FieldSet>
                 <FieldLegend>Vehicle Details</FieldLegend>
                 <FieldDescription>
-                  We need your vehicle details.
+                  Please provide your vehicle details.
                 </FieldDescription>
                 <FieldGroup>
                   <div className="grid grid-cols-2 gap-4">
