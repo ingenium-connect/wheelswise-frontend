@@ -21,6 +21,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
+import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
 
 type Props = {
   motor_type: string | undefined;
@@ -30,6 +31,7 @@ type Props = {
 
 const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const router = useRouter();
+  const { setVehicleDetails } = useVehicleDetailsStore();
   const vehicleValue = useInsuranceStore((store) => store.vehicleValue);
   const motorSubType = useInsuranceStore((store) => store.motorSubtype);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
@@ -62,7 +64,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     }
   };
 
-  // shadcn Select handler
   const handleSelectChange = (name: string, value: string) => {
     const syntheticEvent = {
       target: { name, value },
@@ -72,6 +73,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    setVehicleDetails({ ...form });
+
     router.push(
       `/personal-details?product_type=${product_type}&motor_type=${motor_type}`
     );

@@ -9,3 +9,7 @@ export const MOTOR_TYPES_ENDPOINT = "/motor-type";
 export const POLICY_ENDPOINT = "/policies";
 export const PRODUCT_RATE_ENDPOINT = "/product-rate";
 export const MOTOR_SUBTYPE_ENDPOINT = "/policies/products/subtype";
+
+export const OTP_VERIFY_ENDPOINT = "/otp";
+export const REGISTER_VEHICLE_ENDPOINT = "/vehicle/new";
+export const USER_REGISTRATION_ENDPOINT = "/users/register";

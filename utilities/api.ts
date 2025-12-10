@@ -105,6 +105,55 @@ export const postHandler = async (
 };
 
 /**
+ * Function used to register a vehicle
+ * @param ENDPOINT endpoint URL
+ * @param token token string returned after user registration
+ * @param payload vehicle registration payload
+ * @returns data fetch promise
+ */
+export const handleRegisterVehicle = async (
+  ENDPOINT: string,
+  token: string,
+  payload: PayloadT
+) => {
+  const authHeaderValue = `Bearer ${token}`;
+  try {
+    const url = SERVER_URL + ENDPOINT;
+
+    const response = await fetch(url, {
+      method: "POST",
+      cache: "no-cache",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeaderValue,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    console.log("Vehicle Registration Response:", data);
+
+    if (response.status === 401) {
+      toast.error("Unauthorized access", {
+        description: "You are not authorized to access this service.",
+      });
+    }
+
+    if (!response.ok) {
+      toast.error("Request failed", {
+        description: `Failed to fetch data: ${response?.status} ${response?.statusText}`,
+      });
+      throw new Error(
+        `Failed to fetch data: ${response?.status} ${response?.statusText}`
+      );
+    }
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+/**
  * AUTH ENDPOINTS
  */
 /**
