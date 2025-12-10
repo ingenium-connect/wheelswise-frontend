@@ -15,6 +15,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
+import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 
 type Props = {
   motor_type: string | undefined;
@@ -22,6 +23,7 @@ type Props = {
 };
 
 const PersonalDetails = ({ motor_type, product_type }: Props) => {
+  const { setPersonalDetails } = usePersonalDetailsStore();
   const router = useRouter();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
@@ -46,6 +48,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setPersonalDetails({ ...form });
     router.push(
       `/signup?product_type=${product_type}&motor_type=${motor_type}`
     );

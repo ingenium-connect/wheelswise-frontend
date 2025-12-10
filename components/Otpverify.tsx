@@ -9,12 +9,17 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { postHandler } from "@/utilities/api";
+import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
+import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 
 // Optional – tiny shake animation
 const shakeClass =
   "animate-[shake_0.3s_ease-in-out] @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}";
 
 const OtpVerify: React.FC = () => {
+  const { personalDetails } = usePersonalDetailsStore();
+
   const router = useRouter();
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -40,10 +45,28 @@ const OtpVerify: React.FC = () => {
     return () => clearInterval(interval);
   }, [timer]);
 
+  useEffect(() => {
+    const fetchSubtypes = async () => {
+      try {
+        const data = await postHandler(OTP_VERIFY_ENDPOINT, false, {
+          msisdn: personalDetails.phoneNumber,
+          user_type: "COMPREHENSIVE_CUSTOMER",
+        });
+        console.log("OTP sent response:", data);
+      } catch (err: any) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSubtypes();
+  }, []);
+
   const resendOtp = () => {
     setAllowResend(false);
     setTimer(60);
-    console.log("Resend OTP");
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -63,20 +86,25 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch("/otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ otp }),
-      });
+      const payload = {
+        msisdn: personalDetails.phoneNumber,
+        user_type: "COMPREHENSIVE_CUSTOMER",
+        otp: otp,
+      };
 
-      const result = await response.json();
+      const response: any = await postHandler(
+        OTP_VERIFY_ENDPOINT,
+        false,
+        payload,
+        "PATCH"
+      );
 
-      if (response.ok) {
+      // console.log("OTP Verification Response:", response);
+
+      if (response) {
         router.push("/");
       } else {
-        setError(result.message || "Invalid OTP");
+        setError("Invalid OTP");
 
         // Trigger shake animation for invalid OTP
         setShake(true);
@@ -100,76 +128,86 @@ const OtpVerify: React.FC = () => {
             Enter the 6-digit code sent to your phone number
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className={`flex justify-center ${shake ? shakeClass : ""}`}>
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={(val) => {
-                  setOtp(val);
-                  if (error) setError("");
-                }}
-              >
-                <InputOTPGroup>
-                  {[0, 1, 2].map((i) => (
-                    <InputOTPSlot key={i} index={i} />
-                  ))}
-                </InputOTPGroup>
+          {loading ? (
+            <p className="text-center text-gray-600">Loading...</p>
+          ) : error ? (
+            <p className="text-red-600 text-center">{error}</p>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div
+                  className={`flex justify-center ${shake ? shakeClass : ""}`}
+                >
+                  <InputOTP
+                    maxLength={6}
+                    value={otp}
+                    onChange={(val) => {
+                      setOtp(val);
+                      if (error) setError("");
+                    }}
+                  >
+                    <InputOTPGroup>
+                      {[0, 1, 2].map((i) => (
+                        <InputOTPSlot key={i} index={i} />
+                      ))}
+                    </InputOTPGroup>
 
-                <InputOTPGroup>
-                  {[3, 4, 5].map((i) => (
-                    <InputOTPSlot key={i} index={i} />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            {error && (
-              <p className="text-center text-red-600 text-sm">{error}</p>
-            )}
-
-            {/* Button skeleton loading */}
-            <Button
-              type="submit"
-              className="w-full text-white"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="animate-pulse flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
-                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
-                  <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                    <InputOTPGroup>
+                      {[3, 4, 5].map((i) => (
+                        <InputOTPSlot key={i} index={i} />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
                 </div>
-              ) : (
-                "Verify"
-              )}
-            </Button>
-          </form>
 
-          {/* Resend Timer */}
-          <p className="text-sm text-center text-gray-600 mt-4">
-            Didn’t receive code?{" "}
-            {allowResend ? (
-              <span
-                className="text-blue-700 font-medium cursor-pointer hover:underline"
-                onClick={resendOtp}
-              >
-                Resend
-              </span>
-            ) : (
-              <span className="text-gray-400">Resend in {timer}s</span>
-            )}
-          </p>
+                {error && (
+                  <p className="text-center text-red-600 text-sm">{error}</p>
+                )}
 
-          {/* Alternative verification */}
-          <p className="text-center mt-4 text-sm">
-            <span
-              className="text-primary cursor-pointer hover:underline"
-              onClick={() => router.push("/verify-email")}
-            >
-              Verify using Email instead
-            </span>
-          </p>
+                {/* Button skeleton loading */}
+                <Button
+                  type="submit"
+                  className="w-full text-white"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="animate-pulse flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
+                    </div>
+                  ) : (
+                    "Verify"
+                  )}
+                </Button>
+              </form>
+
+              {/* Resend Timer */}
+              <p className="text-sm text-center text-gray-600 mt-4">
+                Didn’t receive code?{" "}
+                {allowResend ? (
+                  <span
+                    className="text-blue-700 font-medium cursor-pointer hover:underline"
+                    onClick={resendOtp}
+                  >
+                    Resend
+                  </span>
+                ) : (
+                  <span className="text-gray-400">Resend in {timer}s</span>
+                )}
+              </p>
+
+              {/* Alternative verification */}
+              <p className="text-center mt-4 text-sm">
+                <span
+                  className="text-primary cursor-pointer hover:underline"
+                  onClick={() => router.push("/verify-email")}
+                >
+                  Verify using Email instead
+                </span>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

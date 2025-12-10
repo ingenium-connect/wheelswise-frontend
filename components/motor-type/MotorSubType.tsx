@@ -55,7 +55,6 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
         const data = await postHandler(API_URL, false, {
           additional_benefits: [],
         });
-
         setSubtypes(data.underwriter_products || []);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
@@ -73,7 +72,9 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
-    router.push(`/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`);
+    router.push(
+      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`
+    );
   };
 
   return (
