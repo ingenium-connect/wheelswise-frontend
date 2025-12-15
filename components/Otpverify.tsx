@@ -53,7 +53,7 @@ const OtpVerify: React.FC = () => {
           user_type: "COMPREHENSIVE_CUSTOMER",
         });
         console.log("OTP sent response:", data);
-      } catch (err: any) {
+      } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "An unknown error occurred";
         setError(errorMessage);
@@ -62,7 +62,7 @@ const OtpVerify: React.FC = () => {
       }
     };
     fetchSubtypes();
-  }, []);
+  }, [personalDetails.phoneNumber]);
 
   const resendOtp = () => {
     setAllowResend(false);
@@ -92,7 +92,7 @@ const OtpVerify: React.FC = () => {
         otp: otp,
       };
 
-      const response: any = await postHandler(
+      const response = await postHandler(
         OTP_VERIFY_ENDPOINT,
         false,
         payload,
