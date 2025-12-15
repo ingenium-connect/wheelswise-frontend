@@ -20,12 +20,9 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
-import { SIGNUP_TOKEN } from "@/utilities/constants";
-import { setCookie } from "nookies";
 import { handleRegisterVehicle, postHandler } from "@/utilities/api";
 import {
   REGISTER_VEHICLE_ENDPOINT,
-  SERVER_URL,
   USER_REGISTRATION_ENDPOINT,
 } from "@/utilities/endpoints";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
@@ -63,7 +60,7 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const requiredFields = (obj: any, fields: string[]) => {
+  const requiredFields = <T extends object>(obj: T, fields: (keyof T)[]) => {
     return fields.filter((f) => !obj[f] || String(obj[f]).trim() === "");
   };
 
@@ -168,7 +165,7 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       // -------------------------------------
       // 6. Register user
       // -------------------------------------
-      const userResponse: any = await postHandler(
+      const userResponse = await postHandler(
         USER_REGISTRATION_ENDPOINT,
         false,
         userDetailsPayload
@@ -202,10 +199,14 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       // -------------------------------------
       toast.success("Successfully registered!");
       router.push("/otp-verify");
-    } catch (error: any) {
+    } catch (error) {
       console.log(error, "error");
+      let errorMessage = "An unexpected error occurred."
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
       toast.error("Registration Error", {
-        description: error?.message || "An unexpected error occurred.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
