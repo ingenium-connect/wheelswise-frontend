@@ -97,26 +97,23 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                       onChange={(e) => setVehicleValue(Number(e.target.value))}
                     />
                   </Field>
-                  {selectedMotorType?.name === "PSV" && (
-                    <Field>
-                      <FieldLabel htmlFor="seatingCapacity">
-                        Seating Capacity
-                      </FieldLabel>
-                      <Input
-                        id="seatingCapacity"
-                        type="number"
-                        placeholder="e.g. 14"
-                        value={seating_capacity}
-                        onChange={(e) => setSeatingCapacity(e.target.value)}
-                        required
-                      />
-                    </Field>
-                  )}
+                  <Field>
+                    <FieldLabel htmlFor="seatingCapacity">
+                      Seating Capacity
+                    </FieldLabel>
+                    <Input
+                      id="seatingCapacity"
+                      type="number"
+                      placeholder="e.g. 14"
+                      value={seating_capacity}
+                      onChange={(e) => setSeatingCapacity(e.target.value)}
+                      required
+                    />
+                  </Field>
+
                   {selectedMotorType?.name === "COMMERCIAL" && (
                     <Field>
-                      <FieldLabel htmlFor="tonnage">
-                        Tonnage
-                      </FieldLabel>
+                      <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
                       <Input
                         id="tonnage"
                         type="number"

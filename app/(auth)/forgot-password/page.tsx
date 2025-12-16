@@ -12,7 +12,6 @@ const ForgotPassword: React.FC = () => {
 
   const handleReset = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Password reset requested for:", email);
     alert("If this email exists, a reset link has been sent.");
     router.push("/login");
   };

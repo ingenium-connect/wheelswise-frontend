@@ -9,9 +9,8 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { postHandler } from "@/utilities/api";
-import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
+import { otpAction } from "@/app/actions/otp";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -45,24 +44,6 @@ const OtpVerify: React.FC = () => {
     return () => clearInterval(interval);
   }, [timer]);
 
-  useEffect(() => {
-    const fetchSubtypes = async () => {
-      try {
-        const data = await postHandler(OTP_VERIFY_ENDPOINT, false, {
-          msisdn: personalDetails.phoneNumber,
-          user_type: "COMPREHENSIVE_CUSTOMER",
-        });
-        console.log("OTP sent response:", data);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSubtypes();
-  }, [personalDetails.phoneNumber]);
 
   const resendOtp = () => {
     setAllowResend(false);
@@ -88,21 +69,15 @@ const OtpVerify: React.FC = () => {
     try {
       const payload = {
         msisdn: personalDetails.phoneNumber,
-        user_type: "COMPREHENSIVE_CUSTOMER",
+        user_type: "CUSTOMER",
         otp: otp,
       };
 
-      const response = await postHandler(
-        OTP_VERIFY_ENDPOINT,
-        false,
-        payload,
-        "PATCH"
-      );
+      const response = await otpAction(payload);
 
-      // console.log("OTP Verification Response:", response);
 
       if (response) {
-        router.push("/");
+        router.push("/dashboard");
       } else {
         setError("Invalid OTP");
 

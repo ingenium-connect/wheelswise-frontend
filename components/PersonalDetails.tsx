@@ -48,7 +48,11 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form?.phoneNumber.startsWith('254')) {
+      throw new Error("Please enter a valid phone number.");
+    }
     setPersonalDetails({ ...form });
+
     router.push(
       `/signup?product_type=${product_type}&motor_type=${motor_type}`
     );
@@ -104,7 +108,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         name="phoneNumber"
                         value={form.phoneNumber}
                         onChange={handleChange}
-                        placeholder="Phone Number"
+                        placeholder="254*********"
                         required
                       />
                     </Field>
