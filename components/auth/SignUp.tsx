@@ -20,15 +20,13 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
-import { handleRegisterVehicle, postHandler } from "@/utilities/api";
-import {
-  REGISTER_VEHICLE_ENDPOINT,
-  USER_REGISTRATION_ENDPOINT,
-} from "@/utilities/endpoints";
+
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/store/store";
+import { signupAction } from "@/app/actions/signup";
+import { format } from "date-fns";
 
 interface SignupForm {
   msisdn: string;
@@ -67,26 +65,21 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); // clear inline errors
-    setIsLoading(true);
 
     try {
       // -------------------------------------
       // 1. Basic form validation
       // -------------------------------------
       if (!formData.password || formData.password.length < 8) {
-        return toast.error("Password too short", {
-          description: "Your password must be at least 8 characters.",
-        });
+        throw new Error("Password must be at least 8 characters.");
       }
 
       if (formData.password !== formData.confirm_password) {
-        return toast.error("Passwords do not match");
+        throw new Error("Passwords do not match.");
       }
 
       if (!selectedMotorType?.name) {
-        return toast.error("Missing Vehicle Type", {
-          description: "Please select a valid motor type before continuing.",
-        });
+        throw new Error("Please select a valid motor type.");
       }
 
       // -------------------------------------
@@ -102,9 +95,9 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       ]);
 
       if (missingPersonalFields.length > 0) {
-        return toast.error("Missing personal details", {
-          description: missingPersonalFields.join(", "),
-        });
+        throw new Error(
+          `Missing personal details: ${missingPersonalFields.join(", ")}`
+        );
       }
 
       // -------------------------------------
@@ -120,13 +113,15 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       ]);
 
       if (missingVehicleFields.length > 0) {
-        return toast.error("Missing vehicle details", {
-          description: missingVehicleFields.join(", "),
-        });
+        throw new Error(
+          `Missing vehicle details: ${missingVehicleFields.join(", ")}`
+        );
       }
 
+      setIsLoading(true);
+
       // -------------------------------------
-      // 4. Build user payload safely
+      // 4. Build user payload
       // -------------------------------------
       const userDetailsPayload = {
         msisdn: formData.msisdn.trim(),
@@ -136,75 +131,50 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
         id_number: personalDetails.idNumber.trim(),
         email: personalDetails.email.trim(),
         kra_pin: personalDetails.kraPin.trim(),
-        user_type: "COMPREHENSIVE_CUSTOMER",
+        user_type: "CUSTOMER",
       };
 
       // -------------------------------------
       // 5. Build vehicle payload with sanitization
       // -------------------------------------
-      const baseVehiclePayload = {
-        vehicle_value: Number(vehicleDetails.vehicleValue) || null,
+      const vehiclePayload: any = {
+        vehicle_value: Number.isFinite(+vehicleDetails.vehicleValue)
+          ? +vehicleDetails.vehicleValue
+          : null,
         registration_number: vehicleDetails.vehicleNumber.trim(),
         model: vehicleDetails.model.trim(),
-        chasis_number: vehicleDetails.chassisNumber.trim(),
+        chassis_number: vehicleDetails.chassisNumber.trim(),
+        date: format(new Date(), "yyyy-MM-dd"),
         make: vehicleDetails.make.trim(),
         engine_capacity: vehicleDetails.engineCapacity
           ? Number(vehicleDetails.engineCapacity)
           : null,
+        body_type: "Pickup",
+        seating_capacity: seating_capacity ? Number(seating_capacity) : null,
         vehicle_type: selectedMotorType.name,
-        year_of_manufacture: String(vehicleDetails.year).trim(),
+        year_of_manufacture: Number(vehicleDetails.year),
       };
 
-      const vehiclePayload =
-        selectedMotorType.name === "PSV"
-          ? { ...baseVehiclePayload, seating_capacity }
-          : selectedMotorType.name === "COMMERCIAL"
-          ? { ...baseVehiclePayload, tonnage }
-          : baseVehiclePayload;
-
-      // -------------------------------------
-      // 6. Register user
-      // -------------------------------------
-      const userResponse = await postHandler(
-        USER_REGISTRATION_ENDPOINT,
-        false,
-        userDetailsPayload
-      );
-
-      if (!userResponse?.auth_credentials?.token) {
-        return toast.error("Registration Error", {
-          description: "Could not retrieve authentication token.",
-        });
-      }
-
-      const token = userResponse.auth_credentials.token;
-
-      // -------------------------------------
-      // 7. Register vehicle
-      // -------------------------------------
-      const vehicleRegResponse = await handleRegisterVehicle(
-        REGISTER_VEHICLE_ENDPOINT,
-        token,
-        vehiclePayload
-      );
-
-      if (!vehicleRegResponse) {
-        return toast.error("Vehicle registration failed", {
-          description: "Please check your details and try again.",
-        });
+      if (selectedMotorType.name === "COMMERCIAL") {
+        vehiclePayload.tonnage = tonnage;
       }
 
       // -------------------------------------
-      // 8. Success
+      // 6. Server action
       // -------------------------------------
+      await signupAction({
+        userPayload: userDetailsPayload,
+        vehiclePayload,
+      });
+
       toast.success("Successfully registered!");
       router.push("/otp-verify");
     } catch (error) {
-      console.log(error, "error");
-      let errorMessage = "An unexpected error occurred."
-      if (error instanceof Error) {
-        errorMessage = error.message
-      }
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.";
+
       toast.error("Registration Error", {
         description: errorMessage,
       });

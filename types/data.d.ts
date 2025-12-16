@@ -35,7 +35,7 @@ export interface CoverTypesResponse extends ApiResponse {
 }
 
 export interface MotorSubTypeResponse extends ApiResponse {
-  underwriter_products: MotorSubTypeItem[]
+  underwriter_products: MotorSubTypeItem[];
 }
 
 export interface MotorSubTypeItem {
@@ -86,3 +86,5 @@ export interface MotorSubTypeItem {
     }[];
   };
 }
+
+export type OtpPayload = { msisdn: string; user_type: string; otp: string };

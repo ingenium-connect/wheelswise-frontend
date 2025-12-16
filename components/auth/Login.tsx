@@ -42,7 +42,7 @@ const Login: React.FC = () => {
   const [userDetails, setUserDetails] = useState<LoginPayload>({
     national_identifier: "",
     password: "",
-    user_type: "COMPREHENSIVE_CUSTOMER",
+    user_type: "CUSTOMER",
   });
   const router = useRouter();
 

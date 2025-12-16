@@ -5,7 +5,6 @@ import { destroyCookie, parseCookies } from "nookies";
 
 import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "./constants";
 import { LOGIN_ENDPOINT, SERVER_URL } from "./endpoints";
-import { toast } from "sonner";
 import { cookies } from "next/headers";
 
 /**
@@ -31,19 +30,15 @@ export const apiHandler = async (url: string, requiresAuth: boolean = true) => {
     const data = await response.json();
 
     if (response.status === 401) {
-      toast.error("Unauthorized access", {
-        description: "You are not authorized to access this service.",
-      });
-
       [ACCESS_TOKEN, USER_ID, EMAIL, NAME].forEach((cookie) =>
         destroyCookie(null, cookie)
+      );
+      throw new Error(
+        `Failed to fetch data: ${response?.status} ${response?.statusText}`
       );
     }
 
     if (!response.ok) {
-      toast.error("Request failed", {
-        description: `Failed to fetch data: ${response?.status} ${response?.statusText}`,
-      });
       throw new Error(
         `Failed to fetch data: ${response?.status} ${response?.statusText}`
       );
@@ -85,15 +80,12 @@ export const postHandler = async (
     const data = await response.json();
 
     if (response.status === 401) {
-      toast.error("Unauthorized access", {
-        description: "You are not authorized to access this service.",
-      });
+      throw new Error(
+        "Unauthorized access: You are not authorized to access this service."
+      );
     }
 
     if (!response.ok) {
-      toast.error("Request failed", {
-        description: `Failed to fetch data: ${response?.status} ${response?.statusText}`,
-      });
       throw new Error(
         `Failed to fetch data: ${response?.status} ${response?.statusText}`
       );
@@ -131,18 +123,14 @@ export const handleRegisterVehicle = async (
       body: JSON.stringify(payload),
     });
     const data = await response.json();
-    console.log("Vehicle Registration Response:", data);
 
     if (response.status === 401) {
-      toast.error("Unauthorized access", {
-        description: "You are not authorized to access this service.",
-      });
+      throw new Error(
+        "Unauthorized access: You are not authorized to access this service."
+      );
     }
 
     if (!response.ok) {
-      toast.error("Request failed", {
-        description: `Failed to fetch data: ${response?.status} ${response?.statusText}`,
-      });
       throw new Error(
         `Failed to fetch data: ${response?.status} ${response?.statusText}`
       );
