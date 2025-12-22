@@ -1,5 +1,6 @@
 "use server";
 
+import { UserPayload, vehiclePayload } from "@/types/data";
 import { postHandler, handleRegisterVehicle } from "@/utilities/api";
 import { REGISTER_VEHICLE_ENDPOINT, USER_REGISTRATION_ENDPOINT } from "@/utilities/endpoints";
 
@@ -7,8 +8,8 @@ export async function signupAction({
   userPayload,
   vehiclePayload,
 }: {
-  userPayload: any;
-  vehiclePayload: any;
+  userPayload: UserPayload;
+  vehiclePayload: vehiclePayload;
 }) {
   const response = await postHandler(
     USER_REGISTRATION_ENDPOINT,

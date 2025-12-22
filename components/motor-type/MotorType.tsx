@@ -1,12 +1,22 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MotorType, MotorTypesResponse } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import { Field, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
+import { axiosClient } from "@/utilities/axios-client";
 
 type Props = {
   data: MotorTypesResponse;
@@ -17,6 +27,10 @@ const SelectMotorType = ({ data }: Props) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
   );
+  const [vehicleTonnage, setVehicleTonnage] = useState<string>('');
+  const [commercialOptions, setCommercialOptions] = useState<
+    { description: string; code: string }[]
+  >([]);
 
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
@@ -24,27 +38,27 @@ const SelectMotorType = ({ data }: Props) => {
   const setTpoOption = useInsuranceStore((state) => state.setTpoOption);
 
   useEffect(() => {
+    const getCommercialOptions = () => {
+      axiosClient
+        .get("policies/products/tpo-commercial-subcategories")
+        .then((res) => {
+          setCommercialOptions(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
     setCoverStep(1);
+    getCommercialOptions();
   }, []);
 
-  const commercialOptions: { value: string; enum: string }[] = [
-    { value: "Own goods", enum: "COMMERCIAL_OWN_GOODS" },
-    { value: "General cartage", enum: "COMMERCIAL_GENERAL_CARTAGE" },
-    { value: "General cartage tankers", enum: "GENERAL_CARTAGE_TANKERS" },
-    { value: "Motor Advantage", enum: "MOTOR_ADVANTAGE" },
-    { value: "Special types", enum: "COMMERCIAL_SPECIAL_TYPES" },
-    { value: "Psv private hire", enum: "PSV_PRIVATE_HIRE" },
-    { value: "Psv taxis", enum: "PSV_TAXIS" },
-    { value: "Contigent liability", enum: "CONTINGENT_LIABILITY" },
-    {
-      value: "Institutional vehicles",
-      enum: "COMMERCIAL_INSTITUTIONAL_VEHICLES",
-    },
-    {
-      value: "Driving school vehicles",
-      enum: "COMMERCIAL_DRIVING_SCHOOL_VEHICLES",
-    },
-  ];
+  /**
+   * sets the vehicle tonnage var
+   */
+  const handleTonnageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setVehicleTonnage(value);
+  };
   const handleSelect = (type: MotorType) => {
     setMotorType(type);
 
@@ -56,12 +70,11 @@ const SelectMotorType = ({ data }: Props) => {
   const handleTPO = (tpoCategory: string) => {
     setTpoOption(tpoCategory);
     router.push(
-      `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}`
+      `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}&tonnge=${vehicleTonnage}`
     );
   };
 
-  const handleSelectComOption = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+  const handleSelectComOption = (value: string) => {
     if (value && value !== "") {
       setSelectedOption(value);
       return;
@@ -100,19 +113,32 @@ const SelectMotorType = ({ data }: Props) => {
                 width={400}
                 height={200}
               ></Image>
-              <select
-                name="tpoCategory"
-                onChange={handleSelectComOption}
+              <Select
+                onValueChange={handleSelectComOption}
                 value={selectedOption}
-                className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2"
               >
-                <option value="">Select commercial option</option>
-                {commercialOptions.map((option) => (
-                  <option key={option.enum} value={option.enum}>
-                    {option.value}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select commercial option" />
+                </SelectTrigger>
+                <SelectContent>
+                  {commercialOptions.map((option) => (
+                    <SelectItem key={option.code} value={option.code}>
+                      {option.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Field>
+                <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
+                <Input
+                  id="tonnage"
+                  name="tonnage"
+                  type="number"
+                  value={vehicleTonnage}
+                  onChange={handleTonnageChange}
+                />
+              </Field>
+
               {selectedOption && (
                 <Button
                   onClick={() => handleTPO(selectedOption)}
