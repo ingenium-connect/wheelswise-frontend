@@ -88,3 +88,29 @@ export interface MotorSubTypeItem {
 }
 
 export type OtpPayload = { msisdn: string; user_type: string; otp: string };
+
+export interface vehiclePayload {
+  vehicle_value: number | null;
+  registration_number: string;
+  model: string;
+  chassis_number: string;
+  date: string;
+  make: string;
+  engine_capacity: number | null;
+  body_type: string;
+  seating_capacity: number | null;
+  vehicle_type: string;
+  year_of_manufacture: number;
+  tonnage?: string;
+}
+
+export interface UserPayload {
+  msisdn: string;
+  password: string;
+  confirm_password: string;
+  name: string;
+  id_number: string;
+  email: string;
+  kra_pin: string;
+  user_type: string;
+}

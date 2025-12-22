@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { postHandler } from "@/utilities/api";
 import { useInsuranceStore } from "@/store/store";
 import { MotorSubTypeItem } from "@/types/data";
 import { POLICY_ENDPOINT } from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";
+import { axiosClient } from "@/utilities/axios-client";
 
 type Props = {
   motor_type: string | undefined;
@@ -50,20 +50,23 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
       API_URL = `${BASE_URL}${urlString}`;
     }
 
-    const fetchSubtypes = async () => {
-      try {
-        const data = await postHandler(API_URL, false, {
+    const fetchSubtypes = () => {
+      axiosClient
+        .post(API_URL, {
           additional_benefits: [],
+        })
+        .then((res) => {
+          const data = res.data;
+          setSubtypes(data.underwriter_products || []);
+        })
+        .catch((err: unknown) => {
+          const errorMessage =
+            err instanceof Error ? err.message : "An unknown error occurred";
+          setError(errorMessage);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        setSubtypes(data.underwriter_products || []);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An unknown error occurred";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchSubtypes();

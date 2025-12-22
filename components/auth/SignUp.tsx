@@ -27,6 +27,7 @@ import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/store/store";
 import { signupAction } from "@/app/actions/signup";
 import { format } from "date-fns";
+import { vehiclePayload } from "@/types/data";
 
 interface SignupForm {
   msisdn: string;
@@ -137,7 +138,7 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       // -------------------------------------
       // 5. Build vehicle payload with sanitization
       // -------------------------------------
-      const vehiclePayload: any = {
+      const vehiclePayload: vehiclePayload = {
         vehicle_value: Number.isFinite(+vehicleDetails.vehicleValue)
           ? +vehicleDetails.vehicleValue
           : null,

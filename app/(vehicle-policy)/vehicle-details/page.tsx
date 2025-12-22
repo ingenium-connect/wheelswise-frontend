@@ -1,6 +1,6 @@
 import { PageBreadCrumb } from "@/components/PageBreadCrumb";
 import VehicleDetails from "@/components/VehicleDetails";
-import { retrieve } from "@/utilities/api-client";
+import { axiosServer } from "@/utilities/axios-server";
 
 export const dynamic = "force-dynamic"; // Force dynamic rendering at page level
 
@@ -37,7 +37,7 @@ export default async function Page({
     },
   ];
 
-  const makeModelMapResponse = await retrieve("/vehicle/make-model-map", false);
+  const makeModelMapResponse = await axiosServer.get("/vehicle/make-model-map");
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
