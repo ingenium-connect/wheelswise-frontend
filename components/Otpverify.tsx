@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { otpAction } from "@/app/actions/otp";
+import { number } from "zod";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -44,7 +45,6 @@ const OtpVerify: React.FC = () => {
     return () => clearInterval(interval);
   }, [timer]);
 
-
   const resendOtp = () => {
     setAllowResend(false);
     setTimer(60);
@@ -67,6 +67,7 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
+      // TODO: use dummy phone number
       const payload = {
         msisdn: personalDetails.phoneNumber,
         user_type: "CUSTOMER",
@@ -75,9 +76,8 @@ const OtpVerify: React.FC = () => {
 
       const response = await otpAction(payload);
 
-
       if (response) {
-        router.push("/dashboard");
+        router.push("/dashboard/payment-summary");
       } else {
         setError("Invalid OTP");
 

@@ -7,6 +7,7 @@ type PersonalDetails = {
   email: string;
   idNumber: string;
   kraPin: string;
+  ntsaRegitered: boolean;
 };
 
 type PersonalDetailsState = {
@@ -23,6 +24,7 @@ const initialState: PersonalDetails = {
   email: "",
   idNumber: "",
   kraPin: "",
+  ntsaRegitered: false,
 };
 
 export const usePersonalDetailsStore = create<PersonalDetailsState>((set) => ({

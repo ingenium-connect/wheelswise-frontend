@@ -10,12 +10,12 @@ interface VehicleStore {
   } | null;
   vehicleValue: string;
   seating_capacity: string;
-  tonnage: string;
+  tonnage: number;
   tpo_category: string;
   setMotorType: (motorType: VehicleStore["selectedMotorType"]) => void;
   setVehicleValue: (value: string) => void;
   setSeatingCapacity: (value: string) => void;
-  setTonnage: (value: string) => void;
+  setTonnage: (value: number) => void;
   setTpoCategory: (value: string) => void;
   reset: () => void;
 }
@@ -24,7 +24,7 @@ export const useVehicleStore = create<VehicleStore>((set) => ({
   selectedMotorType: null,
   vehicleValue: "",
   seating_capacity: "",
-  tonnage: "",
+  tonnage: 0,
   tpo_category: "",
   setMotorType: (motorType) => set({ selectedMotorType: motorType }),
   setVehicleValue: (value) => set({ vehicleValue: value }),
@@ -36,7 +36,7 @@ export const useVehicleStore = create<VehicleStore>((set) => ({
       selectedMotorType: null,
       vehicleValue: "",
       seating_capacity: "",
-      tonnage: "",
+      tonnage: 0,
       tpo_category: "",
     }),
 }));

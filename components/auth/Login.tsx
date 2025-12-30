@@ -88,7 +88,7 @@ const Login: React.FC = () => {
         );
 
         toast.success("Successfully logged in!");
-        router.push("/");
+        router.push("/dashboard");
       } else {
         toast.error("Submission Error", {
           description: "Error in submitting request! Please try again.",

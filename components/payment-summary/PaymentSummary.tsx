@@ -1,133 +1,159 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
-interface PaymentType {
-  key: string;
-  label: string;
-  description: string;
-}
+const PaymentSummary = () => {
+  const [paymentMethod, setPaymentMethod] = useState<"onetime" | "installment">(
+    "installment"
+  );
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-interface AddedBenefit {
-  label: string;
-  amount: number;
-}
+  const totalPayment = 111000;
 
-const PaymentSummary: React.FC = () => {
-  const router = useRouter();
-  const [selectedType, setSelectedType] = useState("one-time");
-
-  const paymentTypes: PaymentType[] = [
-    {
-      key: "one-time",
-      label: "One-time Payment",
-      description: "Pay the full amount in one go for hassle-free coverage.",
-    },
-    {
-      key: "installments",
-      label: "Lipa Pole Pole",
-      description: "Pay the full amount in 2 installments.",
-    },
-    {
-      key: "daily",
-      label: "Pay Per Day",
-      description: "Flexible daily payments tailored to your needs.",
-    },
-  ];
-
-  const addedBenefits: AddedBenefit[] = [
+  const addedBenefits: any[] = [
     { label: "Windscreen", amount: 26000 },
     { label: "Radio Cassette", amount: 31000 },
   ];
 
-  const totalPayment = 111000;
+  const installments = [
+    {
+      label: "First Installment",
+      amount: 70000,
+    },
+    {
+      label: "Last Installment",
+      amount: 91000,
+    },
+  ];
+
+  const [date, setDate] = useState("");
+  const today = new Date();
 
   return (
-    <div className="flex flex-col min-h-screen justify-between bg-[#f7f9fb]">
-      {/* Navbar */}
-      <div className="w-full sticky top-0 z-50 text-white text-lg bg-primary font-semibold text-center py-4 shadow-md flex items-center justify-between px-4">
-        <button
-          onClick={() => router.back()}
-          className="text-sm bg-white text-gray-700 px-3 py-1 rounded-lg shadow"
-        >
-          Back
-        </button>
-        <span className="flex-1 text-center">Step X: Payment Summary</span>
-        <span className="w-[60px]"></span>
-      </div>
+      <div className="max-w-2xl mx-auto">
+        {/* Payment Method Selection */}
+        <div className="grid grid-cols-2 gap-6 mb-12">
+          <Card
+            className={`p-8 cursor-pointer transition-all border-2 ${
+              paymentMethod === "onetime"
+                ? "border-[#2e5e74] bg-white/80"
+                : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
+            }`}
+            onClick={() => setPaymentMethod("onetime")}
+          >
+            <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">
+              One Time
+            </h3>
+            <p className="text-sm text-[#4f6f7d] leading-relaxed">
+              Pay the full amount in one go for hassle-free coverage.
+            </p>
+          </Card>
 
-      {/* Main content */}
-      <div className="flex-grow px-4 py-10 flex flex-col items-center">
-        {/* Page Title */}
-        <h2 className="text-2xl font-semibold text-center mb-2 texrt-primary-dark">
-          Payment Summary
-        </h2>
-        <p className="text-red-600 text-sm mb-6 text-center">
-          NB: Vehicle valuation is mandatory for comprehensive products
-        </p>
+          <Card
+            className={`p-8 cursor-pointer transition-all border-2 ${
+              paymentMethod === "installment"
+                ? "border-[#2e5e74] bg-white/80"
+                : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
+            }`}
+            onClick={() => setPaymentMethod("installment")}
+          >
+            <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">
+              Installment
+            </h3>
+            <p className="text-sm text-[#4f6f7d] leading-relaxed mb-6">
+              Pay the full amount in 2 installments.
+            </p>
+          </Card>
+        </div>
 
-        {/* Payment Type Selection */}
-        <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-xl mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-center text-primary-dark">
-            Choose Your Payment Type
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {paymentTypes.map((type) => (
-              <div
-                key={type.key}
-                onClick={() => setSelectedType(type.key)}
-                className={`border rounded-lg p-4 cursor-pointer text-center transition-all duration-200 ${
-                  selectedType === type.key
-                    ? "shadow-md border-[3px]"
-                    : "border border-gray-300"
-                } ${selectedType === type.key ? "bg-primary" : "bg-[#ccc]"}`}
-              >
+        {/* Policy Details */}
+        <div className="mb-8">
+          {/* Plan Details */}
+          <div className="bg-white rounded-xl shadow-md p-6 w-full mb-8">
+            <h3 className="text-lg font-semibold mb-4 text-center text-color-dark">
+              Your Policy Details
+            </h3>
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-2 text-primary">
+                Added Benefits
+              </h4>
+              {addedBenefits.map((item, idx) => (
                 <div
-                  className={`w-5 h-5 mx-auto rounded-full mb-2 ${
-                    selectedType === type.key ? "bg-primary" : "bg-[#e5e7eb]"
-                  }`}
-                />
-                <h4 className="font-medium text-gray-800">{type.label}</h4>
-                <p className="text-sm text-gray-600 mt-1">{type.description}</p>
-                {selectedType === type.key && (
-                  <div className="mt-2 font-semibold text-primary">
-                    Selected
-                  </div>
-                )}
-              </div>
-            ))}
+                  key={idx}
+                  className="flex justify-between px-4 py-2 rounded-lg mb-2 bg-[#e6f4f1] border-primary text-color-dark"
+                >
+                  <span>{item.label}</span>
+                  <span>Ksh {item.amount.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Total Payment */}
+          {paymentMethod === "onetime" ? (
+            <div className="rounded-xl shadow-inner p-6 w-full text-center bg-[#ebf2f4]">
+              <h3 className="text-xl font-bold text-gray-700">TOTAL PAYMENT</h3>
+              <p className="text-3xl font-extrabold mt-2 text-priamry">
+                KES {totalPayment.toLocaleString()}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              {installments.map((installment, id) => (
+                <div
+                  className="rounded-xl shadow-inner p-6 w-full text-center bg-[#ebf2f4]"
+                  key={id}
+                >
+                  <h3 className="text-xl font-bold text-gray-700">
+                    {installment.label}
+                  </h3>
+                  <p className="text-3xl font-extrabold mt-2 text-priamry">
+                    {installment.amount}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Plan Details */}
-        <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-xl mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-center text-color-dark">
-            Your Plan Details
-          </h3>
-          <div className="border-t pt-4">
-            <h4 className="font-semibold mb-2 text-primary">Added Benefits</h4>
-            {addedBenefits.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between px-4 py-2 rounded-lg mb-2 bg-[#e6f4f1] border-primary text-color-dark"
-              >
-                <span>{item.label}</span>
-                <span>Ksh {item.amount.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Total Payment */}
-        <div className="rounded-xl shadow-inner p-6 w-full max-w-xl text-center bg-[#ebf2f4]">
-          <h3 className="text-xl font-bold text-gray-700">TOTAL PAYMENT</h3>
-          <p className="text-3xl font-extrabold mt-2 text-priamry">
-            KES {totalPayment.toLocaleString()}
+        {/* Vehicle Registration */}
+        <div className="mb-8 text-center">
+          <p className="text-[#6b8b98] text-sm mb-2">
+            Vehicle Registration Number
           </p>
+          <p className="text-2xl font-medium text-[#2e5e74]">KBV 112_4</p>
+        </div>
+
+        {/* Cover Start Date */}
+        <div className="mb-12">
+          <div className="bg-white p-6 rounded-xl text-center shadow-md w-full">
+            <label className="block text-center text-[#6b8b98] text-sm mb-4">
+              COVER START DATE
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              min={formatDate(today)}
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            className="flex-1 py-6 text-sm border-[#9fc3d1] text-[#2e5e74] hover:bg-[#e5f0f3]"
+          >
+            Back
+          </Button>
+          <Button className="flex-1 py-6 text-sm bg-[#2e5e74] text-white hover:bg-[#244c5f] font-medium">
+            Proceed
+          </Button>
         </div>
       </div>
-    </div>
   );
 };
 

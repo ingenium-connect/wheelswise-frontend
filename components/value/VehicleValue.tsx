@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 type Props = {
   motor_type: string | undefined;
@@ -31,6 +32,10 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
 
   const { seating_capacity, tonnage, setSeatingCapacity, setTonnage } =
     useVehicleStore();
+
+  const [isCommercial] = useState(
+    () => selectedMotorType?.name === "COMMERCIAL"
+  );
 
   useEffect(() => {
     setCoverStep(2);
@@ -53,8 +58,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
       isValid = false;
       setError("Please enter a valid seating capacity.");
     } else if (
-      selectedMotorType?.name === "COMMERCIAL" &&
-      (!tonnage || Number(tonnage) <= 0)
+      isCommercial &&
+      (!tonnage || tonnage <= 0)
     ) {
       isValid = false;
       setError("Please enter a valid tonnage.");
@@ -104,6 +109,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                     <Input
                       id="seatingCapacity"
                       type="number"
+                      min={1}
                       placeholder="e.g. 14"
                       value={seating_capacity}
                       onChange={(e) => setSeatingCapacity(e.target.value)}
@@ -111,16 +117,16 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                     />
                   </Field>
 
-                  {selectedMotorType?.name === "COMMERCIAL" && (
+                  {isCommercial && (
                     <Field>
                       <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
                       <Input
                         id="tonnage"
                         type="number"
+                        min={1}
                         placeholder="e.g. 14"
-                        value={tonnage}
-                        onChange={(e) => setTonnage(e.target.value)}
-                        required
+                        value={tonnage as number}
+                        onChange={(e) => setTonnage(Number(e.target.value))}
                       />
                     </Field>
                   )}
@@ -130,12 +136,13 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
 
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
 
-            <button
+            <Button
               onClick={handleContinue}
+              disabled={isCommercial && (!tonnage || tonnage <= 0)}
               className="mt-4 bg-[#397397] hover:bg-[#2e5e74] text-white px-5 py-2 rounded-lg text-sm font-medium transition"
             >
               Continue
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>

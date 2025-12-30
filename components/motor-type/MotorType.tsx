@@ -27,7 +27,7 @@ const SelectMotorType = ({ data }: Props) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined
   );
-  const [vehicleTonnage, setVehicleTonnage] = useState<string>('');
+  const [vehicleTonnage, setVehicleTonnage] = useState<number>(0);
   const [commercialOptions, setCommercialOptions] = useState<
     { description: string; code: string }[]
   >([]);
@@ -57,7 +57,7 @@ const SelectMotorType = ({ data }: Props) => {
    */
   const handleTonnageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setVehicleTonnage(value);
+    setVehicleTonnage(Number(value));
   };
   const handleSelect = (type: MotorType) => {
     setMotorType(type);
@@ -87,7 +87,7 @@ const SelectMotorType = ({ data }: Props) => {
       {/* Main Content */}
       <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
         {selectedCover === "THIRD_PARTY" && (
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,400px))] gap-4">
+          <div className="grid sm:grid-cols-2 gap-8 sm:max-w-4xl mx-auto">
             <Card className="p-4">
               <p className="font-bold text-primary text-center">PRIVATE</p>
               <Image
@@ -128,24 +128,34 @@ const SelectMotorType = ({ data }: Props) => {
                   ))}
                 </SelectContent>
               </Select>
-              <Field>
-                <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
-                <Input
-                  id="tonnage"
-                  name="tonnage"
-                  type="number"
-                  value={vehicleTonnage}
-                  onChange={handleTonnageChange}
-                />
-              </Field>
 
               {selectedOption && (
-                <Button
-                  onClick={() => handleTPO(selectedOption)}
-                  className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
-                >
-                  Continue
-                </Button>
+                <>
+                  <Field>
+                    <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
+                    <Input
+                      id="tonnage"
+                      name="tonnage"
+                      required
+                      min={0}
+                      type="number"
+                      value={vehicleTonnage}
+                      onChange={handleTonnageChange}
+                    />
+                  </Field>
+                  {!vehicleTonnage && vehicleTonnage <= 0 && (
+                    <p className="text-red-600 text-sm mt-1">
+                      Please enter a valid tonnage for the selected vehicle.
+                    </p>
+                  )}
+                  <Button
+                    disabled={!vehicleTonnage && vehicleTonnage <= 0}
+                    onClick={() => handleTPO(selectedOption)}
+                    className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
+                  >
+                    Continue
+                  </Button>
+                </>
               )}
             </Card>
           </div>

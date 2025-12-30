@@ -1,3 +1,5 @@
+import { int } from "zod";
+
 export interface LoginPayload {
   national_identifier: string;
   password: string;
@@ -101,7 +103,12 @@ export interface vehiclePayload {
   seating_capacity: number | null;
   vehicle_type: string;
   year_of_manufacture: number;
-  tonnage?: string;
+  tonnage?: number;
+}
+
+export interface FinalVehiclePayload {
+  source: string;
+  vehicle: vehiclePayload;
 }
 
 export interface UserPayload {
@@ -113,4 +120,10 @@ export interface UserPayload {
   email: string;
   kra_pin: string;
   user_type: string;
+}
+
+export interface FinalUserPayload {
+  source: string;
+  source_vehicle_reg_number: string;
+  user: UserPayload;
 }

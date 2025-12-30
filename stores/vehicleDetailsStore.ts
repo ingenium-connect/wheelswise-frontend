@@ -8,6 +8,8 @@ type VehicleDetails = {
   make: string;
   model: string;
   year: string;
+  bodyType: string;
+  ntsaRegitered: boolean;
 };
 
 type VehicleDetailsState = {
@@ -25,6 +27,8 @@ const initialState: VehicleDetails = {
   make: "",
   model: "",
   year: "",
+  bodyType: "",
+  ntsaRegitered: false,
 };
 
 export const useVehicleDetailsStore = create<VehicleDetailsState>((set) => ({

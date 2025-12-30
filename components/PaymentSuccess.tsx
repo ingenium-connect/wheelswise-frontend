@@ -5,10 +5,10 @@ import Link from "next/link";
 
 const PaymentSuccess = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#f7f9fb]">
+    <div className="mt-5 sm:mt-[10rem] flex flex-col justify-between">
       {/* Success Message */}
       <div className="flex-grow flex flex-col items-center justify-center px-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
+        <div className="p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
           <CheckCircle
             className="text-green-500 mx-auto mb-4"
             size={64}
