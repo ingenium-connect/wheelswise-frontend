@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wheelwise",
+  title: "Wheelswise",
   description: "Your trusted partner for vehicle insurance",
 };
 

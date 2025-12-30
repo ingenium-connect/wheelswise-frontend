@@ -27,7 +27,11 @@ import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/store/store";
 import { signupAction } from "@/app/actions/signup";
 import { format } from "date-fns";
-import { vehiclePayload } from "@/types/data";
+import {
+  FinalUserPayload,
+  FinalVehiclePayload,
+  vehiclePayload,
+} from "@/types/data";
 
 interface SignupForm {
   msisdn: string;
@@ -150,7 +154,7 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
         engine_capacity: vehicleDetails.engineCapacity
           ? Number(vehicleDetails.engineCapacity)
           : null,
-        body_type: "Pickup",
+        body_type: vehicleDetails.bodyType.trim(),
         seating_capacity: seating_capacity ? Number(seating_capacity) : null,
         vehicle_type: selectedMotorType.name,
         year_of_manufacture: Number(vehicleDetails.year),
@@ -160,12 +164,24 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
         vehiclePayload.tonnage = tonnage;
       }
 
+      const finalUserPayload: FinalUserPayload = {
+        source: personalDetails.ntsaRegitered ? "NTSA" : "",
+        source_vehicle_reg_number: personalDetails.ntsaRegitered
+          ? vehicleDetails.vehicleNumber.trim()
+          : "",
+        user: userDetailsPayload,
+      };
+
+      const finalVehiclePayload: FinalVehiclePayload = {
+        source: vehicleDetails.ntsaRegitered ? "NTSA" : "",
+        vehicle: vehiclePayload,
+      };
       // -------------------------------------
       // 6. Server action
       // -------------------------------------
       await signupAction({
-        userPayload: userDetailsPayload,
-        vehiclePayload,
+        userPayload: finalUserPayload,
+        vehiclePayload: finalVehiclePayload,
       });
 
       toast.success("Successfully registered!");

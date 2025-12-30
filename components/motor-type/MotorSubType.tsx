@@ -82,7 +82,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
   return (
     <>
-      <div className="pt-24 pb-20 px-4 flex-grow">
+      <div className="pt-24 pb-20 px-4 mx-auto">
         {loading ? (
           <p className="text-center text-gray-600">Loading motor subtypes...</p>
         ) : error ? (
@@ -92,44 +92,48 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
             No motor subtypes available.
           </p>
         ) : (
-          <div className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(200px,400px))]">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {subtypes.map((item, index) => {
               const product = item.underwriter_product;
-              const rate = item.product_rate;
 
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow hover:shadow-lg border border-gray-200 hover:border-[#397397] transition p-4 max-w-sm mx-auto flex flex-col justify-between"
+                  className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#c7dde5] shadow-sm hover:shadow-xl hover:border-[#397397] transition-all duration-200 p-6 min-h-[280px] flex flex-col justify-between"
                 >
                   <div>
-                    <h2 className="text-lg font-semibold text-[#397397] uppercase">
+                    <h2 className="text-2xl font-semibold text-[#397397] uppercase tracking-wide">
                       {product.name}
                     </h2>
-                    <p className="text-sm text-gray-600 mt-1 mb-3">
+
+                    <p className="text-base text-gray-600 mt-2 mb-4 leading-relaxed">
                       {product.description}
                     </p>
 
-                    <ul className="text-sm text-gray-700 space-y-1">
+                    <ul className="text-base text-gray-700 space-y-2">
                       <li>
-                        <strong>Rate:</strong> {rate?.rate ?? "N/A"}%
+                        <span className="font-medium text-gray-800">
+                          Subtype:
+                        </span>{" "}
+                        {product.subtype}
                       </li>
                       <li>
-                        <strong>Subtype:</strong> {product.subtype}
-                      </li>
-                      <li>
-                        <strong>Premium:</strong> KES{" "}
+                        <span className="font-medium text-gray-800">
+                          Premium:
+                        </span>{" "}
+                        KES{" "}
                         {product.premium_amount?.one_time_payment.toLocaleString()}
                       </li>
                     </ul>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <Button
+                      size="lg"
                       onClick={() => handleSelect(item)}
-                      className="text-white transition"
+                      className="w-full text-white py-3 text-sm tracking-wide transition"
                     >
-                      Select
+                      Select Plan
                     </Button>
                   </div>
                 </div>

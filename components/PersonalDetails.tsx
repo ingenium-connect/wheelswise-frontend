@@ -23,17 +23,17 @@ type Props = {
 };
 
 const PersonalDetails = ({ motor_type, product_type }: Props) => {
-  const { setPersonalDetails } = usePersonalDetailsStore();
+  const { personalDetails, setPersonalDetails } = usePersonalDetailsStore();
   const router = useRouter();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
+    firstName: personalDetails.firstName || "",
+    lastName: personalDetails.lastName || "",
+    phoneNumber: personalDetails.phoneNumber || "",
     email: "",
-    idNumber: "",
-    kraPin: "",
+    idNumber: personalDetails.idNumber || "",
+    kraPin: personalDetails.kraPin || "",
   });
 
   useEffect(() => {

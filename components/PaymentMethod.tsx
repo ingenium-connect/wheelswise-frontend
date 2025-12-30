@@ -3,6 +3,22 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
+import { Check } from "lucide-react";
+
+const methods = [
+  {
+    id: "mpesa",
+    label: "Mpesa",
+    description: "Pay instantly using your mobile wallet.",
+    image: "/mpesa.png",
+  },
+  {
+    id: "card",
+    label: "Card",
+    description: "Secure payment via debit or credit card.",
+    image: "/card.png",
+  },
+];
 
 const PaymentMethod = () => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
@@ -36,80 +52,62 @@ const PaymentMethod = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#f7f9fb]">
-      {/* Top Navbar */}
-      <div className="w-full sticky top-0 z-50 text-white text-lg font-semibold bg-primary text-center py-4 shadow-md">
-        Choose a Payment Method
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-col items-center py-10 px-4">
+    <section className="max-w-2xl mx-auto">
+      <div className="flex flex-col items-center px-4">
         {/* Method Selection */}
         <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md mb-8">
           <h2 className="text-lg font-semibold text-center mb-4">
             Choose Payment Method
           </h2>
-          <div className="flex justify-center gap-4">
-            {/* Mpesa */}
-            <div
-              className={`flex flex-col items-center border rounded-xl p-4 w-1/2 cursor-pointer ${
-                selectedMethod === "mpesa"
-                  ? "border-[color:var(--tw-shadow-color)] shadow-lg"
-                  : "border-gray-300"
-              }`}
-              onClick={() => handleChoose("mpesa")}
-            >
-              <Image
-                src="mpesa.png"
-                alt="Mpesa"
-                height={12}
-                width={12}
-                className="h-12 mb-2 object-contain"
-              />
-              <Image
-                src="mpesa.png"
-                alt="Mpesa"
-                height={12}
-                width={12}
-                className="h-12 mb-2 object-contain"
-              />
-              <span className="font-medium">Mpesa</span>
+          <div
+            className="flex justify-center gap-4"
+            role="radiogroup"
+            aria-label="Payment method"
+          >
+            {methods.map((method) => {
+              const isSelected = selectedMethod === method.id;
 
-              <Button
-                className={`text-white transition mt-2 ${
-                  selectedMethod === "mpesa" ? "bg-primary" : "bg-[#ccc]"
-                }`}
-              >
-                Choose
-              </Button>
-            </div>
+              return (
+                <button
+                  key={method.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => handleChoose(method.id)}
+                  className={`
+          relative w-1/2 rounded-2xl border p-6 text-center
+          backdrop-blur-sm transition-all duration-200
+          focus:outline-none focus:ring-2 focus:ring-[#2e5e74]/40
+          ${
+            isSelected
+              ? "border-[#2e5e74] bg-white/80 shadow-md scale-[1.01]"
+              : "border-[#c7dde5] bg-white/60 hover:bg-white/70 hover:border-[#9fc3d1]"
+          }
+        `}
+                >
+                  {/* Check Indicator */}
+                  {isSelected && (
+                    <span className="absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#2e5e74] text-white">
+                      <Check className="h-4 w-4" />
+                    </span>
+                  )}
 
-            {/* Card */}
-            <div
-              className={`flex flex-col items-center border rounded-xl p-4 w-1/2 cursor-pointer ${
-                selectedMethod === "card"
-                  ? "border-[color:var(--tw-shadow-color)] shadow-lg"
-                  : "border-gray-300"
-              }`}
-              onClick={() => handleChoose("card")}
-            >
-              <Image
-                src="visa.png"
-                alt="Card"
-                height={12}
-                width={12}
-                className="h-12 mb-2 object-contain"
-              />
+                  <img
+                    src={method.image}
+                    alt={method.label}
+                    className="mx-auto mb-4 h-12 object-contain"
+                  />
 
-              <span className="font-medium">Card</span>
-              <Button
-                className={`text-white transition mt-2 ${
-                  selectedMethod === "card" ? "bg-primary" : "bg-[#ccc]"
-                }`}
-              >
-                Choose
-              </Button>
-            </div>
+                  <h3 className="text-base font-medium text-[#2e5e74]">
+                    {method.label}
+                  </h3>
+
+                  <p className="mt-1 text-sm text-[#6b8b98]">
+                    {method.description}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -131,16 +129,21 @@ const PaymentMethod = () => {
               className="w-full border border-primary rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring focus:border-[color:var(--tw-shadow-color)]"
             />
 
-            <Button onClick={handlePay} className="text-white transition mb-3">
-              Pay
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handlePay}
+                className="text-white transition mb-3"
+              >
+                Pay
+              </Button>
 
-            <Button
-              onClick={handlePay}
-              className="text-white transition bg-[#ccc]"
-            >
-              Confirm Payment
-            </Button>
+              <Button
+                onClick={handlePay}
+                className="text-white transition bg-[#ccc]"
+              >
+                Confirm Payment
+              </Button>
+            </div>
           </div>
         )}
 
@@ -201,7 +204,6 @@ const PaymentMethod = () => {
                 />
               </div>
             </div>
-
             <Button
               disabled
               className="text-white w-full transition mb-3 cursor-not-allowed"
@@ -218,7 +220,7 @@ const PaymentMethod = () => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

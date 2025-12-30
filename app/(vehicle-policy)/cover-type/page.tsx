@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   let response: CoverTypesResponse | undefined = undefined;
-  let errorMsg: string = 'Failed to load cover types.'
+  let errorMsg: string = "Failed to load cover types.";
 
   try {
     const res = await axiosServer.get(
@@ -19,7 +19,7 @@ export default async function Page() {
   } catch (err: unknown) {
     if (isAxiosError(err)) {
       if (err?.response?.status === 404) {
-        errorMsg = 'Page not found'
+        errorMsg = "Page not found";
       }
     }
   }
@@ -35,10 +35,10 @@ export default async function Page() {
         <PageBreadCrumb pages={pages} />
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-bold text-[#2e5e74]">
-            Choose Your Cover
+            Choose a Payment Method
           </h2>
           <p className="text-muted-foreground mt-2">
-            Select the motor insurance plan that best fits your needs.
+            Select your most convenient payment method.
           </p>
         </div>
         <SelectCoverType data={response} />
