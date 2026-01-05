@@ -79,9 +79,16 @@ export const postHandler = async (
     });
     const data = await response.json();
 
+
     if (response.status === 401) {
       throw new Error(
         "Unauthorized access: You are not authorized to access this service."
+      );
+    }
+
+    if (data?.error) {
+      throw new Error(
+        `Failed to fetch data: ${data?.error || "Unknown error occurred"}`
       );
     }
 

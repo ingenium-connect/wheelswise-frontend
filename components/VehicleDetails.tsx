@@ -52,8 +52,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>("idle");
   const [searchMessage, setSearchMessage] = useState("");
+  const [isFieldsDisabled, setIsFieldsDisabled] = useState(false);
 
-  const isFieldsDisabled = searchStatus === "success";
 
   const currentYear = new Date().getFullYear();
 
@@ -128,12 +128,14 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       const { vehicle, owner, regNo } = res.data;
 
       if (!vehicle) {
+        setIsFieldsDisabled(false);
         throw new Error("Vehicle not found");
       }
 
       const vehicleYear = parseInt(vehicle.yearOfManufacture);
       const maxAgeAllowed = motorSubType?.underwriter_product.yom_range;
 
+      setIsFieldsDisabled(true);
       if (maxAgeAllowed && vehicleYear) {
         const vehicleAge = currentYear - vehicleYear;
 
@@ -147,9 +149,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           return; // Prevent the form from populating
         }
       }
-
-      console.log(vehicle, "vehciel");
-      console.log(motorSubType?.underwriter_product.yom_range, "yom_range");
 
       // 1. Find the Make in your map using case-insensitive search
       const matchingMakeEntry = modelMakeMap.find(
@@ -344,10 +343,12 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                         <Input
                           id="vehicleNumber"
                           name="vehicleNumber"
+                          type="text"
+                          onChange={handleChange}
                           value={form.vehicleNumber}
-                          readOnly={isFieldsDisabled}
                           placeholder="Vehicle Number"
                           required
+                          readOnly={isFieldsDisabled}
                           disabled={isFieldsDisabled}
                         />
                       </Field>

@@ -36,6 +36,10 @@ export interface CoverTypesResponse extends ApiResponse {
   coverTypes: CoverType[];
 }
 
+export interface StaticBenefit {
+  label: string;
+  amount: number;
+}
 export interface MotorSubTypeResponse extends ApiResponse {
   underwriter_products: MotorSubTypeItem[];
 }
@@ -55,7 +59,8 @@ export interface MotorSubTypeItem {
     underwriter_name: string;
     name: string;
     description: string;
-    periods: any;
+    period: any;
+    underwriter_id: string;
     has_tonnage: boolean;
     has_seats: boolean;
     subtype: string;
@@ -96,7 +101,6 @@ export interface vehiclePayload {
   registration_number: string;
   model: string;
   chassis_number: string;
-  date: string;
   make: string;
   engine_capacity: number | null;
   body_type: string;
@@ -115,7 +119,8 @@ export interface UserPayload {
   msisdn: string;
   password: string;
   confirm_password: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   id_number: string;
   email: string;
   kra_pin: string;
@@ -126,4 +131,49 @@ export interface FinalUserPayload {
   source: string;
   source_vehicle_reg_number: string;
   user: UserPayload;
+}
+
+export interface PaymentMethods {
+  id: string;
+  name: string;
+  description: string;
+  underwriter_id: string;
+  duration: number;
+}
+
+export interface ProductPremiumAmount {
+  one_time_payment: number;
+}
+
+export interface UnderwriterProduct {
+  id: string;
+  type: string;
+  underwriter_name: string;
+  name: string;
+  description: string;
+  period: number;
+  has_tonnage: boolean;
+  has_seats: boolean;
+  underwriter_id: string;
+  created_by: string;
+  is_active: boolean;
+  date_created: string; // or Date if you parse it
+  updated_at: string;
+  subtype: string;
+  fixed_policy_number: string;
+  product_type: string;
+  premium_amount: ProductPremiumAmount;
+  yom_range: number;
+  product_class: string;
+  image_url: string;
+}
+
+export interface InsuranceCover {
+  id: string;
+  covertype_id: string;
+  rate: number;
+  min_sum_insured: number;
+  max_sum_insured: number;
+  least_premium_amount: number;
+  product: UnderwriterProduct;
 }
