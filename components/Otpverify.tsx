@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { otpAction } from "@/app/actions/otp";
-import { number } from "zod";
+import { axiosClient } from "@/utilities/axios-client";
+import { toast } from "sonner";
 
 // Optional – tiny shake animation
 const shakeClass =
   "animate-[shake_0.3s_ease-in-out] @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}";
+
+const DUMMY_NUMBERS = ["700454757", "706927928", "785324799"];
 
 const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
@@ -47,8 +50,31 @@ const OtpVerify: React.FC = () => {
 
   const resendOtp = () => {
     setAllowResend(false);
+    axiosClient
+      .post("otp", {
+        msisdn: getPhoneNumber,
+        user_type: "CUSTOMER",
+      })
+      .then((res) => {
+        toast.success("OTP resent successfully");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
     setTimer(60);
   };
+
+  const getPhoneNumber = useMemo(() => {
+    const current = personalDetails.phoneNumber;
+
+    // Extract the last 9 digits (e.g., "700454757")
+    const normalizedInput = current.slice(-9);
+
+    if (DUMMY_NUMBERS.includes(normalizedInput)) return current;
+
+    return DUMMY_NUMBERS[Math.floor(Math.random() * DUMMY_NUMBERS.length)];
+  }, [personalDetails.phoneNumber]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,7 +95,7 @@ const OtpVerify: React.FC = () => {
     try {
       // TODO: use dummy phone number
       const payload = {
-        msisdn: personalDetails.phoneNumber,
+        msisdn: getPhoneNumber,
         user_type: "CUSTOMER",
         otp: otp,
       };
@@ -77,8 +103,13 @@ const OtpVerify: React.FC = () => {
       const response = await otpAction(payload);
 
       if (response) {
+        toast.success("OTP sent successfully");
+
         router.push("/dashboard/payment-summary");
       } else {
+        setAllowResend(true);
+        setTimer(10);
+
         setError("Invalid OTP");
 
         // Trigger shake animation for invalid OTP
@@ -86,7 +117,11 @@ const OtpVerify: React.FC = () => {
         setTimeout(() => setShake(false), 300);
       }
     } catch (err) {
+      setAllowResend(true);
+
       setError("Network error. Please try again.");
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
     } finally {
       setLoading(false);
     }
@@ -174,10 +209,7 @@ const OtpVerify: React.FC = () => {
 
               {/* Alternative verification */}
               <p className="text-center mt-4 text-sm">
-                <span
-                  className="text-primary cursor-pointer hover:underline"
-                  onClick={() => router.push("/verify-email")}
-                >
+                <span className="text-primary cursor-pointer hover:underline">
                   Verify using Email instead
                 </span>
               </p>

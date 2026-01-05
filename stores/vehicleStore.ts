@@ -1,5 +1,6 @@
 // stores/vehicleStore.ts
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface VehicleStore {
   selectedMotorType: {
@@ -20,23 +21,30 @@ interface VehicleStore {
   reset: () => void;
 }
 
-export const useVehicleStore = create<VehicleStore>((set) => ({
-  selectedMotorType: null,
-  vehicleValue: "",
-  seating_capacity: "",
-  tonnage: 0,
-  tpo_category: "",
-  setMotorType: (motorType) => set({ selectedMotorType: motorType }),
-  setVehicleValue: (value) => set({ vehicleValue: value }),
-  setSeatingCapacity: (value) => set({ seating_capacity: value }),
-  setTonnage: (value) => set({ tonnage: value }),
-  setTpoCategory: (value) => set({ tpo_category: value }),
-  reset: () =>
-    set({
+export const useVehicleStore = create<VehicleStore>()(
+  persist(
+    (set) => ({
       selectedMotorType: null,
       vehicleValue: "",
       seating_capacity: "",
       tonnage: 0,
       tpo_category: "",
+      setMotorType: (motorType) => set({ selectedMotorType: motorType }),
+      setVehicleValue: (value) => set({ vehicleValue: value }),
+      setSeatingCapacity: (value) => set({ seating_capacity: value }),
+      setTonnage: (value) => set({ tonnage: value }),
+      setTpoCategory: (value) => set({ tpo_category: value }),
+      reset: () =>
+        set({
+          selectedMotorType: null,
+          vehicleValue: "",
+          seating_capacity: "",
+          tonnage: 0,
+          tpo_category: "",
+        }),
     }),
-}));
+    {
+      name: "vehicle-info-store",
+    }
+  )
+);

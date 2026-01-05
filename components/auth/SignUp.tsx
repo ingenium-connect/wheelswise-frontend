@@ -25,13 +25,12 @@ import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/store/store";
-import { signupAction } from "@/app/actions/signup";
-import { format } from "date-fns";
 import {
   FinalUserPayload,
   FinalVehiclePayload,
   vehiclePayload,
 } from "@/types/data";
+import axios from "axios";
 
 interface SignupForm {
   msisdn: string;
@@ -129,13 +128,14 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       // 4. Build user payload
       // -------------------------------------
       const userDetailsPayload = {
+        first_name: personalDetails.firstName.trim(),
+        last_name: personalDetails.lastName.trim(),
         msisdn: formData.msisdn.trim(),
-        password: formData.password,
-        confirm_password: formData.confirm_password,
-        name: `${personalDetails.firstName} ${personalDetails.lastName}`.trim(),
         id_number: personalDetails.idNumber.trim(),
         email: personalDetails.email.trim(),
         kra_pin: personalDetails.kraPin.trim(),
+        password: formData.password,
+        confirm_password: formData.confirm_password,
         user_type: "CUSTOMER",
       };
 
@@ -143,18 +143,17 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       // 5. Build vehicle payload with sanitization
       // -------------------------------------
       const vehiclePayload: vehiclePayload = {
-        vehicle_value: Number.isFinite(+vehicleDetails.vehicleValue)
-          ? +vehicleDetails.vehicleValue
-          : null,
-        registration_number: vehicleDetails.vehicleNumber.trim(),
-        model: vehicleDetails.model.trim(),
         chassis_number: vehicleDetails.chassisNumber.trim(),
-        date: format(new Date(), "yyyy-MM-dd"),
+        registration_number: vehicleDetails.vehicleNumber.trim(),
         make: vehicleDetails.make.trim(),
+        model: vehicleDetails.model.trim(),
         engine_capacity: vehicleDetails.engineCapacity
           ? Number(vehicleDetails.engineCapacity)
           : null,
         body_type: vehicleDetails.bodyType.trim(),
+        vehicle_value: Number.isFinite(+vehicleDetails.vehicleValue)
+          ? +vehicleDetails.vehicleValue
+          : null,
         seating_capacity: seating_capacity ? Number(seating_capacity) : null,
         vehicle_type: selectedMotorType.name,
         year_of_manufacture: Number(vehicleDetails.year),
@@ -200,6 +199,20 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
     }
   };
 
+  const signupAction = async ({
+    userPayload,
+    vehiclePayload,
+  }: {
+    userPayload: FinalUserPayload;
+    vehiclePayload: FinalVehiclePayload;
+  }) => {
+    const res = await axios.post("/api/signup", {
+      userPayload,
+      vehiclePayload,
+    });
+
+    return res.data;
+  };
   return (
     <Card {...props}>
       <CardHeader>

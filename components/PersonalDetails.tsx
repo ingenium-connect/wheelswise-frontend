@@ -48,9 +48,6 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form?.phoneNumber.startsWith('254')) {
-      throw new Error("Please enter a valid phone number.");
-    }
     setPersonalDetails({ ...form });
 
     router.push(

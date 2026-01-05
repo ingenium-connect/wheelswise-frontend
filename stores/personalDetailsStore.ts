@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type PersonalDetails = {
   firstName: string;
@@ -27,18 +28,25 @@ const initialState: PersonalDetails = {
   ntsaRegitered: false,
 };
 
-export const usePersonalDetailsStore = create<PersonalDetailsState>((set) => ({
-  personalDetails: initialState,
+export const usePersonalDetailsStore = create<PersonalDetailsState>()(
+  persist(
+    (set) => ({
+      personalDetails: initialState,
 
-  setPersonalDetails: (payload) =>
-    set((state) => ({
-      personalDetails: { ...state.personalDetails, ...payload },
-    })),
+      setPersonalDetails: (payload) =>
+        set((state) => ({
+          personalDetails: { ...state.personalDetails, ...payload },
+        })),
 
-  updateField: (field, value) =>
-    set((state) => ({
-      personalDetails: { ...state.personalDetails, [field]: value },
-    })),
+      updateField: (field, value) =>
+        set((state) => ({
+          personalDetails: { ...state.personalDetails, [field]: value },
+        })),
 
-  resetPersonalDetails: () => set({ personalDetails: initialState }),
-}));
+      resetPersonalDetails: () => set({ personalDetails: initialState }),
+    }),
+    {
+      name: "personal-details-store",
+    }
+  )
+);

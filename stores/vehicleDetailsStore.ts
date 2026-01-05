@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type VehicleDetails = {
   vehicleValue: number;
@@ -31,18 +32,25 @@ const initialState: VehicleDetails = {
   ntsaRegitered: false,
 };
 
-export const useVehicleDetailsStore = create<VehicleDetailsState>((set) => ({
-  vehicleDetails: initialState,
+export const useVehicleDetailsStore = create<VehicleDetailsState>()(
+  persist(
+    (set) => ({
+      vehicleDetails: initialState,
 
-  setVehicleDetails: (payload) =>
-    set((state) => ({
-      vehicleDetails: { ...state.vehicleDetails, ...payload },
-    })),
+      setVehicleDetails: (payload) =>
+        set((state) => ({
+          vehicleDetails: { ...state.vehicleDetails, ...payload },
+        })),
 
-  updateVehicleField: (field, value) =>
-    set((state) => ({
-      vehicleDetails: { ...state.vehicleDetails, [field]: value },
-    })),
+      updateVehicleField: (field, value) =>
+        set((state) => ({
+          vehicleDetails: { ...state.vehicleDetails, [field]: value },
+        })),
 
-  resetVehicleDetails: () => set({ vehicleDetails: initialState }),
-}));
+      resetVehicleDetails: () => set({ vehicleDetails: initialState }),
+    }),
+    {
+      name: "vehicle-details-store",
+    }
+  )
+);
