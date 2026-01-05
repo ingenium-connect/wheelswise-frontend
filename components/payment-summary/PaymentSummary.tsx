@@ -12,7 +12,7 @@ const PaymentSummary = () => {
 
   const totalPayment = 111000;
 
-  const addedBenefits: any[] = [
+  const addedBenefits: { label: string; amount: number }[] = [
     { label: "Windscreen", amount: 26000 },
     { label: "Radio Cassette", amount: 31000 },
   ];

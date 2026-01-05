@@ -19,10 +19,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const vehicleValue = useInsuranceStore((state) => state.vehicleValue);
-  const motorType = useInsuranceStore((state) => state.motorType);
-  const selectedCover = useInsuranceStore((state) => state.cover);
-  const tpoCategory = useInsuranceStore((state) => state.tpoOption);
+  const { vehicleValue, motorType, cover: selectedCover, tpoOption: tpoCategory } = useInsuranceStore();
   const setVehicleSubType = useInsuranceStore(
     (state) => state.setVehicleSubType
   );
@@ -46,7 +43,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     }
 
     if (selectedCover === "THIRD_PARTY") {
-      const urlString = `&tpo_category=${tpoCategory}`;
+      const urlString = `&tpo_category=${tpoCategory}&tonnage=${tonnage}`;
       API_URL = `${BASE_URL}${urlString}`;
     }
 
@@ -69,7 +66,9 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
         });
     };
 
-    fetchSubtypes();
+    if (API_URL !== "") {
+      fetchSubtypes();
+    }
     setCoverStep(3);
   }, [motorType?.name, vehicleValue]);
 
