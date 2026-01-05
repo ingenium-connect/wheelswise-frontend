@@ -346,9 +346,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                           type="text"
                           onChange={handleChange}
                           value={form.vehicleNumber}
+                          readOnly={isFieldsDisabled}
                           placeholder="Vehicle Number"
                           required
-                          readOnly={isFieldsDisabled}
                           disabled={isFieldsDisabled}
                         />
                       </Field>

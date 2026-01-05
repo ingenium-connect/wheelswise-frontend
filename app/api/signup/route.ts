@@ -44,10 +44,10 @@ export async function POST(req: Request) {
       user: userResponse,
       vehicle: vehicleResponse,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Signup Error:", error);
     return NextResponse.json(
-      { error: error.message ?? "Signup failed" },
+      { error: (error as Error).message ?? "Signup failed" },
       { status: 500 }
     );
   }
