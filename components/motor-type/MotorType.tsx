@@ -17,6 +17,7 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { axiosClient } from "@/utilities/axios-client";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
 type Props = {
   data: MotorTypesResponse;
@@ -36,6 +37,7 @@ const SelectMotorType = ({ data }: Props) => {
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
   const setTpoOption = useInsuranceStore((state) => state.setTpoOption);
+  const setTonnage = useVehicleStore((state) => state.setTonnage)
 
   useEffect(() => {
     const getCommercialOptions = () => {
@@ -58,6 +60,7 @@ const SelectMotorType = ({ data }: Props) => {
   const handleTonnageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setVehicleTonnage(Number(value));
+    setTonnage(Number(value));
   };
   const handleSelect = (type: MotorType) => {
     setMotorType(type);
@@ -139,17 +142,16 @@ const SelectMotorType = ({ data }: Props) => {
                       required
                       min={0}
                       type="number"
-                      value={vehicleTonnage}
                       onChange={handleTonnageChange}
                     />
                   </Field>
-                  {!vehicleTonnage && vehicleTonnage <= 0 && (
+                  {!vehicleTonnage || vehicleTonnage <= 0 && (
                     <p className="text-red-600 text-sm mt-1">
                       Please enter a valid tonnage for the selected vehicle.
                     </p>
                   )}
                   <Button
-                    disabled={!vehicleTonnage && vehicleTonnage <= 0}
+                    disabled={!vehicleTonnage || vehicleTonnage <= 0}
                     onClick={() => handleTPO(selectedOption)}
                     className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
                   >
