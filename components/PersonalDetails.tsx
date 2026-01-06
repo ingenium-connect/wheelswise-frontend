@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
+import { toast } from "sonner";
 
 type Props = {
   motor_type: string | undefined;
@@ -26,6 +27,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const { personalDetails, setPersonalDetails } = usePersonalDetailsStore();
   const router = useRouter();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
+
+  const isNtsaRegistered = personalDetails.ntsaRegitered || false;
 
   const [form, setForm] = useState({
     firstName: personalDetails.firstName || "",
@@ -50,8 +53,30 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
     e.preventDefault();
     setPersonalDetails({ ...form });
 
+    setTimeout(() => {
+      toast.success("User details saved.", { duration: 2000 });
+      reset();
+      router.push(
+        `/signup?product_type=${product_type}&motor_type=${motor_type}`
+      );
+    }, 200);
+  };
+
+  const reset = () => {
+    setForm({
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      email: "",
+      idNumber: "",
+      kraPin: "",
+    });
+  };
+
+  const cancelAction = () => {
+    reset();
     router.push(
-      `/signup?product_type=${product_type}&motor_type=${motor_type}`
+      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`
     );
   };
 
@@ -77,6 +102,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.firstName}
                         onChange={handleChange}
                         placeholder="First Name"
+                        readOnly={isNtsaRegistered}
+                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>
@@ -89,6 +116,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.lastName}
                         onChange={handleChange}
                         placeholder="Last Name"
+                        readOnly={isNtsaRegistered}
+                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>
@@ -106,6 +135,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.phoneNumber}
                         onChange={handleChange}
                         placeholder="254*********"
+                        readOnly={isNtsaRegistered}
+                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>
@@ -135,6 +166,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.kraPin}
                         onChange={handleChange}
                         placeholder="KRA PIN"
+                        readOnly={isNtsaRegistered}
+                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>
@@ -147,6 +180,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.idNumber}
                         onChange={handleChange}
                         placeholder="ID Number"
+                        readOnly={isNtsaRegistered}
+                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>
@@ -154,7 +189,11 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
                   <Field orientation="horizontal">
                     <Button type="submit">Submit</Button>
-                    <Button variant="outline" type="button">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={cancelAction}
+                    >
                       Cancel
                     </Button>
                   </Field>

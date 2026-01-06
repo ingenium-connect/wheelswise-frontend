@@ -26,7 +26,8 @@ import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertTitle } from "./ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { se } from "date-fns/locale/se";
 
 type Props = {
   motor_type: string | undefined;
@@ -53,7 +54,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const [searchStatus, setSearchStatus] = useState<SearchStatus>("idle");
   const [searchMessage, setSearchMessage] = useState("");
   const [isFieldsDisabled, setIsFieldsDisabled] = useState(false);
-
 
   const currentYear = new Date().getFullYear();
 
@@ -142,7 +142,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         if (vehicleAge > maxAgeAllowed) {
           setSearchStatus("error");
           setSearchMessage(
-            `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years.`
+            `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`
           );
           toast.error("Vehicle exceeds age limit");
           setLoadingSearch(false);
@@ -195,18 +195,18 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       setVehicleDetails({ ntsaRegitered: true });
 
       if (owner) {
+        const ownerObj = owner[0];
         setPersonalDetails({
-          firstName: owner.FIRSTNAME || "",
-          lastName: owner.LASTNAME || owner.FIRSTNAME || "",
-          phoneNumber: owner.TELNO || "",
-          idNumber: owner.ID_NUMBER || "",
-          kraPin: owner.PIN || "",
+          firstName: ownerObj.FIRSTNAME || "",
+          lastName: ownerObj.LASTNAME || ownerObj.FIRSTNAME || "",
+          phoneNumber: ownerObj.TELNO || "",
+          idNumber: ownerObj.ID_NUMBER || "",
+          kraPin: ownerObj.PIN || "",
           ntsaRegitered: true,
         });
       }
 
       setSearchStatus("success");
-      setSearchMessage("Vehicle details fetched successfully.");
 
       toast.success("Vehicle found");
     } catch (error) {
@@ -250,14 +250,19 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     });
   };
 
+  const cancelAction = () => {
+    reset();
+    router.push(
+      `/personal-details?product_type=${product_type}&motor_type=${motor_type}`
+    );
+  };
+
   return (
     <div className="w-full">
-      {searchStatus !== "idle" && (
-        <Alert
-          variant={searchStatus === "success" ? "default" : "destructive"}
-          className="mb-4"
-        >
-          <AlertTitle>{searchMessage}</AlertTitle>
+      {searchStatus === "error" && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Error Occured</AlertTitle>
+          <AlertDescription>{searchMessage}</AlertDescription>
         </Alert>
       )}
       <Card
@@ -508,7 +513,11 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       <Button type="submit" disabled={!validDetails()}>
                         Submit
                       </Button>
-                      <Button variant="outline" type="button" onClick={reset}>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        onClick={cancelAction}
+                      >
                         Cancel
                       </Button>
                     </Field>
