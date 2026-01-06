@@ -35,13 +35,11 @@ export default async function Page({
     {
       name: "Personal Details",
       href: `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
-
       isActive: false,
     },
     {
       name: "Sign Up",
-      href: `/sign-up`,
-
+      href: `/sign-up?product_type=${product_type}&motor_type=${motor_type}`,
       isActive: true,
     },
   ];
@@ -56,7 +54,7 @@ export default async function Page({
       {/* Form Content */}
       <div className="flex-grow flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
-          <Signup />
+          <Signup product_type={product_type} motor_type={motor_type} />
         </div>
       </div>
     </section>

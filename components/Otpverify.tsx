@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, FormEvent, useEffect, useMemo } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
@@ -17,8 +17,6 @@ import { toast } from "sonner";
 // Optional – tiny shake animation
 const shakeClass =
   "animate-[shake_0.3s_ease-in-out] @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}";
-
-const DUMMY_NUMBERS = ["700454757", "706927928", "785324799"];
 
 const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
@@ -52,7 +50,7 @@ const OtpVerify: React.FC = () => {
     setAllowResend(false);
     axiosClient
       .post("otp", {
-        msisdn: getPhoneNumber,
+        msisdn: personalDetails.phoneNumber,
         user_type: "CUSTOMER",
       })
       .then((res) => {
@@ -64,17 +62,6 @@ const OtpVerify: React.FC = () => {
 
     setTimer(60);
   };
-
-  const getPhoneNumber = useMemo(() => {
-    const current = personalDetails.phoneNumber;
-
-    // Extract the last 9 digits (e.g., "700454757")
-    const normalizedInput = current.slice(-9);
-
-    if (DUMMY_NUMBERS.includes(normalizedInput)) return current;
-
-    return DUMMY_NUMBERS[Math.floor(Math.random() * DUMMY_NUMBERS.length)];
-  }, [personalDetails.phoneNumber]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,7 +82,7 @@ const OtpVerify: React.FC = () => {
     try {
       // TODO: use dummy phone number
       const payload = {
-        msisdn: getPhoneNumber,
+        msisdn: personalDetails.phoneNumber,
         user_type: "CUSTOMER",
         otp: otp,
       };
@@ -128,7 +115,7 @@ const OtpVerify: React.FC = () => {
   };
 
   return (
-    <div className="">
+    <>
       <div className="flex-grow flex items-center justify-center px-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-2xl md:text-3xl font-extrabold text-center text-primary mb-2">
@@ -217,7 +204,7 @@ const OtpVerify: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

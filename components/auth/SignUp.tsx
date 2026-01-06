@@ -38,7 +38,16 @@ interface SignupForm {
   confirm_password: string;
 }
 
-const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
+interface Props extends React.ComponentProps<typeof Card> {
+  motor_type: string | undefined;
+  product_type: string | undefined;
+}
+
+const Signup: React.FC<Props> = ({
+  motor_type,
+  product_type,
+  ...props
+}: Props) => {
   const { personalDetails } = usePersonalDetailsStore();
 
   const { vehicleDetails } = useVehicleDetailsStore();
@@ -184,7 +193,9 @@ const Signup: React.FC = ({ ...props }: React.ComponentProps<typeof Card>) => {
       });
 
       toast.success("Successfully registered!");
-      router.push("/otp-verify");
+      router.push(
+        `/otp-verify?product_type=${product_type}&motor_type=${motor_type}`
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error
