@@ -55,10 +55,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
     setTimeout(() => {
       toast.success("User details saved.", { duration: 2000 });
-      reset();
-      router.push(
-        `/signup?product_type=${product_type}&motor_type=${motor_type}`
-      );
+      cancelAction();
     }, 200);
   };
 
@@ -76,7 +73,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const cancelAction = () => {
     reset();
     router.push(
-      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`
+      `/signup?product_type=${product_type}&motor_type=${motor_type}`
     );
   };
 

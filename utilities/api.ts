@@ -137,11 +137,6 @@ export const handleRegisterVehicle = async (
       );
     }
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch data: ${response?.status} ${response?.statusText}`
-      );
-    }
     return data;
   } catch (error: any) {
     throw error;
