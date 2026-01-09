@@ -22,7 +22,7 @@ type InsuranceStoreState = {
 };
 
 /**
- * stoeres the insurance details in local storage
+ * stores the insurance details in local storage
  */
 const useInsuranceStore = create<InsuranceStoreState>()(
   persist(

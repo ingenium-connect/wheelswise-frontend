@@ -4,7 +4,6 @@ import {
   USER_REGISTRATION_ENDPOINT,
 } from "@/utilities/endpoints";
 import { handleRegisterVehicle, postHandler } from "@/utilities/api";
-import { setCookie } from "nookies";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 
 export async function POST(req: Request) {
@@ -31,19 +30,22 @@ export async function POST(req: Request) {
       vehiclePayload
     );
 
-    if (vehicleResponse) {
-      setCookie(null, ACCESS_TOKEN, token, {
-        maxAge: 60 * 60, // 1 hour
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-    }
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: userResponse,
       vehicle: vehicleResponse,
     });
+
+    response.cookies.set({
+      name: ACCESS_TOKEN,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60, // 1 hour
+    });
+
+    return response;
   } catch (error: unknown) {
     console.error("Signup Error:", error);
     return NextResponse.json(

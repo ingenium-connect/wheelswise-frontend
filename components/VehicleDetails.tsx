@@ -129,6 +129,19 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
       if (!vehicle) {
         setIsFieldsDisabled(false);
+        reset();
+
+        setVehicleDetails({ ntsaRegitered: false });
+
+        setPersonalDetails({
+          firstName: "",
+          lastName: "",
+          phoneNumber: "",
+          idNumber: "",
+          kraPin: "",
+          ntsaRegitered: false,
+        });
+
         throw new Error("Vehicle not found");
       }
 
@@ -211,6 +224,18 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       toast.success("Vehicle found");
     } catch (error) {
       reset();
+
+      setVehicleDetails({ ntsaRegitered: false });
+
+      setPersonalDetails({
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        idNumber: "",
+        kraPin: "",
+        ntsaRegitered: false,
+      });
+
       setSearchStatus("error");
       setSearchMessage(
         "Vehicle could not be found. Kindly enter the vehicle details manually."
