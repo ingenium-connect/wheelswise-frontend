@@ -52,6 +52,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPersonalDetails({ ...form });
+    toast.success("User details saved.", { duration: 2000 });
+    reset();
 
     setTimeout(() => {
       toast.success("User details saved.", { duration: 2000 });
