@@ -4,23 +4,27 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
-import { PaymentMethods, StaticBenefit } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
 import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
+import {
+  PaymentMethods,
+  StaticBenefit,
+  UIMappedPaymentMethod,
+} from "@/types/data";
 
 const PaymentSummary = () => {
-  const [paymentMethod, setPaymentMethod] = useState<"onetime" | "installment">(
-    "installment"
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
+  const [paymentMethods, setPaymentMethods] = useState<UIMappedPaymentMethod[]>(
+    []
   );
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethods[]>([]);
+  const [oneTimePayment, setOneTimePayment] = useState<number>(0);
+
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const { vehicleDetails } = useVehicleDetailsStore();
 
-  const [oneTimePayment, setOneTimePayment] = useState<number>(0);
-  const [installments, setInstallments] = useState<
-    { label: string; amount: number }[]
-  >([
+  const installments = [
     {
       label: "First Installment",
       amount: 70000,
@@ -29,24 +33,40 @@ const PaymentSummary = () => {
       label: "Last Installment",
       amount: 91000,
     },
-  ]);
+  ];
   const addedBenefits: StaticBenefit[] = [
     { label: "Windscreen", amount: 26000 },
     { label: "Radio Cassette", amount: 31000 },
   ];
 
+  const MappedPaymentMethods: Record<
+    string,
+    { name: string; description: string; key: string }
+  > = {
+    ONE_TIME: {
+      name: "One Time",
+      description: "Pay the full amount in one go for hassle-free coverage.",
+      key: "onetime",
+    },
+    INSTALLMENT: {
+      name: "Installment",
+      description: "Pay the full amount in 2 installments.",
+      key: "installment",
+    },
+  };
+
   const [date, setDate] = useState("");
   const today = new Date();
   useEffect(() => {
     if (motorSubType?.underwriter_product.premium_amount?.one_time_payment) {
-      setPaymentMethod("onetime");
+      setSelectedPaymentMethod("onetime");
       setOneTimePayment(
         motorSubType?.underwriter_product.premium_amount?.one_time_payment
       );
     } else {
-      setPaymentMethod("installment");
+      setSelectedPaymentMethod("installment");
     }
-  }, []);
+  }, [motorSubType]);
 
   useEffect(() => {
     const getPaymentMethods = () => {
@@ -55,48 +75,67 @@ const PaymentSummary = () => {
       axiosClient
         .get(`payment-method?underwriter_id=${underwriterId}`)
         .then((res) => {
-          setPaymentMethods(res.data?.payment_method ?? []);
+          const mappedMethods = methodMapper(res.data?.payment_method);
+          setPaymentMethods(mappedMethods ?? []);
+          if (mappedMethods.length > 0) {
+            setSelectedPaymentMethod(mappedMethods[0].uiKey);
+          }
         })
         .catch((err) => {
           console.error(err);
         });
     };
     getPaymentMethods();
-  }, []);
+  }, [motorSubType]);
+
+  const methodMapper = (payment_methods: PaymentMethods[]) => {
+    const enrichedPaymentMethods: UIMappedPaymentMethod[] = payment_methods
+      .map((method: UIMappedPaymentMethod) => {
+        const mapped = MappedPaymentMethods[method.name];
+
+        if (!mapped) return null;
+
+        return {
+          ...method,
+          name: mapped.name,
+          description: mapped.description,
+          uiKey: mapped.key,
+        };
+      })
+      .filter(Boolean) as UIMappedPaymentMethod[];
+    return enrichedPaymentMethods;
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
       {/* Payment Method Selection */}
-      <div className="grid grid-cols-2 gap-6 mb-12">
-        <Card
-          className={`p-8 cursor-pointer transition-all border-2 ${
-            paymentMethod === "onetime"
-              ? "border-[#2e5e74] bg-white/80"
-              : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
-          }`}
-          onClick={() => setPaymentMethod("onetime")}
-        >
-          <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">One Time</h3>
-          <p className="text-sm text-[#4f6f7d] leading-relaxed">
-            Pay the full amount in one go for hassle-free coverage.
-          </p>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+        {paymentMethods.length > 1 &&
+          paymentMethods.map((method) => {
+            const isSelected = selectedPaymentMethod === method.uiKey;
 
-        <Card
-          className={`p-8 cursor-pointer transition-all border-2 ${
-            paymentMethod === "installment"
-              ? "border-[#2e5e74] bg-white/80"
+            return (
+              <Card
+                key={method.id}
+                onClick={() => setSelectedPaymentMethod(method.id)}
+                className={`p-8 cursor-pointer transition-all border-2 rounded-xl
+          ${
+            isSelected
+              ? "border-[#2e5e74] bg-white/80 scale-[1.01]"
               : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
-          }`}
-          onClick={() => setPaymentMethod("installment")}
-        >
-          <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">
-            Installment
-          </h3>
-          <p className="text-sm text-[#4f6f7d] leading-relaxed mb-6">
-            Pay the full amount in 2 installments.
-          </p>
-        </Card>
+          }
+        `}
+              >
+                <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">
+                  {method.name}
+                </h3>
+
+                <p className="text-sm text-[#4f6f7d] leading-relaxed">
+                  {method.description}
+                </p>
+              </Card>
+            );
+          })}
       </div>
 
       {/* Policy Details */}
@@ -121,7 +160,7 @@ const PaymentSummary = () => {
         </div>
 
         {/* Total Payment */}
-        {paymentMethod === "onetime" ? (
+        {selectedPaymentMethod === "onetime" ? (
           <div className="rounded-xl shadow-inner p-6 w-full text-center bg-[#ebf2f4]">
             <h3 className="text-xl font-bold text-gray-700">TOTAL PAYMENT</h3>
             <p className="text-3xl font-extrabold mt-2 text-priamry">

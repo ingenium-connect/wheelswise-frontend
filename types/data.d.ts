@@ -138,7 +138,6 @@ export interface PaymentMethods {
   name: string;
   description: string;
   underwriter_id: string;
-  duration: number;
 }
 
 export interface ProductPremiumAmount {
@@ -177,3 +176,36 @@ export interface InsuranceCover {
   least_premium_amount: number;
   product: UnderwriterProduct;
 }
+
+// types/vehicle.ts
+export type Vehicle = {
+  id: string;
+  name: string;
+  registration: string;
+  color: string;
+};
+
+// types/policy.ts
+export type InsurancePolicy = {
+  id: string;
+  vehicleName: string;
+  registration: string;
+  insurer: string;
+  policyNumber: string;
+  coverage: "COMPREHENSIVE" | "THIRD PARTY";
+  premium: number;
+  expiryDate: string;
+  remainingDays: number;
+};
+
+export type UserProfile = {
+  name: string;
+  idNumber: string;
+  kraPin: string;
+  phoneNumber: string;
+  email: string;
+};
+
+export type UIMappedPaymentMethod = PaymentMethod & {
+  uiKey: string;
+};

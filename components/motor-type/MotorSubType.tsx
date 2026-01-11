@@ -73,6 +73,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   }, [motorType?.name, vehicleValue]);
 
   const handleSelect = (product: MotorSubTypeItem) => {
+    console.log("Selected product:", product);
     setVehicleSubType(product);
     router.push(
       `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`

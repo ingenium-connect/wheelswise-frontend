@@ -1,6 +1,4 @@
 import axios from "axios";
-import { parseCookies } from "nookies";
-import { ACCESS_TOKEN } from "./constants";
 
 /**
  * axios instance for client components
@@ -33,15 +31,15 @@ const axiosAuthClient = axios.create({
 /**
  * Attach token dynamically on each request
  */
-axiosAuthClient.interceptors.request.use((config) => {
-  const token = parseCookies()[ACCESS_TOKEN];
+// axiosAuthClient.interceptors.request.use((config) => {
+//   const token = parseCookies()[ACCESS_TOKEN];
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
 
-  return config;
-});
+//   return config;
+// });
 
 axiosAuthClient.interceptors.response.use(
   (response) => response,
