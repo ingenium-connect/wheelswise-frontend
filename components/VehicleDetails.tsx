@@ -159,6 +159,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           );
           toast.error("Vehicle exceeds age limit");
           setLoadingSearch(false);
+          setTimeout(() => {
+            router.back()
+          }, 1000)
           return; // Prevent the form from populating
         }
       }

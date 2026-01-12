@@ -209,3 +209,5 @@ export type UserProfile = {
 export type UIMappedPaymentMethod = PaymentMethod & {
   uiKey: string;
 };
+
+export type TpoOption =  "PRIVATE" | "COMMERCIAL"
