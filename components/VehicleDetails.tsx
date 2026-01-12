@@ -95,7 +95,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -121,8 +121,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       const res = await axiosClient.get(
         `vehicle/search?vehicle_registration_number=${vehicleRegNumber.replace(
           / /g,
-          ""
-        )}`
+          "",
+        )}`,
       );
 
       const { vehicle, owner, regNo } = res.data;
@@ -155,20 +155,20 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         if (vehicleAge > maxAgeAllowed) {
           setSearchStatus("error");
           setSearchMessage(
-            `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`
+            `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`,
           );
           toast.error("Vehicle exceeds age limit");
           setLoadingSearch(false);
           setTimeout(() => {
-            router.back()
-          }, 1000)
+            router.back();
+          }, 1000);
           return; // Prevent the form from populating
         }
       }
 
       // 1. Find the Make in your map using case-insensitive search
       const matchingMakeEntry = modelMakeMap.find(
-        (m) => m.make.toLowerCase() === vehicle.carMake?.toLowerCase()
+        (m) => m.make.toLowerCase() === vehicle.carMake?.toLowerCase(),
       );
 
       // 2. Determine the correctly cased Make and populate Model list
@@ -183,13 +183,13 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
       const correctlyCasedModel =
         availableModels.find(
-          (mod) => mod.toLowerCase() === vehicle.carModel?.toLowerCase()
+          (mod) => mod.toLowerCase() === vehicle.carModel?.toLowerCase(),
         ) || vehicle.carModel;
 
       // 3. Find correctly cased Body Type from your fetched bodyTypes list
       const correctlyCasedBodyType =
         bodyTypes.find(
-          (bt) => bt.toLowerCase() === vehicle.bodyType?.toLowerCase()
+          (bt) => bt.toLowerCase() === vehicle.bodyType?.toLowerCase(),
         ) || vehicle.bodyType;
 
       // 🔁 Populate models BEFORE setting form.model
@@ -241,7 +241,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
       setSearchStatus("error");
       setSearchMessage(
-        "Vehicle could not be found. Kindly enter the vehicle details manually."
+        "Vehicle could not be found. Kindly enter the vehicle details manually.",
       );
 
       toast.error("Vehicle not found");
@@ -260,7 +260,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       toast.success("Vehicle details saved.", { duration: 2000 });
       reset();
       router.push(
-        `/personal-details?product_type=${product_type}&motor_type=${motor_type}`
+        `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
       );
     }, 200);
   };
@@ -281,7 +281,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const cancelAction = () => {
     reset();
     router.push(
-      `/personal-details?product_type=${product_type}&motor_type=${motor_type}`
+      `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
     );
   };
 
@@ -501,7 +501,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                                       {year}
                                     </SelectItem>
                                   );
-                                }
+                                },
                               )}
                             </SelectContent>
                           </Select>

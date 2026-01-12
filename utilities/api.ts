@@ -31,16 +31,16 @@ export const apiHandler = async (url: string, requiresAuth: boolean = true) => {
 
     if (response.status === 401) {
       [ACCESS_TOKEN, USER_ID, EMAIL, NAME].forEach((cookie) =>
-        destroyCookie(null, cookie)
+        destroyCookie(null, cookie),
       );
       throw new Error(
-        `Failed to fetch data: ${response?.status} ${response?.statusText}`
+        `Failed to fetch data: ${response?.status} ${response?.statusText}`,
       );
     }
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch data: ${response?.status} ${response?.statusText}`
+        `Failed to fetch data: ${response?.status} ${response?.statusText}`,
       );
     }
 
@@ -59,7 +59,7 @@ export const postHandler = async (
   ENDPOINT: string,
   requiresAuth: boolean = true,
   payload: PayloadT,
-  method: string = "POST"
+  method: string = "POST",
 ) => {
   const token = parseCookies()[ACCESS_TOKEN];
 
@@ -79,22 +79,21 @@ export const postHandler = async (
     });
     const data = await response.json();
 
-
     if (response.status === 401) {
       throw new Error(
-        "Unauthorized access: You are not authorized to access this service."
+        "Unauthorized access: You are not authorized to access this service.",
       );
     }
 
     if (data?.error) {
       throw new Error(
-        `Failed to fetch data: ${data?.error || "Unknown error occurred"}`
+        `Failed to fetch data: ${data?.error || "Unknown error occurred"}`,
       );
     }
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch data: ${response?.status} ${response?.statusText}`
+        `Failed to fetch data: ${response?.status} ${response?.statusText}`,
       );
     }
     return data;
@@ -113,7 +112,7 @@ export const postHandler = async (
 export const handleRegisterVehicle = async (
   ENDPOINT: string,
   token: string,
-  payload: PayloadT
+  payload: PayloadT,
 ) => {
   const authHeaderValue = `Bearer ${token}`;
   try {
@@ -133,7 +132,7 @@ export const handleRegisterVehicle = async (
 
     if (response.status === 401) {
       throw new Error(
-        "Unauthorized access: You are not authorized to access this service."
+        "Unauthorized access: You are not authorized to access this service.",
       );
     }
 
@@ -186,7 +185,7 @@ export const loginSubmitHandler = async ({
  */
 export const getData = async (
   ENDPOINT: string,
-  requiresAuth: boolean = true
+  requiresAuth: boolean = true,
 ) => {
   try {
     const url = SERVER_URL + ENDPOINT;
@@ -213,7 +212,7 @@ export async function getDataRq<T>(url: string): Promise<T> {
 export const postData = async (
   ENDPOINT: string,
   payload: PayloadT,
-  method: string = "POST"
+  method: string = "POST",
 ) => {
   try {
     const requiresAuth = true;

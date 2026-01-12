@@ -8,17 +8,15 @@ import { isAxiosError } from "axios";
 export const dynamic = "force-dynamic";
 
 export default async function MotorTypePage() {
-  let motortypeData: MotorTypesResponse | undefined = undefined
-  let errorMsg: string = '';
-  
-  try{
-    const res = await axiosServer.get(
-      MOTOR_TYPES_ENDPOINT,
-    );
-    motortypeData = res.data
-  }catch(err: unknown) {
+  let motortypeData: MotorTypesResponse | undefined = undefined;
+  let errorMsg: string = "";
+
+  try {
+    const res = await axiosServer.get(MOTOR_TYPES_ENDPOINT);
+    motortypeData = res.data;
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
-      errorMsg = 'Failed to load motor types.'
+      errorMsg = "Failed to load motor types.";
     }
   }
 
@@ -30,19 +28,18 @@ export default async function MotorTypePage() {
 
   return (
     <>
-    {
-      motortypeData ?
-      <section className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-        <PageBreadCrumb pages={pages} />
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#2e5e74]">Step One</h2>
-          <p className="text-muted-foreground mt-2">Choose a Motor Type</p>
-        </div>
-        <SelectMotorType data={motortypeData} />
-      </section>
-      :
-      <p>{errorMsg}</p>
-    }
+      {motortypeData ? (
+        <section className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
+          <PageBreadCrumb pages={pages} />
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-4xl font-bold text-[#2e5e74]">Step One</h2>
+            <p className="text-muted-foreground mt-2">Choose a Motor Type</p>
+          </div>
+          <SelectMotorType data={motortypeData} />
+        </section>
+      ) : (
+        <p>{errorMsg}</p>
+      )}
     </>
   );
 }

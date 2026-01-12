@@ -210,4 +210,4 @@ export type UIMappedPaymentMethod = PaymentMethod & {
   uiKey: string;
 };
 
-export type TpoOption =  "PRIVATE" | "COMMERCIAL"
+export type TpoOption = "PRIVATE" | "COMMERCIAL";

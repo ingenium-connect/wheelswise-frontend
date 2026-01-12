@@ -17,7 +17,7 @@ axiosClient.interceptors.response.use(
       window.location.href = "/auth/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 const axiosAuthClient = axios.create({
@@ -48,7 +48,7 @@ axiosAuthClient.interceptors.response.use(
       window.location.href = "/auth/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export { axiosClient, axiosAuthClient };

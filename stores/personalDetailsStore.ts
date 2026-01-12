@@ -47,6 +47,6 @@ export const usePersonalDetailsStore = create<PersonalDetailsState>()(
     }),
     {
       name: "personal-details-store",
-    }
-  )
+    },
+  ),
 );

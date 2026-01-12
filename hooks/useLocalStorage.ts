@@ -3,6 +3,4 @@
  */
 const IS_SERVER = typeof window === "undefined";
 
-
-export function useLocalStorage() {
-}
+export function useLocalStorage() {}

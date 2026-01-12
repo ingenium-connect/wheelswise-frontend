@@ -7,6 +7,12 @@ export const tpoCategories = [
   { label: "Psv Private Hire", value: "PSV_PRIVATE_HIRE" },
   { label: "Psv Taxis", value: "PSV_TAXIS" },
   { label: "Contingent Liability", value: "CONTINGENT_LIABILITY" },
-  { label: "Commercial Institutional Vehicles", value: "COMMERCIAL_INSTITUTIONAL_VEHICLES" },
-  { label: "Commercial Driving School Vehicles", value: "COMMERCIAL_DRIVING_SCHOOL_VEHICLES" }
-]
+  {
+    label: "Commercial Institutional Vehicles",
+    value: "COMMERCIAL_INSTITUTIONAL_VEHICLES",
+  },
+  {
+    label: "Commercial Driving School Vehicles",
+    value: "COMMERCIAL_DRIVING_SCHOOL_VEHICLES",
+  },
+];

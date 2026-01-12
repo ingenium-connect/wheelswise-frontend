@@ -26,19 +26,19 @@ type Props = {
 const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [vehicleTonnage, setVehicleTonnage] = useState<number>(0);
   const [commercialOptions, setCommercialOptions] = useState<
     { description: string; code: string }[]
   >([]);
-  const tpoSeatCapacityOptions = []
+  const tpoSeatCapacityOptions = [];
 
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
   const setTpoOption = useInsuranceStore((state) => state.setTpoOption);
-  const setTonnage = useVehicleStore((state) => state.setTonnage)
+  const setTonnage = useVehicleStore((state) => state.setTonnage);
 
   useEffect(() => {
     const getCommercialOptions = () => {
@@ -67,31 +67,31 @@ const SelectMotorType = ({ data }: Props) => {
     setMotorType(type);
 
     router.push(
-      `/vehicle-value?product_type=${selectedCover}&motor_type=${type.name}`
+      `/vehicle-value?product_type=${selectedCover}&motor_type=${type.name}`,
     );
   };
 
   const handleTPO = (category: string) => {
-    const tpoCategory = category as TpoOption
+    const tpoCategory = category as TpoOption;
     // setting placeholder information for TPO option
     if (tpoCategory === "PRIVATE") {
       setMotorType({
         id: "1",
         name: "PRIVATE",
         description: "",
-        image_url: ""
-      })
+        image_url: "",
+      });
     } else {
       setMotorType({
         id: "2",
         name: "COMMERCIAL",
         description: "",
-        image_url: ""
-      })
+        image_url: "",
+      });
     }
     setTpoOption(tpoCategory);
     router.push(
-      `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}&tonnge=${vehicleTonnage}`
+      `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}&tonnge=${vehicleTonnage}`,
     );
   };
 
@@ -163,11 +163,12 @@ const SelectMotorType = ({ data }: Props) => {
                       onChange={handleTonnageChange}
                     />
                   </Field>
-                  {!vehicleTonnage || vehicleTonnage <= 0 && (
-                    <p className="text-red-600 text-sm mt-1">
-                      Please enter a valid tonnage for the selected vehicle.
-                    </p>
-                  )}
+                  {!vehicleTonnage ||
+                    (vehicleTonnage <= 0 && (
+                      <p className="text-red-600 text-sm mt-1">
+                        Please enter a valid tonnage for the selected vehicle.
+                      </p>
+                    ))}
                   <Button
                     disabled={!vehicleTonnage || vehicleTonnage <= 0}
                     onClick={() => handleTPO(selectedOption)}

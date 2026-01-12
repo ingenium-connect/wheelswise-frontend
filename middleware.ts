@@ -24,7 +24,9 @@ export default function middleware(request: NextRequest) {
   // If user is authenticated and trying to access login or register, redirect to /dashboard
   if (
     authToken &&
-    (pathname === "/" || pathname.startsWith("/register") || pathname.startsWith("/login"))
+    (pathname === "/" ||
+      pathname.startsWith("/register") ||
+      pathname.startsWith("/login"))
   ) {
     return NextResponse.redirect(new URL(`/dashboard`, request.url));
   }

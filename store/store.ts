@@ -48,8 +48,8 @@ const useInsuranceStore = create<InsuranceStoreState>()(
     }),
     {
       name: "motor-insurance-details",
-    }
-  )
+    },
+  ),
 );
 
 export { useInsuranceStore };

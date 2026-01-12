@@ -16,7 +16,7 @@ const PaymentSummary = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
   const [paymentMethods, setPaymentMethods] = useState<UIMappedPaymentMethod[]>(
-    []
+    [],
   );
   const [oneTimePayment, setOneTimePayment] = useState<number>(0);
 
@@ -61,7 +61,7 @@ const PaymentSummary = () => {
     if (motorSubType?.underwriter_product.premium_amount?.one_time_payment) {
       setSelectedPaymentMethod("onetime");
       setOneTimePayment(
-        motorSubType?.underwriter_product.premium_amount?.one_time_payment
+        motorSubType?.underwriter_product.premium_amount?.one_time_payment,
       );
     } else {
       setSelectedPaymentMethod("installment");
