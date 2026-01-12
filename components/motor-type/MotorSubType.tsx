@@ -19,7 +19,12 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const { vehicleValue, motorType, cover: selectedCover, tpoOption: tpoCategory } = useInsuranceStore();
+  const {
+    vehicleValue,
+    motorType,
+    cover: selectedCover,
+    tpoOption: tpoCategory,
+  } = useInsuranceStore();
   const setVehicleSubType = useInsuranceStore(
     (state) => state.setVehicleSubType
   );
@@ -80,6 +85,16 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     );
   };
 
+  /**
+   * Returns the year ranges for a specific product
+   * @param range the range of year of manufacture
+   */
+  const getYomRange = (range: number) => {
+    const now = new Date().getFullYear()
+    const startDate = now - range
+    return `${startDate} - ${now}`
+  }
+
   return (
     <>
       <div className="pt-24 pb-20 px-4 mx-auto">
@@ -123,6 +138,28 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                         </span>{" "}
                         KES{" "}
                         {product.premium_amount?.one_time_payment.toLocaleString()}
+                      </li>
+                      {
+                        item.product_rate &&
+
+                      <li>
+                        <span className="font-medium text-gray-800">
+                          Rate:
+                        </span>{" "}
+                        {item.product_rate?.rate}%
+                      </li>
+                      }
+                      <li>
+                        <span className="font-medium text-gray-800">
+                          Period:
+                        </span>{" "}
+                        {product.period} days
+                      </li>
+                      <li>
+                        <span className="font-medium text-gray-800">
+                          Year of Manufacture Range:
+                        </span>{" "}
+                        {getYomRange(product.yom_range)}
                       </li>
                     </ul>
                   </div>

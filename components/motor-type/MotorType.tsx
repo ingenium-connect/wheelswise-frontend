@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { MotorType, MotorTypesResponse } from "@/types/data";
+import { MotorType, MotorTypesResponse, TpoOption } from "@/types/data";
 import { useInsuranceStore } from "@/store/store";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -32,6 +32,7 @@ const SelectMotorType = ({ data }: Props) => {
   const [commercialOptions, setCommercialOptions] = useState<
     { description: string; code: string }[]
   >([]);
+  const tpoSeatCapacityOptions = []
 
   const selectedCover = useInsuranceStore((state) => state.cover);
   const setMotorType = useInsuranceStore((state) => state.setMotorType);
@@ -70,7 +71,24 @@ const SelectMotorType = ({ data }: Props) => {
     );
   };
 
-  const handleTPO = (tpoCategory: string) => {
+  const handleTPO = (category: string) => {
+    const tpoCategory = category as TpoOption
+    // setting placeholder information for TPO option
+    if (tpoCategory === "PRIVATE") {
+      setMotorType({
+        id: "1",
+        name: "PRIVATE",
+        description: "",
+        image_url: ""
+      })
+    } else {
+      setMotorType({
+        id: "2",
+        name: "COMMERCIAL",
+        description: "",
+        image_url: ""
+      })
+    }
     setTpoOption(tpoCategory);
     router.push(
       `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}&tonnge=${vehicleTonnage}`

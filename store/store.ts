@@ -1,4 +1,4 @@
-import { MotorSubTypeItem, MotorType } from "@/types/data";
+import { MotorSubTypeItem, MotorType, TpoOption } from "@/types/data";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -18,7 +18,7 @@ type InsuranceStoreState = {
   nextCoverStep: () => void;
   previousCoverStep: () => void;
   setCoverStep: (step: number) => void;
-  setTpoOption: (option: string) => void;
+  setTpoOption: (option: TpoOption) => void;
 };
 
 /**
