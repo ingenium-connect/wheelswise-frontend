@@ -32,7 +32,7 @@ export default async function MotorTypePage({
       ? {
           ...response,
           motor_types: response.motor_types.filter((mt: MotorType) =>
-            ["PRIVATE", "COMMERCIAL"].includes(mt.name.toUpperCase())
+            ["PRIVATE", "COMMERCIAL"].includes(mt.name.toUpperCase()),
           ),
         }
       : response;

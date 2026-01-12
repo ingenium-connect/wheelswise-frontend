@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useRouter, usePathname } from "next/navigation";
 
@@ -10,7 +10,7 @@ interface Step {
 const steps: Step[] = [
   { path: "/date", label: "Select Policy Start Date" },
   { path: "/payment-summary", label: "Payment Summary" },
-  { path: "/final-step", label: "Confirmation" }, 
+  { path: "/final-step", label: "Confirmation" },
 ];
 
 const StepNav: React.FC = () => {
@@ -45,4 +45,4 @@ const StepNav: React.FC = () => {
   );
 };
 
-export default StepNav; 
+export default StepNav;

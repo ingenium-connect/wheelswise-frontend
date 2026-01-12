@@ -13,21 +13,21 @@ export async function POST(req: Request) {
     const userResponse = await postHandler(
       USER_REGISTRATION_ENDPOINT,
       false,
-      userPayload
+      userPayload,
     );
 
     const token = userResponse?.auth_credentials?.idToken;
     if (!token) {
       return NextResponse.json(
         { error: "User registration failed: token missing" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const vehicleResponse = await handleRegisterVehicle(
       REGISTER_VEHICLE_ENDPOINT,
       token,
-      vehiclePayload
+      vehiclePayload,
     );
 
     const response = NextResponse.json({
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     console.error("Signup Error:", error);
     return NextResponse.json(
       { error: (error as Error).message ?? "Signup failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

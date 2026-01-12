@@ -13,7 +13,7 @@ export default async function Page() {
 
   try {
     const res = await axiosServer.get(
-      `${COVER_TYPES_ENDPOINT}/?page=1&page_size=3`
+      `${COVER_TYPES_ENDPOINT}/?page=1&page_size=3`,
     );
     response = res.data;
   } catch (err: unknown) {

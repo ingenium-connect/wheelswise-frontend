@@ -34,7 +34,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
     useVehicleStore();
 
   const [isCommercial] = useState(
-    () => selectedMotorType?.name === "COMMERCIAL"
+    () => selectedMotorType?.name === "COMMERCIAL",
   );
 
   useEffect(() => {
@@ -57,10 +57,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
     ) {
       isValid = false;
       setError("Please enter a valid seating capacity.");
-    } else if (
-      isCommercial &&
-      (!tonnage || tonnage <= 0)
-    ) {
+    } else if (isCommercial && (!tonnage || tonnage <= 0)) {
       isValid = false;
       setError("Please enter a valid tonnage.");
     }
@@ -70,7 +67,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
     setError("");
 
     router.push(
-      `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`
+      `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
     );
   };
 

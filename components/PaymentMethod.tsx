@@ -42,7 +42,7 @@ const PaymentMethod = () => {
   };
 
   const handleCardDetailsChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = event.target;
     setCardDetails((prevDetails) => ({

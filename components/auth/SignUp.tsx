@@ -109,7 +109,7 @@ const Signup: React.FC<Props> = ({
 
       if (missingPersonalFields.length > 0) {
         throw new Error(
-          `Missing personal details: ${missingPersonalFields.join(", ")}`
+          `Missing personal details: ${missingPersonalFields.join(", ")}`,
         );
       }
 
@@ -127,7 +127,7 @@ const Signup: React.FC<Props> = ({
 
       if (missingVehicleFields.length > 0) {
         throw new Error(
-          `Missing vehicle details: ${missingVehicleFields.join(", ")}`
+          `Missing vehicle details: ${missingVehicleFields.join(", ")}`,
         );
       }
 
@@ -194,7 +194,7 @@ const Signup: React.FC<Props> = ({
 
       toast.success("Successfully registered!");
       router.push(
-        `/otp-verify?product_type=${product_type}&motor_type=${motor_type}`
+        `/otp-verify?product_type=${product_type}&motor_type=${motor_type}`,
       );
     } catch (error) {
       const errorMessage =

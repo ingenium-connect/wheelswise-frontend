@@ -26,7 +26,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     tpoOption: tpoCategory,
   } = useInsuranceStore();
   const setVehicleSubType = useInsuranceStore(
-    (state) => state.setVehicleSubType
+    (state) => state.setVehicleSubType,
   );
   const { seating_capacity, tonnage } = useVehicleStore();
 
@@ -42,8 +42,8 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
         motor_type === "PSV"
           ? `seating_capacity=${seating_capacity}`
           : ["COMMERCIAL", "PRIME COMMERCIAL VEHICLES"].includes(motorType.name)
-          ? `tonnage=${tonnage}`
-          : "";
+            ? `tonnage=${tonnage}`
+            : "";
       API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}&${urlString}`;
     }
 
@@ -81,7 +81,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     console.log("Selected product:", product);
     setVehicleSubType(product);
     router.push(
-      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`
+      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`,
     );
   };
 
@@ -90,10 +90,10 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
    * @param range the range of year of manufacture
    */
   const getYomRange = (range: number) => {
-    const now = new Date().getFullYear()
-    const startDate = now - range
-    return `${startDate} - ${now}`
-  }
+    const now = new Date().getFullYear();
+    const startDate = now - range;
+    return `${startDate} - ${now}`;
+  };
 
   return (
     <>
@@ -139,16 +139,14 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                         KES{" "}
                         {product.premium_amount?.one_time_payment.toLocaleString()}
                       </li>
-                      {
-                        item.product_rate &&
-
-                      <li>
-                        <span className="font-medium text-gray-800">
-                          Rate:
-                        </span>{" "}
-                        {item.product_rate?.rate}%
-                      </li>
-                      }
+                      {item.product_rate && (
+                        <li>
+                          <span className="font-medium text-gray-800">
+                            Rate:
+                          </span>{" "}
+                          {item.product_rate?.rate}%
+                        </li>
+                      )}
                       <li>
                         <span className="font-medium text-gray-800">
                           Period:

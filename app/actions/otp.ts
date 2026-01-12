@@ -9,7 +9,7 @@ export async function otpAction(otpPayload: OtpPayload) {
     OTP_VERIFY_ENDPOINT,
     false,
     otpPayload,
-    "PATCH"
+    "PATCH",
   );
 
   return response;

@@ -55,11 +55,7 @@ const LandingMain: React.FC = () => {
             <Button asChild className="text-white transition">
               <Link href="/cover-type">Get Started</Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="transition"
-            >
+            <Button asChild variant="outline" className="transition">
               <Link href="/login">Login</Link>
             </Button>
           </div>

@@ -84,7 +84,7 @@ const Login: React.FC = () => {
             path: "/",
             secure: process.env.NODE_ENV === "production", // Not using HTTPS locally
             sameSite: "lax", // 'lax' is more permissive for local dev
-          })
+          }),
         );
 
         toast.success("Successfully logged in!");

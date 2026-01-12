@@ -44,7 +44,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -75,7 +75,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const cancelAction = () => {
     reset();
     router.push(
-      `/signup?product_type=${product_type}&motor_type=${motor_type}`
+      `/signup?product_type=${product_type}&motor_type=${motor_type}`,
     );
   };
 

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,9 +18,9 @@ const DateSelection: React.FC = () => {
       alert("Please select a start date.");
       return;
     }
-    
+
     // Store the selected date in localStorage
-    localStorage.setItem('policyStartDate', startDate);
+    localStorage.setItem("policyStartDate", startDate);
     router.push("/payment-summary");
   };
 
@@ -72,4 +72,4 @@ const DateSelection: React.FC = () => {
   );
 };
 
-export default DateSelection; 
+export default DateSelection;

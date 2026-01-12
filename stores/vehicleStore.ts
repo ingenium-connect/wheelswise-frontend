@@ -45,6 +45,6 @@ export const useVehicleStore = create<VehicleStore>()(
     }),
     {
       name: "vehicle-info-store",
-    }
-  )
+    },
+  ),
 );
