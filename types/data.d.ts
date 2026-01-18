@@ -180,9 +180,17 @@ export interface InsuranceCover {
 // types/vehicle.ts
 export type Vehicle = {
   id: string;
-  name: string;
-  registration: string;
-  color: string;
+  chassis_number: string;
+  registration_number: string;
+  make: string;
+  model: string;
+  owner: string;
+  vehicle_value: number;
+  seating_capacity: number;
+  tonnage: number;
+  body_type: string;
+  vehicle_type: string;
+  year_of_manufacture: string;
 };
 
 // types/policy.ts
@@ -199,11 +207,14 @@ export type InsurancePolicy = {
 };
 
 export type UserProfile = {
+  id: string;
   name: string;
-  idNumber: string;
-  kraPin: string;
-  phoneNumber: string;
+  msisdn: string;
+  id_number: string;
   email: string;
+  kra_pin: string;
+  is_active: boolean;
+  user_type: string;
 };
 
 export type UIMappedPaymentMethod = PaymentMethod & {

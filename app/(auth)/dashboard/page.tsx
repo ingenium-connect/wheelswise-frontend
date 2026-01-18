@@ -5,73 +5,47 @@ import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import { InsurancePolicy, UserProfile, Vehicle } from "@/types/data";
 import { PolicyCard } from "@/components/policy/policy-card";
 import { AccountCard } from "@/components/auth/profile-card";
+import { isAxiosError } from "axios";
+import {
+  PROFILE_ENDPOINT,
+  USER_POLICIES_ENDPOINT,
+  USER_VEHICLES_ENDPOINT,
+} from "@/utilities/endpoints";
 
-const vehicles: Vehicle[] = [
-  {
-    id: "1",
-    name: "2022 Toyota Camry",
-    registration: "KDA288L",
-    color: "White",
-  },
-  {
-    id: "2",
-    name: "2022 Toyota Axio",
-    registration: "KDA288J",
-    color: "Silver",
-  },
-  {
-    id: "3",
-    name: "2022 Volvo S60",
-    registration: "KDA288J",
-    color: "Black",
-  },
-];
+import { getData } from "@/utilities/api";
+import DashboardBanner from "@/components/auth/dashboard-banner";
 
-const policies: InsurancePolicy[] = [
-  {
-    id: "1",
-    vehicleName: "2022 Toyota Camry",
-    registration: "KDA288L",
-    insurer: "Safe Insurance",
-    policyNumber: "POL-001-2024",
-    coverage: "COMPREHENSIVE",
-    premium: 20500,
-    expiryDate: "2/15/2026",
-    remainingDays: 319,
-  },
-  {
-    id: "2",
-    vehicleName: "2022 Toyota Axio",
-    registration: "KDA288J",
-    insurer: "Safe Insurance",
-    policyNumber: "POL-001-2024",
-    coverage: "THIRD PARTY",
-    premium: 20500,
-    expiryDate: "2/15/2026",
-    remainingDays: 200,
-  },
-  {
-    id: "3",
-    vehicleName: "2022 Volvo S60",
-    registration: "KDA288J",
-    insurer: "Safe Insurance",
-    policyNumber: "POL-001-2024",
-    coverage: "COMPREHENSIVE",
-    premium: 20500,
-    expiryDate: "2/15/2026",
-    remainingDays: 9,
-  },
-];
-
-const user: UserProfile = {
-  name: "Victor Nyangi",
-  idNumber: "23454323",
-  kraPin: "67373932",
-  phoneNumber: "+254711223344",
-  email: "mzenyangi@gmail.com",
-};
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  let policies: InsurancePolicy[] | undefined = undefined;
+  let profile: UserProfile | undefined = undefined;
+  let vehicles: Vehicle[] | undefined = undefined;
+
+  let errorMsg: string = "Failed to load data.";
+
+  try {
+    const results = await Promise.allSettled([
+      getData(PROFILE_ENDPOINT),
+      getData(`${USER_POLICIES_ENDPOINT}?page=1&page_size=10`),
+      getData(`${USER_VEHICLES_ENDPOINT}?page=1&page_size=10`),
+    ]);
+
+    const [profileRes, policiesRes, vehiclesRes] = results.map((res) =>
+      res.status === "fulfilled" ? res?.value : null,
+    );
+
+    profile = profileRes;
+    policies = policiesRes;
+    vehicles = vehiclesRes;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) {
+      if (err?.response?.status === 404) {
+        errorMsg = "Page not found";
+      }
+    }
+  }
+
   return (
     <>
       <div className="min-h-screen bg-background p-8">
@@ -101,62 +75,18 @@ export default async function Page() {
                   </TabsList>
 
                   <TabsContent value="home" className="space-y-4">
-                    <div className="border border-border rounded-lg p-4 bg-background/50">
-                      <p className="text-sm text-foreground mb-3">
-                        Welcome back, Kathurima
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-4">
-                        Manage your vehicles and insurance policies all in one
-                        place.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="border border-border rounded p-2 text-center">
-                        <p className="text-xs text-muted-foreground">
-                          Total Vehicles
-                        </p>
-                        <p className="text-sm font-semibold text-foreground mt-1">
-                          5
-                        </p>
-                      </div>
-                      <div className="border border-border rounded p-2 text-center">
-                        <p className="text-xs text-muted-foreground">
-                          Active Policies
-                        </p>
-                        <p className="text-sm font-semibold text-foreground mt-1">
-                          2
-                        </p>
-                      </div>
-                      <div className="border border-border rounded p-2 text-center">
-                        <p className="text-xs text-muted-foreground">
-                          Expiring Soon
-                        </p>
-                        <p className="text-sm font-semibold text-foreground mt-1">
-                          1
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-2 border border-border rounded-lg p-4 bg-background/50">
-                      <p className="text-xs font-semibold text-foreground">
-                        Quick Actions
-                      </p>
-                      <div className="flex gap-2">
-                        <button className="text-xs border border-border rounded px-3 py-1.5 text-foreground hover:bg-muted transition">
-                          Add New Vehicle
-                        </button>
-                        <button className="text-xs border border-border rounded px-3 py-1.5 text-foreground hover:bg-muted transition">
-                          View All Policies
-                        </button>
-                      </div>
-                    </div>
+                    <DashboardBanner
+                      name={profile?.name ?? "-"}
+                      vehicleCount={vehicles?.length ?? 0}
+                      policyCount={policies?.length ?? 0}
+                    />
                   </TabsContent>
 
                   <TabsContent value="vehicle">
                     <section className="min-h-screen px-6 py-8 text-black">
-                      {/* Header */}
                       <div className="flex items-center justify-between mb-8">
                         <h1 className="text-xl font-semibold tracking-wide">
-                          Kathurima Vehicles
+                          {`${profile?.name}'s Vehicles`}
                         </h1>
 
                         <Button
@@ -168,11 +98,17 @@ export default async function Page() {
                       </div>
 
                       {/* Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
-                        {vehicles.map((vehicle) => (
-                          <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                        ))}
-                      </div>
+                      {!Array.isArray(vehicles) || vehicles?.length === 0 ? (
+                        <p className="text-center text-gray-500">
+                          No vehicles found. Please add a vehicle.
+                        </p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
+                          {(vehicles ?? []).map((vehicle: Vehicle) => (
+                            <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                          ))}
+                        </div>
+                      )}
                     </section>
                   </TabsContent>
 
@@ -182,17 +118,25 @@ export default async function Page() {
                         Insurance Policies
                       </h1>
 
-                      <div className="space-y-6 max-w-6xl">
-                        {policies.map((policy) => (
-                          <PolicyCard key={policy.id} policy={policy} />
-                        ))}
-                      </div>
+                      {!Array.isArray(policies) || policies?.length === 0 ? (
+                        <p className="text-center text-gray-500">
+                          No policies found. Please add a policy.
+                        </p>
+                      ) : (
+                        <div className="space-y-6 max-w-6xl">
+                          {(policies ?? []).map((policy) => (
+                            <PolicyCard key={policy.id} policy={policy} />
+                          ))}
+                        </div>
+                      )}
                     </section>
                   </TabsContent>
 
-                  <TabsContent value="profile">
-                    <AccountCard user={user} />
-                  </TabsContent>
+                  {profile && (
+                    <TabsContent value="profile">
+                      <AccountCard user={profile} />
+                    </TabsContent>
+                  )}
                 </Tabs>
               </CardContent>
             </Card>

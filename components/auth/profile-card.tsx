@@ -1,4 +1,3 @@
-// components/account-card.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types/data";
@@ -24,14 +23,20 @@ export function AccountCard({ user }: Props) {
         </div>
 
         {/* Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
-          <Info label="Name" value={user.name} />
-          <Info label="ID Number" value={user.idNumber} />
-          <Info label="KRA PIN" value={user.kraPin} />
+        {!user ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No user data available.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+            <Info label="Name" value={user.name} />
+            <Info label="ID Number" value={user.id_number} />
+            <Info label="KRA PIN" value={user.kra_pin} />
 
-          <Info label="Phone Number" value={user.phoneNumber} />
-          <Info label="Email" value={user.email} />
-        </div>
+            <Info label="Phone Number" value={user.msisdn} />
+            <Info label="Email" value={user.email} />
+          </div>
+        )}
 
         {/* Action */}
         <Button

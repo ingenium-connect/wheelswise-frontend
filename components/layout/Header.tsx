@@ -14,10 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ACCESS_TOKEN } from "@/utilities/constants";
-import { parseCookies } from "nookies";
-const Header = () => {
-  const token = parseCookies()[ACCESS_TOKEN];
-  console.log("TOKEN HEADER:", token);
+import { cookies } from "next/headers";
+
+export default async function Header() {
+  const cookiesData = await cookies();
+
+  const token = cookiesData.get(ACCESS_TOKEN)?.value;
   return (
     <>
       <header className="px-4 md:px-16 py-2 flex items-center justify-between bg-gradient-to-r from-[#d7e8ee] via-white to-[#e5f0f3]">
@@ -57,6 +59,4 @@ const Header = () => {
       </header>
     </>
   );
-};
-
-export default Header;
+}
