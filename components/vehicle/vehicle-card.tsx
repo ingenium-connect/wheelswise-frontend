@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Vehicle } from "@/types/data";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 type Props = {
   vehicle: Vehicle;
-  insured?: boolean;
 };
 
-export function VehicleCard({ vehicle, insured = false }: Props) {
+export function VehicleCard({ vehicle }: Props) {
   const {
     make,
     model,
@@ -17,6 +17,7 @@ export function VehicleCard({ vehicle, insured = false }: Props) {
     tonnage,
     vehicle_value,
     year_of_manufacture,
+    active_policy,
   } = vehicle;
 
   return (
@@ -30,12 +31,22 @@ export function VehicleCard({ vehicle, insured = false }: Props) {
           <p className="mt-1 text-sm opacity-90">{registration_number}</p>
         </div>
 
-        <Button
-          variant="outline"
-          className="border-black text-black hover:bg-black/10"
-        >
-          {insured ? "Insured / Covered" : "Insure"}
-        </Button>
+        {active_policy && active_policy !== null ? (
+          <Button
+            variant="outline"
+            className="border-black text-black hover:bg-black/10"
+          >
+            Insured / Covered
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            asChild
+            className="border-black text-black hover:bg-black/10"
+          >
+            <Link href="/cover-type">Insure</Link>
+          </Button>
+        )}
       </div>
 
       {/* Details */}

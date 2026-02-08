@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import { MotorSubTypeItem } from "@/types/data";
 import { POLICY_ENDPOINT } from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";

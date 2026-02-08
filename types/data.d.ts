@@ -191,6 +191,7 @@ export type Vehicle = {
   body_type: string;
   vehicle_type: string;
   year_of_manufacture: string;
+  active_policy?: InsurancePolicy | null;
 };
 
 // types/policy.ts

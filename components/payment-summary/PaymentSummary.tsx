@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
-import { useInsuranceStore } from "@/store/store";
-import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import {
   PaymentMethods,
   StaticBenefit,
   UIMappedPaymentMethod,
 } from "@/types/data";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
 const PaymentSummary = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -22,7 +22,7 @@ const PaymentSummary = () => {
 
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
-  const { vehicleDetails } = useVehicleDetailsStore();
+  const { vehicleDetails } = useVehicleStore();
 
   const installments = [
     {

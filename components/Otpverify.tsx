@@ -10,9 +10,13 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
-import { otpAction } from "@/app/actions/otp";
-import { axiosClient } from "@/utilities/axios-client";
+import { axiosAuthClient } from "@/utilities/axios-client";
+import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
+import { parseCookies } from "nookies";
+import { ACCESS_TOKEN } from "@/utilities/constants";
+import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
+import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -20,6 +24,7 @@ const shakeClass =
 
 const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
+  const { sendOtp, timeUntilResend } = useOtp();
 
   const router = useRouter();
   const [otp, setOtp] = useState("");
@@ -48,19 +53,22 @@ const OtpVerify: React.FC = () => {
 
   const resendOtp = () => {
     setAllowResend(false);
-    axiosClient
-      .post("otp", {
-        msisdn: personalDetails.phoneNumber,
-        user_type: "CUSTOMER",
-      })
-      .then((res) => {
-        toast.success("OTP resent successfully");
-      })
-      .catch((err) => {
+    (async () => {
+      try {
+        const res = await sendOtp(personalDetails.phoneNumber);
+        if (res.ok) {
+          setTimer(Math.ceil(OTP_RESEND_WINDOW_MS / 1000));
+        } else if (res.reason === "recently-sent") {
+          toast.success("OTP already sent recently");
+          const until = timeUntilResend(personalDetails.phoneNumber);
+          setTimer(Math.ceil(until / 1000));
+        }
+      } catch (err) {
         console.error(err);
-      });
-
-    setTimer(60);
+        toast.error("Failed to resend OTP");
+        setAllowResend(true);
+      }
+    })();
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -80,18 +88,26 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
-      // TODO: use dummy phone number
       const payload = {
         msisdn: personalDetails.phoneNumber,
         user_type: "CUSTOMER",
         otp: otp,
       };
 
-      const response = await otpAction(payload);
+      const cookies = parseCookies();
+      const token = cookies[ACCESS_TOKEN];
 
-      if (response) {
-        toast.success("OTP sent successfully");
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
 
+      const res = await axiosAuthClient.patch(OTP_VERIFY_ENDPOINT, payload, {
+        headers,
+      });
+
+      const data = res?.data;
+
+      if (data) {
+        toast.success("OTP successfully verified");
         router.push("/dashboard/payment-summary");
       } else {
         setAllowResend(true);
@@ -99,7 +115,6 @@ const OtpVerify: React.FC = () => {
 
         setError("Invalid OTP");
 
-        // Trigger shake animation for invalid OTP
         setShake(true);
         setTimeout(() => setShake(false), 300);
       }

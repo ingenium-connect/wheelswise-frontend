@@ -28,19 +28,6 @@ const axiosAuthClient = axios.create({
   },
 });
 
-/**
- * Attach token dynamically on each request
- */
-// axiosAuthClient.interceptors.request.use((config) => {
-//   const token = parseCookies()[ACCESS_TOKEN];
-
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   return config;
-// });
-
 axiosAuthClient.interceptors.response.use(
   (response) => response,
   (error) => {

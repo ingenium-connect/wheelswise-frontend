@@ -50,8 +50,10 @@ export default async function Header() {
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                Log out
-                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                <a href="/api/logout" className="w-full block">
+                  Log out
+                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                </a>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

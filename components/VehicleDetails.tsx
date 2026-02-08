@@ -1,5 +1,5 @@
 "use client";
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,13 +21,12 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
-import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { se } from "date-fns/locale/se";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
 type Props = {
   motor_type: string | undefined;
@@ -44,7 +43,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
 
-  const { setVehicleDetails } = useVehicleDetailsStore();
+  const { setVehicleDetails } = useVehicleStore();
   const { setPersonalDetails } = usePersonalDetailsStore();
 
   const [models, setModels] = useState<string[]>([]);
@@ -131,7 +130,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         setIsFieldsDisabled(false);
         reset();
 
-        setVehicleDetails({ ntsaRegitered: false });
+        setVehicleDetails({ ntsaRegistered: false });
 
         setPersonalDetails({
           firstName: "",
@@ -139,7 +138,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           phoneNumber: "",
           idNumber: "",
           kraPin: "",
-          ntsaRegitered: false,
+          ntsaRegistered: false,
         });
 
         throw new Error("Vehicle not found");
@@ -161,7 +160,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           setLoadingSearch(false);
           setTimeout(() => {
             router.back();
-          }, 1000);
+          }, 3000);
           return; // Prevent the form from populating
         }
       }
@@ -208,7 +207,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         bodyType: correctlyCasedBodyType || "",
       }));
 
-      setVehicleDetails({ ntsaRegitered: true });
+      setVehicleDetails({ ntsaRegistered: true });
 
       if (owner) {
         const ownerObj = owner[0];
@@ -218,7 +217,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           phoneNumber: ownerObj.TELNO || "",
           idNumber: ownerObj.ID_NUMBER || "",
           kraPin: ownerObj.PIN || "",
-          ntsaRegitered: true,
+          ntsaRegistered: true,
         });
       }
 
@@ -228,7 +227,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     } catch (error) {
       reset();
 
-      setVehicleDetails({ ntsaRegitered: false });
+      setVehicleDetails({ ntsaRegistered: false });
 
       setPersonalDetails({
         firstName: "",
@@ -236,7 +235,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         phoneNumber: "",
         idNumber: "",
         kraPin: "",
-        ntsaRegitered: false,
+        ntsaRegistered: false,
       });
 
       setSearchStatus("error");

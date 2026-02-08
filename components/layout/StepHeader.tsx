@@ -1,6 +1,6 @@
 "use client";
 
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useRouter } from "next/navigation";
 
 export default function StepHeader() {

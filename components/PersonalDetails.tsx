@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { useInsuranceStore } from "@/store/store";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -17,6 +16,7 @@ import {
 import { Card, CardContent } from "./ui/card";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 
 type Props = {
   motor_type: string | undefined;
@@ -28,7 +28,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const router = useRouter();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
-  const isNtsaRegistered = personalDetails.ntsaRegitered || false;
+  const isNtsaRegistered = personalDetails.ntsaRegistered || false;
 
   const [form, setForm] = useState({
     firstName: personalDetails.firstName || "",
