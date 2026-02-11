@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import { loginFormSchema } from "@/lib/validation-schemas";
 import { PasswordInput } from "../forms/password-input";
 import { useState } from "react";
 import { loginSubmitHandler } from "@/utilities/api";
@@ -35,6 +34,7 @@ import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
 import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "@/utilities/constants";
+import { loginFormSchema } from "@/utilities/validation-schemas";
 
 const formSchema = loginFormSchema;
 

@@ -14,6 +14,7 @@ import {
 
 import { getData } from "@/utilities/api";
 import DashboardBanner from "@/components/auth/dashboard-banner";
+import StoreUserClient from "@/components/auth/StoreUserClient";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,7 @@ export default async function Page() {
 
   return (
     <>
+      {profile && <StoreUserClient user={profile} />}
       <div className="min-h-screen bg-background p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}

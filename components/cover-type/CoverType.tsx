@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useEffect } from "react";
 
 type Props = {

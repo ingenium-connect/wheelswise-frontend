@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
 
 import {

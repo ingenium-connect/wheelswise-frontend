@@ -34,11 +34,9 @@ export default async function Page() {
       <section className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
         <PageBreadCrumb pages={pages} />
         <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#2e5e74]">
-            Choose a Payment Method
-          </h2>
+          <h2 className="text-4xl font-bold text-[#2e5e74]">Choose a Cover</h2>
           <p className="text-muted-foreground mt-2">
-            Select your most convenient payment method.
+            Select your most convenient cover type.
           </p>
         </div>
         <SelectCoverType data={response} />

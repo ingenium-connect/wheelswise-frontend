@@ -8,13 +8,13 @@ type PersonalDetails = {
   email: string;
   idNumber: string;
   kraPin: string;
-  ntsaRegitered: boolean;
+  ntsaRegistered: boolean;
 };
 
 type PersonalDetailsState = {
   personalDetails: PersonalDetails;
   setPersonalDetails: (payload: Partial<PersonalDetails>) => void;
-  updateField: (field: keyof PersonalDetails, value: string) => void;
+  updateField: (field: keyof PersonalDetails, value: string | boolean) => void;
   resetPersonalDetails: () => void;
 };
 
@@ -25,7 +25,7 @@ const initialState: PersonalDetails = {
   email: "",
   idNumber: "",
   kraPin: "",
-  ntsaRegitered: false,
+  ntsaRegistered: false,
 };
 
 export const usePersonalDetailsStore = create<PersonalDetailsState>()(
@@ -40,7 +40,7 @@ export const usePersonalDetailsStore = create<PersonalDetailsState>()(
 
       updateField: (field, value) =>
         set((state) => ({
-          personalDetails: { ...state.personalDetails, [field]: value },
+          personalDetails: { ...state.personalDetails, [field]: value as any },
         })),
 
       resetPersonalDetails: () => set({ personalDetails: initialState }),

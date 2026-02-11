@@ -22,9 +22,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
-import { useVehicleDetailsStore } from "@/stores/vehicleDetailsStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
-import { useInsuranceStore } from "@/store/store";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import {
   FinalUserPayload,
   FinalVehiclePayload,
@@ -50,8 +49,7 @@ const Signup: React.FC<Props> = ({
 }: Props) => {
   const { personalDetails } = usePersonalDetailsStore();
 
-  const { vehicleDetails } = useVehicleDetailsStore();
-  const { tonnage, seating_capacity } = useVehicleStore();
+  const { tonnage, seating_capacity, vehicleDetails } = useVehicleStore();
 
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
 
@@ -173,15 +171,15 @@ const Signup: React.FC<Props> = ({
       }
 
       const finalUserPayload: FinalUserPayload = {
-        source: personalDetails.ntsaRegitered ? "NTSA" : "",
-        source_vehicle_reg_number: personalDetails.ntsaRegitered
+        source: personalDetails.ntsaRegistered ? "NTSA" : "",
+        source_vehicle_reg_number: personalDetails.ntsaRegistered
           ? vehicleDetails.vehicleNumber.trim()
           : "",
         user: userDetailsPayload,
       };
 
       const finalVehiclePayload: FinalVehiclePayload = {
-        source: vehicleDetails.ntsaRegitered ? "NTSA" : "",
+        source: vehicleDetails.ntsaRegistered ? "NTSA" : "",
         vehicle: vehiclePayload,
       };
       // -------------------------------------
