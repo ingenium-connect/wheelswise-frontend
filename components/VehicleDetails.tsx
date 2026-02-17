@@ -279,9 +279,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const cancelAction = () => {
     reset();
-    router.push(
-      `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
-    );
+    router.back();
   };
 
   return (

@@ -44,7 +44,39 @@ export interface MotorSubTypeResponse extends ApiResponse {
   underwriter_products: MotorSubTypeItem[];
 }
 
-export interface MotorSubTypeItem {
+export type AdditionalBenefit = {
+  id: string;
+  name: string;
+  included: boolean;
+  duration_days: number;
+  base_amount: number;
+  currency: string;
+  underwriter_product_id: string;
+  percentage: number;
+};
+
+export type ProductBenefits = {
+  underwriter_product_id: string;
+  product_benefits: {
+    id: string;
+    name: string;
+    limits?: { amount: string; currency: string; label?: string }[];
+    description?: string;
+  }[];
+  applicable_excesses: {
+    name: string;
+    id: string;
+    percentage: number;
+    percentage_of: string;
+    minimum_amount: number;
+    currency: string;
+    additional_amount: number;
+    conditions: string;
+  }[];
+  additional_benefits: AdditionalBenefit[];
+};
+
+export type MotorSubTypeItem = {
   product_rate: {
     id: string;
     covertype_id: string;
@@ -70,14 +102,7 @@ export interface MotorSubTypeItem {
       one_time_payment: number;
     };
     image_url: string;
-    additional_benefits: {
-      id: string;
-      name: string;
-      duration_days: number;
-      base_amount: number;
-      currency: string;
-      percentage: number;
-    }[];
+    additional_benefits: AdditionalBenefit[];
     applicable_excesses: {
       id: string;
       name: string;
@@ -92,7 +117,7 @@ export interface MotorSubTypeItem {
       limits: { label?: string; amount: number; currency: string }[];
     }[];
   };
-}
+};
 
 export type OtpPayload = { msisdn: string; user_type: string; otp: string };
 
