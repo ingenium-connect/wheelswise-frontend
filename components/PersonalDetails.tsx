@@ -57,7 +57,10 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
     setTimeout(() => {
       toast.success("User details saved.", { duration: 2000 });
-      cancelAction();
+      reset();
+      router.push(
+        `/signup?product_type=${product_type}&motor_type=${motor_type}`,
+      );
     }, 200);
   };
 
@@ -74,9 +77,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
   const cancelAction = () => {
     reset();
-    router.push(
-      `/signup?product_type=${product_type}&motor_type=${motor_type}`,
-    );
+    router.back();
   };
 
   return (
@@ -134,8 +135,6 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                         value={form.phoneNumber}
                         onChange={handleChange}
                         placeholder="254*********"
-                        readOnly={isNtsaRegistered}
-                        disabled={isNtsaRegistered}
                         required
                       />
                     </Field>

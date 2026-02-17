@@ -4,14 +4,72 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useInsuranceStore } from "@/stores/insuranceStore";
-import { MotorSubTypeItem } from "@/types/data";
+import {
+  AdditionalBenefit,
+  MotorSubTypeItem,
+  ProductBenefits,
+} from "@/types/data";
 import { POLICY_ENDPOINT } from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { axiosClient } from "@/utilities/axios-client";
+import { LucideChevronDown, LucideChevronUp } from "lucide-react";
 
 type Props = {
   motor_type: string | undefined;
   product_type: string | undefined;
+};
+
+type BenefitsSectionProps = {
+  productId: string;
+};
+
+const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
+  const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
+
+  useEffect(() => {
+    const fetchProductBenefits = () => {
+      axiosClient
+        .get("benefit/extras", {
+          params: {
+            underwriter_product_id: productId,
+          },
+        })
+        .then((response) => setProductBenefits(response.data));
+    };
+
+    fetchProductBenefits();
+  }, []);
+
+  return (
+    <div className="flex flex-wrap gap-4">
+      {productBenefits ? (
+        <>
+          <div>
+            <p className="font-bold">Product benefits</p>
+            {productBenefits.product_benefits.map((benefit) => (
+              <ul className="pl-4" key={benefit.id}>
+                <li className="cursor-pointer list-disc">{benefit.name}</li>
+              </ul>
+            ))}
+          </div>
+          <div>
+            <p className="font-bold">Applicable excesses</p>
+            {productBenefits.applicable_excesses.map((benefit) => (
+              <ul className="pl-4" key={benefit.id}>
+                <li className="cursor-pointer list-disc">
+                  {benefit.name}
+                  <p>{`${benefit.percentage}% of ${benefit.percentage_of}. Minimum amount ${benefit.minimum_amount}${benefit.currency}`}</p>
+                  {benefit.conditions && <p>Condition: {benefit.conditions}</p>}
+                </li>
+              </ul>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p>Loading benefits...</p>
+      )}
+    </div>
+  );
 };
 
 const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
@@ -19,6 +77,10 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showBenefits, setShowBenefits] = useState(false);
+  const [additionalBenefits, setAdditionalBenefits] = useState<
+    AdditionalBenefit[]
+  >([]);
   const {
     vehicleValue,
     motorType,
@@ -55,7 +117,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     const fetchSubtypes = () => {
       axiosClient
         .post(API_URL, {
-          additional_benefits: [],
+          additional_benefits: additionalBenefits,
         })
         .then((res) => {
           const data = res.data;
@@ -75,7 +137,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
       fetchSubtypes();
     }
     setCoverStep(3);
-  }, [motorType?.name, vehicleValue]);
+  }, [motorType?.name, vehicleValue, additionalBenefits]);
 
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
@@ -94,6 +156,25 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     return `${startDate} - ${now}`;
   };
 
+  /**
+   * adds additional benefits
+   * @param benefit an additional benefit object
+   */
+  const addBenefit = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    benefit: AdditionalBenefit,
+  ) => {
+    // return early if benefit is already added
+    if (additionalBenefits.includes(benefit)) return;
+    if (event.target.checked) {
+      setAdditionalBenefits([...additionalBenefits, benefit]);
+    } else {
+      setAdditionalBenefits(
+        additionalBenefits.filter((item) => item.id !== benefit.id),
+      );
+    }
+  };
+
   return (
     <>
       <div className="pt-24 pb-20 px-4 mx-auto">
@@ -106,7 +187,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
             No motor subtypes available.
           </p>
         ) : (
-          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
             {subtypes.map((item, index) => {
               const product = item.underwriter_product;
 
@@ -160,6 +241,48 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                       </li>
                     </ul>
                   </div>
+                  <div className="mt-4">
+                    <p className="font-bold">Additional benefits</p>
+                    {item.underwriter_product.additional_benefits.map(
+                      (benefit) => (
+                        <div key={benefit.id}>
+                          <input
+                            name={benefit.id}
+                            onChange={(event) => addBenefit(event, benefit)}
+                            className="cursor-pointer"
+                            type="checkbox"
+                          />
+                          <label
+                            htmlFor={benefit.id}
+                            className="pl-2 cursor-pointer"
+                          >
+                            {benefit.name}
+                          </label>
+                        </div>
+                      ),
+                    )}
+                  </div>
+
+                  <Button
+                    variant="secondary"
+                    className="mt-4 flex not-first: justify-between  px-2 cursor-pointer py-2 hover:bg-primary/10 rounded-md text-primary font-bold"
+                    onClick={() => setShowBenefits(!showBenefits)}
+                  >
+                    Click to {showBenefits ? "hide" : "view"} benefits{" "}
+                    {!showBenefits ? (
+                      <LucideChevronDown />
+                    ) : (
+                      <LucideChevronUp />
+                    )}
+                  </Button>
+                  {/* product benefits section */}
+                  {showBenefits && (
+                    <div>
+                      <BenefitsSection
+                        productId={item.underwriter_product.id}
+                      />
+                    </div>
+                  )}
 
                   <div className="mt-6">
                     <Button
