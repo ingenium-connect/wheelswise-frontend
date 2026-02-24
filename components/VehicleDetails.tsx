@@ -48,6 +48,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
+  const [purposeCategories, setPurposeCategories] = useState<
+    { code: number; name: string }[]
+  >([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [vehicleRegNumber, setVehicleRegNumber] = useState("");
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>("idle");
@@ -59,12 +63,15 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const [form, setForm] = useState({
     vehicleValue: vehicleValue,
     engineCapacity: "",
+    engineNumber: "",
     vehicleNumber: "",
     chassisNumber: "",
     make: "",
     model: "",
     year: "",
     bodyType: "",
+    vehiclePurpose: "",
+    vehiclePurposeCategory: "",
   });
 
   useEffect(() => {
@@ -80,16 +87,40 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     setCoverStep(4);
   }, []);
 
+  // Fetch purpose categories whenever vehiclePurpose changes
+  useEffect(() => {
+    if (!form.vehiclePurpose) {
+      setPurposeCategories([]);
+      return;
+    }
+    setLoadingCategories(true);
+    axiosClient
+      .get(
+        `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}`,
+      )
+      .then((res) => {
+        setPurposeCategories(res.data.categories ?? []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setPurposeCategories([]);
+      })
+      .finally(() => setLoadingCategories(false));
+  }, [form.vehiclePurpose]);
+
   const validDetails = () => {
     return (
       form.vehicleValue > 0 &&
       form.engineCapacity &&
+      form.engineNumber &&
       form.vehicleNumber &&
       form.chassisNumber &&
       form.make &&
       form.model &&
       form.year &&
-      form.bodyType
+      form.bodyType &&
+      form.vehiclePurpose &&
+      form.vehiclePurposeCategory
     );
   };
 
@@ -198,6 +229,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       setForm((prev) => ({
         ...prev,
         engineCapacity: vehicle.engineCapacity || "",
+        engineNumber: vehicle.engineNumber || "",
         vehicleNumber: regNo || "",
         chassisNumber: vehicle.ChassisNo || "",
         // Ensure the strings match exactly what is in your modelMakeMap
@@ -205,6 +237,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         model: correctlyCasedModel || "",
         year: vehicle.yearOfManufacture?.toString() || "",
         bodyType: correctlyCasedBodyType || "",
+        vehiclePurpose: vehicle.purpose || "",
+        vehiclePurposeCategory: "",
       }));
 
       setVehicleDetails({ ntsaRegistered: true });
@@ -268,13 +302,17 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     setForm({
       vehicleValue: vehicleValue,
       engineCapacity: "",
+      engineNumber: "",
       vehicleNumber: "",
       chassisNumber: "",
       make: "",
       model: "",
       year: "",
       bodyType: "",
+      vehiclePurpose: "",
+      vehiclePurposeCategory: "",
     });
+    setPurposeCategories([]);
   };
 
   const cancelAction = () => {
@@ -291,9 +329,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         </Alert>
       )}
       <Card
-        className={`mx-auto mt-4 sm:mt-10 w-full bg-white/80 backdrop-blur-sm shadow-lg transition-all ${
-          searchStatus === "idle" ? "max-w-md" : "max-w-3xl"
-        }`}
+        className={`mx-auto mt-4 sm:mt-10 w-full bg-white/80 backdrop-blur-sm shadow-lg transition-all ${searchStatus === "idle" ? "max-w-md" : "max-w-3xl"
+          }`}
       >
         <CardContent>
           {searchStatus === "idle" ? (
@@ -534,10 +571,85 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                         )}
                       </Field>
                     </div>
-                    <Field orientation="horizontal">
-                      <Button type="submit" disabled={!validDetails()}>
-                        Submit
-                      </Button>
+                    {/* Engine Number & Vehicle Purpose */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field>
+                        <FieldLabel htmlFor="engineNumber">
+                          Engine Number
+                        </FieldLabel>
+                        <Input
+                          id="engineNumber"
+                          type="text"
+                          name="engineNumber"
+                          value={form.engineNumber}
+                          onChange={handleChange}
+                          placeholder="Engine Number"
+                          required
+                          disabled={isFieldsDisabled && !!form.engineNumber}
+                          readOnly={isFieldsDisabled && !!form.engineNumber}
+                        />
+                      </Field>
+                      <Field>
+                        <FieldLabel htmlFor="vehiclePurpose">
+                          Vehicle Purpose
+                        </FieldLabel>
+                        <Input
+                          id="vehiclePurpose"
+                          type="text"
+                          name="vehiclePurpose"
+                          value={form.vehiclePurpose}
+                          onChange={handleChange}
+                          placeholder="e.g. PSV, Private"
+                          required
+                          disabled={isFieldsDisabled && !!form.vehiclePurpose}
+                          readOnly={isFieldsDisabled && !!form.vehiclePurpose}
+                        />
+                      </Field>
+                    </div>
+
+                    {/* Vehicle Purpose Category */}
+                    <div className="grid grid-cols-2 gap-4 mt-0">
+                      <Field>
+                        <FieldLabel htmlFor="vehiclePurposeCategory">
+                          Vehicle Purpose Category
+                        </FieldLabel>
+                        <Select
+                          onValueChange={(v) =>
+                            handleSelectChange("vehiclePurposeCategory", v)
+                          }
+                          value={form.vehiclePurposeCategory}
+                          disabled={
+                            !form.vehiclePurpose ||
+                            loadingCategories ||
+                            purposeCategories.length === 0
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={
+                                loadingCategories
+                                  ? "Loading categories…"
+                                  : !form.vehiclePurpose
+                                    ? "Enter vehicle purpose first"
+                                    : "Select category"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {purposeCategories.map((cat) => (
+                              <SelectItem
+                                key={cat.code}
+                                value={cat.code.toString()}
+                              >
+                                {cat.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    </div>
+
+                    <div className="flex justify-between mt-4">
                       <Button
                         variant="outline"
                         type="button"
@@ -545,7 +657,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       >
                         Cancel
                       </Button>
-                    </Field>
+                      <Button type="submit" disabled={!validDetails()}>
+                        Next
+                      </Button>
+                    </div>
                   </FieldGroup>
                 </FieldSet>
               </FieldGroup>

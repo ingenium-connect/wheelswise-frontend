@@ -20,12 +20,12 @@ export default async function Page({
     },
     ...(product_type === "COMPREHENSIVE"
       ? [
-          {
-            name: "Vehicle Value",
-            href: `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
-            isActive: false,
-          },
-        ]
+        {
+          name: "Vehicle Value",
+          href: `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
+          isActive: false,
+        },
+      ]
       : []),
     {
       name: "Vehicle Details",
@@ -39,7 +39,7 @@ export default async function Page({
     },
   ];
   return (
-    <section className="min-h-screen bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
+    <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
       <PageBreadCrumb pages={pages} />
       <div className="max-w-4xl mx-auto text-center mb-12">
         <h2 className="text-4xl font-bold text-[#2e5e74]">Step Five</h2>

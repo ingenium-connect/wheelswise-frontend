@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/stores/insuranceStore";
+import { useUserStore } from "@/stores/userStore";
 import {
   FinalUserPayload,
   FinalVehiclePayload,
@@ -52,6 +53,7 @@ const Signup: React.FC<Props> = ({
   const { tonnage, seating_capacity, vehicleDetails } = useVehicleStore();
 
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
+  const { setProfile } = useUserStore();
 
   const router = useRouter();
   const [formData, setFormData] = useState<SignupForm>({
@@ -60,6 +62,7 @@ const Signup: React.FC<Props> = ({
     confirm_password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -183,12 +186,16 @@ const Signup: React.FC<Props> = ({
         vehicle: vehiclePayload,
       };
       // -------------------------------------
-      // 6. Server action
+      // 6. Server action — capture result to persist user_id
       // -------------------------------------
-      await signupAction({
+      const res = await signupAction({
         userPayload: finalUserPayload,
         vehiclePayload: finalVehiclePayload,
       });
+
+      if (res?.user?.id) {
+        setProfile({ id: res.user.id } as any);
+      }
 
       toast.success("Successfully registered!");
       router.push(
@@ -303,7 +310,31 @@ const Signup: React.FC<Props> = ({
 
             <FieldGroup>
               <Field>
-                <Button type="submit" disabled={isLoading}>
+                {/* Terms & Conditions */}
+                <label className="flex items-start gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 accent-[#397397]"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <Link
+                      href="/terms"
+                      className="text-primary font-medium hover:underline"
+                      target="_blank"
+                    >
+                      Terms &amp; Conditions
+                    </Link>
+                  </span>
+                </label>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading || !agreedToTerms}
+                  className="mt-2"
+                >
                   {isLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}

@@ -10,10 +10,9 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
-import { axiosAuthClient } from "@/utilities/axios-client";
+import { useUserStore } from "@/stores/userStore";
+import { axiosClient } from "@/utilities/axios-client";
 import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
-import { parseCookies } from "nookies";
-import { ACCESS_TOKEN } from "@/utilities/constants";
 import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
@@ -24,6 +23,7 @@ const shakeClass =
 
 const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
+  const { profile } = useUserStore();
   const { sendOtp, timeUntilResend } = useOtp();
 
   const router = useRouter();
@@ -89,20 +89,12 @@ const OtpVerify: React.FC = () => {
 
     try {
       const payload = {
-        msisdn: personalDetails.phoneNumber,
-        user_type: "CUSTOMER",
+        user_id: profile?.id ?? "",
         otp: otp,
+        user_type: "CUSTOMER",
       };
 
-      const cookies = parseCookies();
-      const token = cookies[ACCESS_TOKEN];
-
-      const headers: Record<string, string> = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      const res = await axiosAuthClient.patch(OTP_VERIFY_ENDPOINT, payload, {
-        headers,
-      });
+      const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
 
       const data = res?.data;
 
