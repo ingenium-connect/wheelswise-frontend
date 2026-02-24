@@ -185,8 +185,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                     </Field>
                   </div>
 
-                  <Field orientation="horizontal">
-                    <Button type="submit">Submit</Button>
+                  <div className="flex justify-between w-full">
                     <Button
                       variant="outline"
                       type="button"
@@ -194,7 +193,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                     >
                       Cancel
                     </Button>
-                  </Field>
+                    <Button type="submit">Next</Button>
+                  </div>
                 </FieldGroup>
               </FieldSet>
             </FieldGroup>

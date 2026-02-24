@@ -73,7 +73,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
 
   return (
     <>
-      <div className="w-full">
+      <div className="w-full max-w-sm mx-auto">
         <Card>
           <CardContent>
             <FieldGroup>
@@ -133,13 +133,22 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
 
             {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
 
-            <Button
-              onClick={handleContinue}
-              disabled={isCommercial && (!tonnage || tonnage <= 0)}
-              className="mt-4 bg-[#397397] hover:bg-[#2e5e74] text-white px-5 py-2 rounded-lg text-sm font-medium transition"
-            >
-              Continue
-            </Button>
+            <div className="flex justify-between mt-4">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => router.back()}
+              >
+                Back
+              </Button>
+              <Button
+                onClick={handleContinue}
+                disabled={isCommercial && (!tonnage || tonnage <= 0)}
+                className="bg-[#397397] hover:bg-[#2e5e74] text-white px-5 py-2 rounded-lg text-sm font-medium transition"
+              >
+                Continue
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
