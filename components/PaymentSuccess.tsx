@@ -18,7 +18,8 @@ const PaymentSuccess = () => {
             Payment Received Successfully!!
           </h2>
           <p className="text-gray-600 mb-6">
-            Check your email for your vehicle sticker. Thank you for choosing us!
+            Check your email for your vehicle sticker. Thank you for choosing
+            us!
           </p>
           <Link
             href="/"

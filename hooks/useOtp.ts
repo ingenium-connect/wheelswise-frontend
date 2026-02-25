@@ -47,15 +47,15 @@ export function useOtp() {
   );
 
   const sendOtp = useCallback(
-    async (msisdn: string) => {
+    async (national_id: string) => {
       if (inFlight.current) return { ok: false, reason: "in-flight" };
-      if (!canSend(msisdn)) return { ok: false, reason: "recently-sent" };
+      if (!canSend(national_id)) return { ok: false, reason: "recently-sent" };
 
       inFlight.current = true;
       setSending(true);
       try {
-        await axiosClient.post("otp", { msisdn, user_type: "CUSTOMER" });
-        writeLastSent(msisdn);
+        await axiosClient.post("otp", { national_id, user_type: "CUSTOMER" });
+        writeLastSent(national_id);
         toast.success("OTP sent successfully");
         return { ok: true };
       } catch (err) {

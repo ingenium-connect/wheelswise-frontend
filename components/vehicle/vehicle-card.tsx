@@ -1,7 +1,8 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Vehicle } from "@/types/data";
 import { Button } from "../ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Car, CheckCircle2, ShieldOff } from "lucide-react";
 
 type Props = {
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function VehicleCard({ vehicle }: Props) {
+  const router = useRouter();
+
   const {
     make,
     model,
@@ -24,10 +27,18 @@ export function VehicleCard({ vehicle }: Props) {
 
   const isInsured = !!active_policy;
 
+  const handleCarSelection = () => {
+    // Store the selected date in localStorage
+    localStorage.setItem("vehicleRegistrationNumber", registration_number);
+    router.push("/cover-type");
+  };
+
   return (
     <Card className="border border-[#d7e8ee] shadow-md hover:shadow-xl transition-shadow duration-200 rounded-2xl overflow-hidden">
       {/* Status bar */}
-      <div className={`h-1.5 w-full ${isInsured ? "bg-emerald-500" : "bg-amber-400"}`} />
+      <div
+        className={`h-1.5 w-full ${isInsured ? "bg-emerald-500" : "bg-amber-400"}`}
+      />
 
       <CardContent className="p-5">
         {/* Header */}
@@ -62,16 +73,22 @@ export function VehicleCard({ vehicle }: Props) {
         {/* Details grid */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm border-t border-[#d7e8ee] pt-4 mb-5">
           <Detail label="Body Type" value={body_type} />
-          <Detail label="Seating" value={seating_capacity ? `${seating_capacity} seats` : undefined} />
+          <Detail
+            label="Seating"
+            value={seating_capacity ? `${seating_capacity} seats` : undefined}
+          />
           {tonnage && <Detail label="Tonnage" value={`${tonnage} T`} />}
           {purpose && <Detail label="Purpose" value={purpose} />}
-          <Detail label="Value" value={`KES ${vehicle_value.toLocaleString()}`} />
+          <Detail
+            label="Value"
+            value={`KES ${vehicle_value.toLocaleString()}`}
+          />
         </div>
 
         {/* Action */}
         {!isInsured && (
-          <Button asChild className="w-full text-white">
-            <Link href="/cover-type">Insure this Vehicle</Link>
+          <Button onClick={handleCarSelection} className="w-full text-white">
+            Insure this Vehicle
           </Button>
         )}
       </CardContent>

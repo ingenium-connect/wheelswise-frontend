@@ -280,6 +280,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // default behaviour: save to store and navigate
     setVehicleDetails({ ...form });
 
     setTimeout(() => {
@@ -325,7 +326,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       <Card className="w-full border border-[#d7e8ee] shadow-sm overflow-hidden">
         <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
         <CardContent className="p-6">
-
           {/* Search state */}
           {searchStatus === "idle" ? (
             <form onSubmit={searchVehicle} className="space-y-5">
@@ -334,12 +334,18 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   <Search className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">Search by Registration</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Enter your vehicle registration number to auto-fill details.</p>
+                  <p className="font-semibold text-[#1e3a5f] text-sm">
+                    Search by Registration
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Enter your vehicle registration number to auto-fill details.
+                  </p>
                 </div>
               </div>
               <Field>
-                <FieldLabel htmlFor="vehicleReg">Vehicle Registration Number</FieldLabel>
+                <FieldLabel htmlFor="vehicleReg">
+                  Vehicle Registration Number
+                </FieldLabel>
                 <Input
                   id="vehicleReg"
                   value={vehicleRegNumber}
@@ -348,32 +354,46 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   required
                 />
               </Field>
-              <Button type="submit" className="w-full text-white" disabled={loadingSearch}>
-                {loadingSearch ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Search Vehicle"}
+              <Button
+                type="submit"
+                className="w-full text-white"
+                disabled={loadingSearch}
+              >
+                {loadingSearch ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Search Vehicle"
+                )}
               </Button>
             </form>
           ) : (
-
             /* Details form */
             <form onSubmit={handleSubmit} className="space-y-6">
-
               {/* Header */}
               <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
                 <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
                   <Car className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">Vehicle Details</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Enter your vehicle details manually.</p>
+                  <p className="font-semibold text-[#1e3a5f] text-sm">
+                    Vehicle Details
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Enter your vehicle details manually.
+                  </p>
                 </div>
               </div>
 
               {/* Section: Identification */}
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Identification</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                  Identification
+                </p>
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="vehicleNumber">Vehicle Number</FieldLabel>
+                    <FieldLabel htmlFor="vehicleNumber">
+                      Vehicle Number
+                    </FieldLabel>
                     <Input
                       id="vehicleNumber"
                       name="vehicleNumber"
@@ -387,7 +407,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="chassisNumber">Chassis Number</FieldLabel>
+                    <FieldLabel htmlFor="chassisNumber">
+                      Chassis Number
+                    </FieldLabel>
                     <Input
                       id="chassisNumber"
                       name="chassisNumber"
@@ -404,18 +426,32 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
               {/* Section: Vehicle Specs */}
               <div className="border-t border-[#d7e8ee] pt-5">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Vehicle Specs</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                  Vehicle Specs
+                </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehicleMake">Make</FieldLabel>
                     {isFieldsDisabled ? (
-                      <Input value={form.make} readOnly disabled className="bg-[#f0f6f9]" />
+                      <Input
+                        value={form.make}
+                        readOnly
+                        disabled
+                        className="bg-[#f0f6f9]"
+                      />
                     ) : (
-                      <Select onValueChange={(v) => handleSelectChange("make", v)} value={form.make}>
-                        <SelectTrigger><SelectValue placeholder="Select Make" /></SelectTrigger>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("make", v)}
+                        value={form.make}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Make" />
+                        </SelectTrigger>
                         <SelectContent>
                           {modelMakeMap.map((m) => (
-                            <SelectItem key={m.make} value={m.make}>{m.make}</SelectItem>
+                            <SelectItem key={m.make} value={m.make}>
+                              {m.make}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -424,30 +460,65 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   <Field>
                     <FieldLabel htmlFor="vehicleModel">Model</FieldLabel>
                     {isFieldsDisabled ? (
-                      <Input value={form.model} readOnly disabled className="bg-[#f0f6f9]" />
+                      <Input
+                        value={form.model}
+                        readOnly
+                        disabled
+                        className="bg-[#f0f6f9]"
+                      />
                     ) : (
-                      <Select onValueChange={(v) => handleSelectChange("model", v)} value={form.model}>
-                        <SelectTrigger><SelectValue placeholder="Select Model" /></SelectTrigger>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("model", v)}
+                        value={form.model}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Model" />
+                        </SelectTrigger>
                         <SelectContent>
                           {models.map((model) => (
-                            <SelectItem key={model} value={model}>{model}</SelectItem>
+                            <SelectItem key={model} value={model}>
+                              {model}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="yearOfManufacture">Year of Manufacture</FieldLabel>
+                    <FieldLabel htmlFor="yearOfManufacture">
+                      Year of Manufacture
+                    </FieldLabel>
                     {isFieldsDisabled ? (
-                      <Input value={form.year} readOnly disabled className="bg-[#f0f6f9]" />
+                      <Input
+                        value={form.year}
+                        readOnly
+                        disabled
+                        className="bg-[#f0f6f9]"
+                      />
                     ) : (
-                      <Select onValueChange={(v) => handleSelectChange("year", v)} value={form.year}>
-                        <SelectTrigger><SelectValue placeholder="Year of manufacture" /></SelectTrigger>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("year", v)}
+                        value={form.year}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Year of manufacture" />
+                        </SelectTrigger>
                         <SelectContent>
-                          {Array.from({ length: motorSubType?.underwriter_product.yom_range ?? 0 }, (_, i) => {
-                            const year = currentYear - i;
-                            return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
-                          })}
+                          {Array.from(
+                            {
+                              length:
+                                motorSubType?.underwriter_product.yom_range ??
+                                0,
+                            },
+                            (_, i) => {
+                              const year = currentYear - i;
+                              return (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
+                                </SelectItem>
+                              );
+                            },
+                          )}
                         </SelectContent>
                       </Select>
                     )}
@@ -455,20 +526,34 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   <Field>
                     <FieldLabel htmlFor="bodyType">Body Type</FieldLabel>
                     {isFieldsDisabled ? (
-                      <Input value={form.bodyType} readOnly disabled className="bg-[#f0f6f9]" />
+                      <Input
+                        value={form.bodyType}
+                        readOnly
+                        disabled
+                        className="bg-[#f0f6f9]"
+                      />
                     ) : (
-                      <Select onValueChange={(v) => handleSelectChange("bodyType", v)} value={form.bodyType}>
-                        <SelectTrigger><SelectValue placeholder="Select body type" /></SelectTrigger>
+                      <Select
+                        onValueChange={(v) => handleSelectChange("bodyType", v)}
+                        value={form.bodyType}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select body type" />
+                        </SelectTrigger>
                         <SelectContent>
                           {bodyTypes.map((type) => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="engineCapacity">Engine Capacity</FieldLabel>
+                    <FieldLabel htmlFor="engineCapacity">
+                      Engine Capacity
+                    </FieldLabel>
                     <Input
                       id="engineCapacity"
                       name="engineCapacity"
@@ -481,7 +566,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="engineNumber">Engine Number</FieldLabel>
+                    <FieldLabel htmlFor="engineNumber">
+                      Engine Number
+                    </FieldLabel>
                     <Input
                       id="engineNumber"
                       name="engineNumber"
@@ -495,7 +582,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="vehicleValue">Vehicle Value (KES)</FieldLabel>
+                    <FieldLabel htmlFor="vehicleValue">
+                      Vehicle Value (KES)
+                    </FieldLabel>
                     <Input
                       id="vehicleValue"
                       name="vehicleValue"
@@ -510,10 +599,14 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
               {/* Section: Purpose */}
               <div className="border-t border-[#d7e8ee] pt-5">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Purpose</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                  Purpose
+                </p>
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="vehiclePurpose">Vehicle Purpose</FieldLabel>
+                    <FieldLabel htmlFor="vehiclePurpose">
+                      Vehicle Purpose
+                    </FieldLabel>
                     <Input
                       id="vehiclePurpose"
                       name="vehiclePurpose"
@@ -527,22 +620,39 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="vehiclePurposeCategory">Purpose Category</FieldLabel>
+                    <FieldLabel htmlFor="vehiclePurposeCategory">
+                      Purpose Category
+                    </FieldLabel>
                     <Select
-                      onValueChange={(v) => handleSelectChange("vehiclePurposeCategory", v)}
+                      onValueChange={(v) =>
+                        handleSelectChange("vehiclePurposeCategory", v)
+                      }
                       value={form.vehiclePurposeCategory}
-                      disabled={!form.vehiclePurpose || loadingCategories || purposeCategories.length === 0}
+                      disabled={
+                        !form.vehiclePurpose ||
+                        loadingCategories ||
+                        purposeCategories.length === 0
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue
                           placeholder={
-                            loadingCategories ? "Loading…" : !form.vehiclePurpose ? "Enter purpose first" : "Select category"
+                            loadingCategories
+                              ? "Loading…"
+                              : !form.vehiclePurpose
+                                ? "Enter purpose first"
+                                : "Select category"
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
                         {purposeCategories.map((cat) => (
-                          <SelectItem key={cat.code} value={cat.code.toString()}>{cat.name}</SelectItem>
+                          <SelectItem
+                            key={cat.code}
+                            value={cat.code.toString()}
+                          >
+                            {cat.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -560,7 +670,11 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1 text-white" disabled={!validDetails()}>
+                <Button
+                  type="submit"
+                  className="flex-1 text-white"
+                  disabled={!validDetails()}
+                >
                   Next
                 </Button>
               </div>

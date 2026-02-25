@@ -162,9 +162,9 @@ function GeneralDisclaimer() {
       <LastUpdated date="2026-03-07" />
 
       <Prose>
-        The information and services provided by MedGen Insurance Agency, trading
-        as MedGen, are offered strictly on an informational and facilitative
-        basis.
+        The information and services provided by MedGen Insurance Agency,
+        trading as MedGen, are offered strictly on an informational and
+        facilitative basis.
       </Prose>
 
       <SectionHeading number="1" title="No Insurance or Medical Advice" />

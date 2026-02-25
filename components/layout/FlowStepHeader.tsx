@@ -31,9 +31,7 @@ export default function FlowStepHeader({
           </div>
         ) : null}
         <h1 className="text-2xl md:text-3xl font-bold text-white">{title}</h1>
-        {subtitle && (
-          <p className="text-white/60 text-sm mt-1">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-white/60 text-sm mt-1">{subtitle}</p>}
       </div>
     </div>
   );

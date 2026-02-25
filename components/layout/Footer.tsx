@@ -16,7 +16,6 @@ const Footer: React.FC = () => {
       {/* Main content */}
       <div className="px-6 md:px-16 pt-12 pb-8">
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-10">
-
           {/* Brand column */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
@@ -26,15 +25,24 @@ const Footer: React.FC = () => {
               <span className="font-bold text-lg tracking-tight">MedGen</span>
             </div>
             <p className="text-white/60 text-sm leading-relaxed mb-5">
-              Kenya&apos;s digital motor insurance platform. Fast, transparent, and
-              fully regulated by the IRA.
+              Kenya&apos;s digital motor insurance platform. Fast, transparent,
+              and fully regulated by the IRA.
             </p>
             <div className="flex gap-3">
               {[
-                { href: "https://facebook.com", icon: <FaFacebookF size={15} /> },
+                {
+                  href: "https://facebook.com",
+                  icon: <FaFacebookF size={15} />,
+                },
                 { href: "https://twitter.com", icon: <FaXTwitter size={15} /> },
-                { href: "https://instagram.com", icon: <FaInstagram size={15} /> },
-                { href: "https://linkedin.com", icon: <FaLinkedinIn size={15} /> },
+                {
+                  href: "https://instagram.com",
+                  icon: <FaInstagram size={15} />,
+                },
+                {
+                  href: "https://linkedin.com",
+                  icon: <FaLinkedinIn size={15} />,
+                },
               ].map(({ href, icon }) => (
                 <a
                   key={href}
@@ -140,7 +148,8 @@ const Footer: React.FC = () => {
       <div className="border-t border-white/10 px-6 md:px-16 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
           <span>
-            &copy; {new Date().getFullYear()} MedGen Insurance Agency. All rights reserved.
+            &copy; {new Date().getFullYear()} MedGen Insurance Agency. All
+            rights reserved.
           </span>
           <span>
             Powered by{" "}

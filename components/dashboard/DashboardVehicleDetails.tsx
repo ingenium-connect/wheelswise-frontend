@@ -121,7 +121,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    handleChange({ target: { name, value } } as React.ChangeEvent<HTMLSelectElement>);
+    handleChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLSelectElement>);
   };
 
   const isValid = () =>

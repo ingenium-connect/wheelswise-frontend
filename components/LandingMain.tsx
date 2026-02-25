@@ -37,7 +37,11 @@ const steps = [
   { icon: ShieldCheck, label: "Choose Cover", desc: "Comprehensive or TPO" },
   { icon: FileText, label: "Select Plan", desc: "Compare & pick your plan" },
   { icon: Car, label: "Enter Details", desc: "Vehicle & personal info" },
-  { icon: CreditCard, label: "Pay & Done", desc: "Certificate issued instantly" },
+  {
+    icon: CreditCard,
+    label: "Pay & Done",
+    desc: "Certificate issued instantly",
+  },
 ];
 
 const coverOptions = [
@@ -94,22 +98,26 @@ const features = [
   {
     icon: Zap,
     title: "Instant Quotes",
-    description: "Compare quotes from multiple underwriters in seconds — no waiting, no back-and-forth.",
+    description:
+      "Compare quotes from multiple underwriters in seconds — no waiting, no back-and-forth.",
   },
   {
     icon: ShieldCheck,
     title: "All Vehicle Types",
-    description: "Private cars, commercial trucks, PSVs — we cover every type of motor vehicle.",
+    description:
+      "Private cars, commercial trucks, PSVs — we cover every type of motor vehicle.",
   },
   {
     icon: BadgeCheck,
     title: "IRA Compliant",
-    description: "All policies are issued by licensed underwriters, fully compliant with Kenya's Insurance Act.",
+    description:
+      "All policies are issued by licensed underwriters, fully compliant with Kenya's Insurance Act.",
   },
   {
     icon: Clock,
     title: "24/7 Support",
-    description: "Our team is always available to help you with quotes, claims, or any insurance queries.",
+    description:
+      "Our team is always available to help you with quotes, claims, or any insurance queries.",
   },
 ];
 
@@ -127,7 +135,6 @@ const LandingMain: React.FC = () => {
 
   return (
     <div className="flex flex-col">
-
       {/* ── Hero ── */}
       <section className="relative bg-[#1e3a5f] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#397397_0%,_transparent_60%)] opacity-40" />
@@ -149,7 +156,9 @@ const LandingMain: React.FC = () => {
               <span className="text-[#8bbfd8]">Simplified.</span>
             </h1>
             <p className="text-white/70 text-base md:text-lg max-w-lg mb-8 leading-relaxed">
-              Kenya&apos;s fastest motor insurance platform. Compare plans from top underwriters, insure any vehicle, and get your certificate in minutes — entirely online.
+              Kenya&apos;s fastest motor insurance platform. Compare plans from
+              top underwriters, insure any vehicle, and get your certificate in
+              minutes — entirely online.
             </p>
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <a
@@ -215,7 +224,10 @@ const LandingMain: React.FC = () => {
       </section>
 
       {/* ── Cover Types ── */}
-      <section id="cover-types" className="bg-[#f0f6f9] px-4 md:px-8 py-14 scroll-mt-16">
+      <section
+        id="cover-types"
+        className="bg-[#f0f6f9] px-4 md:px-8 py-14 scroll-mt-16"
+      >
         <div className="max-w-5xl mx-auto">
           <p className="text-center text-xs uppercase tracking-widest text-primary font-semibold mb-2">
             What We Cover
@@ -224,7 +236,8 @@ const LandingMain: React.FC = () => {
             Choose Your Cover Type
           </h2>
           <p className="text-center text-muted-foreground text-sm mb-10 max-w-md mx-auto">
-            Pick the cover that suits your vehicle and budget — then compare plans from top underwriters.
+            Pick the cover that suits your vehicle and budget — then compare
+            plans from top underwriters.
           </p>
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {coverOptions.map((opt, i) => {
@@ -246,9 +259,13 @@ const LandingMain: React.FC = () => {
                       <Icon className={`w-8 h-8 ${opt.color}`} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-[#1e3a5f] leading-tight">{opt.title}</h3>
+                      <h3 className="text-xl font-bold text-[#1e3a5f] leading-tight">
+                        {opt.title}
+                      </h3>
                       {opt.tag && (
-                        <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${opt.tagBg} ${opt.tagText}`}>
+                        <span
+                          className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${opt.tagBg} ${opt.tagText}`}
+                        >
                           {opt.tag}
                         </span>
                       )}
@@ -260,8 +277,13 @@ const LandingMain: React.FC = () => {
                     </p>
                     <ul className="space-y-2.5 mb-7 flex-1">
                       {opt.bullets.map((b) => (
-                        <li key={b} className="flex items-center gap-2.5 text-sm text-[#334e68]">
-                          <CheckCircle2 className={`w-4 h-4 shrink-0 ${opt.color}`} />
+                        <li
+                          key={b}
+                          className="flex items-center gap-2.5 text-sm text-[#334e68]"
+                        >
+                          <CheckCircle2
+                            className={`w-4 h-4 shrink-0 ${opt.color}`}
+                          />
                           {b}
                         </li>
                       ))}
@@ -282,7 +304,10 @@ const LandingMain: React.FC = () => {
           </div>
           <p className="text-center text-xs text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary font-medium hover:underline">
+            <Link
+              href="/login"
+              className="text-primary font-medium hover:underline"
+            >
               Log in to manage your policies
             </Link>
           </p>
@@ -310,7 +335,9 @@ const LandingMain: React.FC = () => {
                   <div className="p-3 bg-primary/10 rounded-xl mb-3">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">{v.label}</p>
+                  <p className="font-semibold text-[#1e3a5f] text-sm">
+                    {v.label}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">{v.desc}</p>
                 </motion.div>
               );
@@ -346,8 +373,12 @@ const LandingMain: React.FC = () => {
                   <div className="p-3 bg-primary/10 rounded-xl mb-3 mt-2">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <p className="text-sm font-semibold text-[#1e3a5f]">{step.label}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{step.desc}</p>
+                  <p className="text-sm font-semibold text-[#1e3a5f]">
+                    {step.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {step.desc}
+                  </p>
                 </motion.div>
               );
             })}
@@ -365,7 +396,8 @@ const LandingMain: React.FC = () => {
             Built for Kenyan Motorists
           </h2>
           <p className="text-center text-muted-foreground text-sm mb-10 max-w-md mx-auto">
-            Smart, fast, and fully regulated insurance — designed around your needs.
+            Smart, fast, and fully regulated insurance — designed around your
+            needs.
           </p>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
             {features.map((f, i) => {
@@ -382,8 +414,12 @@ const LandingMain: React.FC = () => {
                   <div className="p-2.5 bg-primary/10 rounded-xl w-fit mb-4">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-[#1e3a5f] mb-2 text-sm">{f.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{f.description}</p>
+                  <h3 className="font-semibold text-[#1e3a5f] mb-2 text-sm">
+                    {f.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {f.description}
+                  </p>
                 </motion.div>
               );
             })}
@@ -397,7 +433,10 @@ const LandingMain: React.FC = () => {
           <div className="text-center md:text-left">
             <div className="flex items-center gap-1 justify-center md:justify-start mb-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <Star
+                  key={i}
+                  className="w-4 h-4 text-amber-400 fill-amber-400"
+                />
               ))}
             </div>
             <p className="text-[#1e3a5f] font-semibold text-lg">
@@ -409,8 +448,16 @@ const LandingMain: React.FC = () => {
           </div>
           <div className="flex items-center gap-6">
             <div className="text-center">
-              <Image src="/mpesa.png" alt="M-Pesa" width={80} height={40} className="h-8 w-auto mx-auto object-contain" />
-              <p className="text-xs text-muted-foreground mt-1">M-Pesa Payments</p>
+              <Image
+                src="/mpesa.png"
+                alt="M-Pesa"
+                width={80}
+                height={40}
+                className="h-8 w-auto mx-auto object-contain"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                M-Pesa Payments
+              </p>
             </div>
             <div className="h-10 w-px bg-[#d7e8ee]" />
             <div className="text-center">
@@ -435,7 +482,8 @@ const LandingMain: React.FC = () => {
             Ready to get covered?
           </h2>
           <p className="text-white/60 text-base mb-8 max-w-md mx-auto">
-            Get a motor insurance quote in under 2 minutes. No agents, no paperwork.
+            Get a motor insurance quote in under 2 minutes. No agents, no
+            paperwork.
           </p>
           <Link
             href="/cover-type"
@@ -446,7 +494,6 @@ const LandingMain: React.FC = () => {
           </Link>
         </motion.div>
       </section>
-
     </div>
   );
 };

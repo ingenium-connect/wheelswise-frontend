@@ -33,7 +33,6 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#1e3a5f]/10 bg-[#1e3a5f] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16">
-
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <Image

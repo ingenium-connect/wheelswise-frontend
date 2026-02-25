@@ -20,20 +20,20 @@ import { Input } from "../ui/input";
 import { axiosClient } from "@/utilities/axios-client";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useUserStore } from "@/stores/userStore";
+import { ACCESS_TOKEN } from "@/utilities/constants";
 import { useOtp } from "@/hooks/useOtp";
 
 type Props = {
   data: MotorTypesResponse;
-  token?: string | undefined;
 };
 
-const SelectMotorType = ({ data, token }: Props) => {
+const SelectMotorType = ({ data }: Props) => {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined,
   );
   const [vehicleTonnage, setVehicleTonnage] = useState<number>(0);
-  const { sending: sendingOtp, sendOtp, canSend: _canSend, timeUntilResend: _timeUntilResend } = useOtp();
+  const { sending: sendingOtp, sendOtp } = useOtp();
   const [commercialOptions, setCommercialOptions] = useState<
     { description: string; code: string }[]
   >([]);
@@ -45,6 +45,23 @@ const SelectMotorType = ({ data, token }: Props) => {
   const setTonnage = useVehicleStore((state) => state.setTonnage);
 
   const initialProfile = useUserStore((state) => state.profile);
+  const resetProfile = useUserStore((state) => state.resetProfile);
+  const [hasAuthToken, setHasAuthToken] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check cookie for access token; if missing, clear persisted profile
+    try {
+      const cookies = document.cookie.split("; ").map((c) => c.trim());
+      const tokenCookie = cookies.find((c) => c.startsWith(`${ACCESS_TOKEN}=`));
+      const present = Boolean(tokenCookie && tokenCookie.split("=")[1]);
+      setHasAuthToken(present);
+      if (!present) {
+        resetProfile();
+      }
+    } catch (err) {
+      // ignore
+    }
+  }, [resetProfile]);
 
   useEffect(() => {
     const getCommercialOptions = () => {
@@ -72,9 +89,10 @@ const SelectMotorType = ({ data, token }: Props) => {
   const handleSelect = async (type: MotorType) => {
     setMotorType(type);
 
-    if (token && initialProfile) {
+    // Only treat as authenticated when we have a profile and an auth token
+    if (initialProfile && hasAuthToken) {
       // use hook to send OTP (dedupe + session persistence)
-      const res = await sendOtp(initialProfile.msisdn);
+      const res = await sendOtp(initialProfile.id_number);
       if (res.ok || res.reason === "recently-sent") {
         router.push(
           `/otp-verify?product_type=${selectedCover}&motor_type=${type.name}`,
@@ -106,8 +124,8 @@ const SelectMotorType = ({ data, token }: Props) => {
       });
     }
     setTpoOption(tpoCategory);
-    if (token && initialProfile) {
-      const res = await sendOtp(initialProfile.msisdn);
+    if (initialProfile && hasAuthToken) {
+      const res = await sendOtp(initialProfile.id_number);
       if (res.ok || res.reason === "recently-sent") {
         router.push(
           `/otp-verify?product_type=${selectedCover}&motor_type=${tpoCategory}`,
@@ -132,6 +150,7 @@ const SelectMotorType = ({ data, token }: Props) => {
 
   return (
     <>
+      {sendingOtp && <p className="text-gray-800 text-lg">Sending OTP...</p>}
       {selectedCover === "THIRD_PARTY" && (
         <div className="flex flex-col gap-5 max-w-3xl mx-auto w-full">
           {/* Private card */}
@@ -155,7 +174,9 @@ const SelectMotorType = ({ data, token }: Props) => {
               {/* Content */}
               <div className="flex flex-col flex-1 p-6 gap-4">
                 <div>
-                  <h3 className="text-xl font-bold text-[#1e3a5f]">PRIVATE CARS</h3>
+                  <h3 className="text-xl font-bold text-[#1e3a5f]">
+                    PRIVATE CARS
+                  </h3>
                   <p className="text-sm text-muted-foreground mt-0.5">
                     Saloons, SUVs, hatchbacks & personal vehicles
                   </p>
@@ -169,7 +190,9 @@ const SelectMotorType = ({ data, token }: Props) => {
                   ].map((point) => (
                     <div key={point} className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <span className="text-xs text-muted-foreground">{point}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {point}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -179,7 +202,13 @@ const SelectMotorType = ({ data, token }: Props) => {
                   disabled={sendingOtp}
                   className="bg-[#1e3a5f] hover:bg-[#397397] text-white gap-2 mt-auto self-start px-6"
                 >
-                  {sendingOtp ? "Sending…" : <>Select Private <ArrowRight className="w-4 h-4" /></>}
+                  {sendingOtp ? (
+                    "Sending…"
+                  ) : (
+                    <>
+                      Select Private <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -206,14 +235,19 @@ const SelectMotorType = ({ data, token }: Props) => {
               {/* Content */}
               <div className="flex flex-col flex-1 p-6 gap-4">
                 <div>
-                  <h3 className="text-xl font-bold text-[#1e3a5f]">COMMERCIAL VEHICLES</h3>
+                  <h3 className="text-xl font-bold text-[#1e3a5f]">
+                    COMMERCIAL VEHICLES
+                  </h3>
                   <p className="text-sm text-muted-foreground mt-0.5">
                     Trucks, vans, pickups & goods vehicles
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Select onValueChange={handleSelectComOption} value={selectedOption}>
+                  <Select
+                    onValueChange={handleSelectComOption}
+                    value={selectedOption}
+                  >
                     <SelectTrigger className="w-full border-[#d7e8ee] bg-white text-sm">
                       <SelectValue placeholder="Select commercial category" />
                     </SelectTrigger>
@@ -229,7 +263,9 @@ const SelectMotorType = ({ data, token }: Props) => {
                   {selectedOption && (
                     <>
                       <Field>
-                        <FieldLabel htmlFor="tonnage">Vehicle Tonnage (tonnes)</FieldLabel>
+                        <FieldLabel htmlFor="tonnage">
+                          Vehicle Tonnage (tonnes)
+                        </FieldLabel>
                         <Input
                           id="tonnage"
                           name="tonnage"
@@ -251,10 +287,21 @@ const SelectMotorType = ({ data, token }: Props) => {
 
                 <Button
                   onClick={() => handleTPO(selectedOption ?? "")}
-                  disabled={sendingOtp || !selectedOption || !vehicleTonnage || vehicleTonnage <= 0}
+                  disabled={
+                    sendingOtp ||
+                    !selectedOption ||
+                    !vehicleTonnage ||
+                    vehicleTonnage <= 0
+                  }
                   className="bg-[#1e3a5f] hover:bg-[#397397] text-white gap-2 mt-auto self-start px-6"
                 >
-                  {sendingOtp ? "Sending…" : <>Continue <ArrowRight className="w-4 h-4" /></>}
+                  {sendingOtp ? (
+                    "Sending…"
+                  ) : (
+                    <>
+                      Continue <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -290,11 +337,20 @@ const SelectMotorType = ({ data, token }: Props) => {
                   {type.description}
                 </p>
                 <Button
-                  onClick={(e) => { e.stopPropagation(); handleSelect(type); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelect(type);
+                  }}
                   disabled={sendingOtp}
                   className="w-full bg-[#1e3a5f] hover:bg-[#397397] text-white mt-4 gap-2"
                 >
-                  {sendingOtp ? "Sending…" : <>Select <ArrowRight className="w-4 h-4" /></>}
+                  {sendingOtp ? (
+                    "Sending…"
+                  ) : (
+                    <>
+                      Select <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </Card>

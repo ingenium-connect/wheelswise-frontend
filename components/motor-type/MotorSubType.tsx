@@ -294,7 +294,9 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
       ) : subtypes.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <ShieldCheck className="w-8 h-8 text-muted-foreground/40" />
-          <p className="text-muted-foreground font-medium">No plans available</p>
+          <p className="text-muted-foreground font-medium">
+            No plans available
+          </p>
           <p className="text-sm text-muted-foreground">
             No plans match your selection. Try adjusting your details.
           </p>

@@ -1,6 +1,25 @@
 import PaymentMethod from "@/components/PaymentMethod";
+import { ACCESS_TOKEN } from "@/utilities/constants";
+import { cookies } from "next/headers";
 
-export default function Page() {
+export default async function Page() {
+  const cookiesData = await cookies();
+
+  const token = cookiesData.get(ACCESS_TOKEN)?.value;
+
+  const pages = [
+    { name: "Dashboard", href: "/dashboard", isActive: false },
+    {
+      name: "Payment Summary",
+      href: "/dashboard/payment-summary",
+      isActive: false,
+    },
+    {
+      name: "Payment Method",
+      href: "/dashboard/payment-method",
+      isActive: true,
+    },
+  ];
   return (
     <>
       {/* Page gradient header */}
@@ -16,7 +35,7 @@ export default function Page() {
       </div>
 
       <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-6">
-        <PaymentMethod />
+        <PaymentMethod token={token} />
       </div>
     </>
   );

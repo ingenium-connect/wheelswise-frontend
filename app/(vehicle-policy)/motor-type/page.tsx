@@ -2,18 +2,12 @@ import SelectMotorType from "@/components/motor-type/MotorType";
 import { PageBreadCrumb } from "@/components/PageBreadCrumb";
 import { MotorTypesResponse } from "@/types/data";
 import { axiosServer } from "@/utilities/axios-server";
-import { ACCESS_TOKEN } from "@/utilities/constants";
 import { MOTOR_TYPES_ENDPOINT } from "@/utilities/endpoints";
 import { isAxiosError } from "axios";
-import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function MotorTypePage() {
-  const cookiesData = await cookies();
-
-  const token = cookiesData.get(ACCESS_TOKEN)?.value;
-
   let motortypeData: MotorTypesResponse | undefined = undefined;
   let errorMsg: string = "";
 
@@ -41,7 +35,7 @@ export default async function MotorTypePage() {
             <h2 className="text-4xl font-bold text-[#2e5e74]">Step One</h2>
             <p className="text-muted-foreground mt-2">Choose Motor Type</p>
           </div>
-          <SelectMotorType data={motortypeData} token={token} />
+          <SelectMotorType data={motortypeData} />
         </section>
       ) : (
         <p>{errorMsg}</p>

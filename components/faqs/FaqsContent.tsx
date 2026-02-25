@@ -32,7 +32,9 @@ const CATEGORIES: Category[] = [
           <>
             Getting a quote is fast and free. Simply:
             <ol className="list-decimal ml-5 mt-2 space-y-1 text-sm">
-              <li>Select your cover type (Comprehensive or Third Party Only)</li>
+              <li>
+                Select your cover type (Comprehensive or Third Party Only)
+              </li>
               <li>Choose your motor type and enter your vehicle value</li>
               <li>Browse plans from multiple underwriters</li>
               <li>Enter your vehicle and personal details</li>
@@ -83,7 +85,8 @@ const CATEGORIES: Category[] = [
               <p className="text-sm text-muted-foreground">
                 Covers liability to third parties only — bodily injury and
                 property damage caused to others. It does not cover damage to
-                your own vehicle. This is the minimum legal requirement in Kenya.
+                your own vehicle. This is the minimum legal requirement in
+                Kenya.
               </p>
             </div>
           </div>
@@ -155,12 +158,12 @@ const CATEGORIES: Category[] = [
             In the event of an incident:
             <ol className="list-decimal ml-5 mt-2 space-y-1 text-sm">
               <li>
-                Notify the underwriter directly using the contact details on your
-                certificate as soon as possible
+                Notify the underwriter directly using the contact details on
+                your certificate as soon as possible
               </li>
               <li>
-                Do not admit liability or make any offers to third parties at the
-                scene
+                Do not admit liability or make any offers to third parties at
+                the scene
               </li>
               <li>
                 Gather evidence — photos, witness contacts, police abstract (for
@@ -199,7 +202,7 @@ const CATEGORIES: Category[] = [
       },
       {
         q: "How do I view my policies and vehicles on my dashboard?",
-        a: 'Log in to your account and navigate to the Dashboard. Use the tabs to switch between Home, Vehicles, Policies, and Profile. Your active policies and registered vehicles are listed with all relevant details.',
+        a: "Log in to your account and navigate to the Dashboard. Use the tabs to switch between Home, Vehicles, Policies, and Profile. Your active policies and registered vehicles are listed with all relevant details.",
       },
       {
         q: "Can I update my personal information?",
@@ -230,16 +233,14 @@ const CATEGORIES: Category[] = [
           <>
             If you did not receive your OTP:
             <ul className="list-disc ml-5 mt-2 space-y-1 text-sm">
+              <li>Ensure the phone number entered is correct and active</li>
+              <li>Wait up to 60 seconds — network delays may occur</li>
               <li>
-                Ensure the phone number entered is correct and active
+                Use the &ldquo;Resend OTP&rdquo; option after the timer expires
               </li>
               <li>
-                Wait up to 60 seconds — network delays may occur
-              </li>
-              <li>Use the &ldquo;Resend OTP&rdquo; option after the timer expires</li>
-              <li>
-                Check that your phone has network coverage and is not in
-                Do Not Disturb mode
+                Check that your phone has network coverage and is not in Do Not
+                Disturb mode
               </li>
               <li>
                 If the issue persists, contact our support team with your
@@ -265,21 +266,40 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-function AccordionItem({ faq, isOpen, onToggle }: { faq: Faq; isOpen: boolean; onToggle: () => void }) {
+function AccordionItem({
+  faq,
+  isOpen,
+  onToggle,
+}: {
+  faq: Faq;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
   return (
-    <div className={cn("border-b border-[#d7e8ee] last:border-0 transition-colors", isOpen && "bg-primary/5 rounded-xl mb-1")}>
+    <div
+      className={cn(
+        "border-b border-[#d7e8ee] last:border-0 transition-colors",
+        isOpen && "bg-primary/5 rounded-xl mb-1",
+      )}
+    >
       <button
         className="w-full flex items-start justify-between gap-4 px-5 py-4 text-left"
         onClick={onToggle}
       >
-        <span className={cn("text-sm font-semibold leading-snug transition-colors", isOpen ? "text-primary" : "text-[#1e3a5f]")}>
+        <span
+          className={cn(
+            "text-sm font-semibold leading-snug transition-colors",
+            isOpen ? "text-primary" : "text-[#1e3a5f]",
+          )}
+        >
           {faq.q}
         </span>
         <span className="shrink-0 mt-0.5">
-          {isOpen
-            ? <ChevronUp className="w-4 h-4 text-primary" />
-            : <ChevronDown className="w-4 h-4 text-muted-foreground" />
-          }
+          {isOpen ? (
+            <ChevronUp className="w-4 h-4 text-primary" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          )}
         </span>
       </button>
       {isOpen && (
@@ -349,7 +369,10 @@ export default function FaqsContent() {
           Our support team is available 24/7 to help you.
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
-          <Button asChild className="bg-white text-primary hover:bg-white/90 font-semibold">
+          <Button
+            asChild
+            className="bg-white text-primary hover:bg-white/90 font-semibold"
+          >
             <Link href="/support">Submit a Request</Link>
           </Button>
           <a

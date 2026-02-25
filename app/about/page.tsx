@@ -108,7 +108,10 @@ export default function AboutPage() {
             fully online.
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
-            <Button asChild className="bg-white text-primary hover:bg-white/90 font-semibold">
+            <Button
+              asChild
+              className="bg-white text-primary hover:bg-white/90 font-semibold"
+            >
               <Link href="/cover-type">Get a Quote</Link>
             </Button>
             <Link
@@ -159,10 +162,10 @@ export default function AboutPage() {
                     through a single, intuitive digital platform.
                   </p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    We do not underwrite policies ourselves. Instead, we
-                    partner with established insurers to bring you vetted
-                    products with transparent pricing — no hidden fees, no
-                    surprise deductions.
+                    We do not underwrite policies ourselves. Instead, we partner
+                    with established insurers to bring you vetted products with
+                    transparent pricing — no hidden fees, no surprise
+                    deductions.
                   </p>
                 </div>
                 <div className="space-y-3">

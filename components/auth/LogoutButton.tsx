@@ -5,7 +5,6 @@ import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "@/utilities/constants";
 import { LogOut } from "lucide-react";
 
 export default function LogoutButton() {
-
   const handleLogout = () => {
     // Clear client-side cookies
     [ACCESS_TOKEN, USER_ID, NAME, EMAIL].forEach((key) =>

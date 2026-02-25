@@ -10,12 +10,12 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
-import { useUserStore } from "@/stores/userStore";
 import { axiosClient } from "@/utilities/axios-client";
 import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
 import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
+import { useUserStore } from "@/stores/userStore";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -55,12 +55,12 @@ const OtpVerify: React.FC = () => {
     setAllowResend(false);
     (async () => {
       try {
-        const res = await sendOtp(personalDetails.phoneNumber);
+        const res = await sendOtp(personalDetails.idNumber);
         if (res.ok) {
           setTimer(Math.ceil(OTP_RESEND_WINDOW_MS / 1000));
         } else if (res.reason === "recently-sent") {
           toast.success("OTP already sent recently");
-          const until = timeUntilResend(personalDetails.phoneNumber);
+          const until = timeUntilResend(personalDetails.idNumber);
           setTimer(Math.ceil(until / 1000));
         }
       } catch (err) {
@@ -102,23 +102,22 @@ const OtpVerify: React.FC = () => {
         toast.success("OTP successfully verified");
         router.push("/dashboard/payment-summary");
       } else {
-        setAllowResend(true);
-        setTimer(10);
-
-        setError("Invalid OTP");
-
-        setShake(true);
-        setTimeout(() => setShake(false), 300);
+        retryOtp();
       }
-    } catch (_err) {
-      setAllowResend(true);
+    } catch (err) {
+      retryOtp();
 
       setError("Network error. Please try again.");
-      setShake(true);
-      setTimeout(() => setShake(false), 300);
     } finally {
       setLoading(false);
     }
+  };
+
+  const retryOtp = () => {
+    setAllowResend(true);
+    setTimer(10);
+    setShake(true);
+    setTimeout(() => setShake(false), 300);
   };
 
   return (
@@ -162,14 +161,20 @@ const OtpVerify: React.FC = () => {
               <p className="text-center text-red-600 text-sm">{error}</p>
             )}
 
-            <Button type="submit" className="w-full text-white" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full text-white"
+              disabled={loading}
+            >
               {loading ? (
                 <div className="animate-pulse flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-white/60" />
                   <div className="w-2 h-2 rounded-full bg-white/60" />
                   <div className="w-2 h-2 rounded-full bg-white/60" />
                 </div>
-              ) : "Verify"}
+              ) : (
+                "Verify"
+              )}
             </Button>
           </form>
 
@@ -177,11 +182,16 @@ const OtpVerify: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               Didn&apos;t receive a code?{" "}
               {allowResend ? (
-                <span className="text-primary font-medium cursor-pointer hover:underline" onClick={resendOtp}>
+                <span
+                  className="text-primary font-medium cursor-pointer hover:underline"
+                  onClick={resendOtp}
+                >
                   Resend
                 </span>
               ) : (
-                <span className="text-muted-foreground">Resend in {timer}s</span>
+                <span className="text-muted-foreground">
+                  Resend in {timer}s
+                </span>
               )}
             </p>
             <p className="text-sm">

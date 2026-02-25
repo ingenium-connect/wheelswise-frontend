@@ -21,5 +21,13 @@ export async function GET(req: NextRequest) {
     maxAge: 0,
   });
 
+  // Also signal the client to clear client-side state (localStorage + persisted stores)
+  response.cookies.set({
+    name: "clear_client_state",
+    value: "1",
+    path: "/",
+    sameSite: "lax",
+  });
+
   return response;
 }

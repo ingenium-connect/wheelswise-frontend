@@ -45,7 +45,9 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
     setPersonalDetails({ ...form });
     toast.success("User details saved.", { duration: 2000 });
     setTimeout(() => {
-      router.push(`/signup?product_type=${product_type}&motor_type=${motor_type}`);
+      router.push(
+        `/signup?product_type=${product_type}&motor_type=${motor_type}`,
+      );
     }, 200);
   };
 
@@ -64,14 +66,20 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
               <User className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="font-semibold text-[#1e3a5f] text-sm">Personal Details</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Please provide your personal information.</p>
+              <p className="font-semibold text-[#1e3a5f] text-sm">
+                Personal Details
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Please provide your personal information.
+              </p>
             </div>
           </div>
 
           {/* Name */}
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Full Name</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+              Full Name
+            </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="firstName">First Name</FieldLabel>
@@ -106,7 +114,9 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
           {/* Contact */}
           <div className="border-t border-[#d7e8ee] pt-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Contact</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+              Contact
+            </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
@@ -137,7 +147,9 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
           {/* Identity */}
           <div className="border-t border-[#d7e8ee] pt-5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Identity</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+              Identity
+            </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="idNumber">ID Number</FieldLabel>

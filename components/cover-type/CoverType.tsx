@@ -66,56 +66,58 @@ const SelectCoverType = ({ data }: Props) => {
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-        {(data?.coverTypes ?? []).map((type) => {
-          const mapping = CoverMappings[type.type];
-          if (!mapping) return null;
+      {(data?.coverTypes ?? []).map((type) => {
+        const mapping = CoverMappings[type.type];
+        if (!mapping) return null;
 
-          return (
-            <Card
-              key={type.id}
-              className="border border-[#d7e8ee] shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Top accent bar */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+        return (
+          <Card
+            key={type.id}
+            className="border border-[#d7e8ee] shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+          >
+            {/* Top accent bar */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
 
-              <CardContent className="p-6 flex flex-col h-full">
-                {/* Header */}
-                <div className={`flex items-center gap-3 bg-gradient-to-br ${mapping.accent} rounded-xl p-4 mb-5`}>
-                  <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                    {mapping.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1e3a5f] text-lg leading-tight">
-                      {type.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {mapping.description}
-                    </p>
-                  </div>
+            <CardContent className="p-6 flex flex-col h-full">
+              {/* Header */}
+              <div
+                className={`flex items-center gap-3 bg-gradient-to-br ${mapping.accent} rounded-xl p-4 mb-5`}
+              >
+                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
+                  {mapping.icon}
                 </div>
+                <div>
+                  <h3 className="font-bold text-[#1e3a5f] text-lg leading-tight">
+                    {type.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {mapping.description}
+                  </p>
+                </div>
+              </div>
 
-                {/* Features */}
-                <ul className="space-y-2.5 mb-6 flex-1">
-                  {mapping.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                      <span className="text-sm text-[#1e3a5f]">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Features */}
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {mapping.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-sm text-[#1e3a5f]">{feature}</span>
+                  </li>
+                ))}
+              </ul>
 
-                {/* CTA */}
-                <Button
-                  size="lg"
-                  className="w-full text-white"
-                  onClick={() => handleSelect(type.type, mapping.path)}
-                >
-                  Select {type.name}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+              {/* CTA */}
+              <Button
+                size="lg"
+                className="w-full text-white"
+                onClick={() => handleSelect(type.type, mapping.path)}
+              >
+                Select {type.name}
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };

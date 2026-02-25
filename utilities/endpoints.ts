@@ -8,6 +8,7 @@ export const LOGIN_ENDPOINT = "/users/login";
 export const PROFILE_ENDPOINT = "/users/profile";
 export const USER_POLICIES_ENDPOINT = "/users/policies";
 export const USER_VEHICLES_ENDPOINT = "/users/vehicles";
+export const RESET_PASSWORD_ENDPOINT = "/account/request";
 
 // DATA ENDPOINTS
 export const COVER_TYPES_ENDPOINT = "/cover-types";
@@ -19,3 +20,6 @@ export const MOTOR_SUBTYPE_ENDPOINT = "/policies/products/subtype";
 export const OTP_VERIFY_ENDPOINT = "/otp";
 export const REGISTER_VEHICLE_ENDPOINT = "/vehicle/new";
 export const USER_REGISTRATION_ENDPOINT = "/users/register";
+
+export const POLICY_PAYMENT_ENDPOINT = "policy/new";
+export const POLICY_PAYMENT_VERIFY_ENDPOINT = "payments/verify";
