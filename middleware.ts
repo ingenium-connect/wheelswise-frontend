@@ -15,7 +15,7 @@ export default function middleware(request: NextRequest) {
       "/favicon.ico",
     ].includes(pathname)
   )
-    return;
+    return NextResponse.next();
 
   response = NextResponse.next();
 
@@ -34,7 +34,16 @@ export default function middleware(request: NextRequest) {
   // If user is unauthenticated and trying to access a protected route redirect to /
   const isAuthPage = pathname.startsWith("/dashboard");
   if (!authToken && isAuthPage) {
-    return NextResponse.redirect(new URL(`/`, request.url));
+    const res = NextResponse.redirect(new URL(`/`, request.url));
+    // Signal the client to clear client-side state (localStorage + stores)
+    res.cookies.set({
+      name: "clear_client_state",
+      value: "1",
+      path: "/",
+      // not httpOnly so client JS can read and clear it
+      sameSite: "lax",
+    });
+    return res;
   }
 
   return response;

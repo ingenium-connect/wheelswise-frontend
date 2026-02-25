@@ -9,11 +9,31 @@ type Props = {
 
 export function AccountCard({ user }: Props) {
   const fields = [
-    { icon: <User className="w-4 h-4" />, label: "Full Name", value: user.name },
-    { icon: <Hash className="w-4 h-4" />, label: "ID Number", value: user.id_number },
-    { icon: <CreditCard className="w-4 h-4" />, label: "KRA PIN", value: user.kra_pin },
-    { icon: <Phone className="w-4 h-4" />, label: "Phone Number", value: user.msisdn },
-    { icon: <Mail className="w-4 h-4" />, label: "Email Address", value: user.email },
+    {
+      icon: <User className="w-4 h-4" />,
+      label: "Full Name",
+      value: user.name,
+    },
+    {
+      icon: <Hash className="w-4 h-4" />,
+      label: "ID Number",
+      value: user.id_number,
+    },
+    {
+      icon: <CreditCard className="w-4 h-4" />,
+      label: "KRA PIN",
+      value: user.kra_pin,
+    },
+    {
+      icon: <Phone className="w-4 h-4" />,
+      label: "Phone Number",
+      value: user.msisdn,
+    },
+    {
+      icon: <Mail className="w-4 h-4" />,
+      label: "Email Address",
+      value: user.email,
+    },
   ];
 
   return (

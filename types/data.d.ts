@@ -130,6 +130,8 @@ export interface vehiclePayload {
   engine_capacity: number | null;
   body_type: string;
   seating_capacity: number | null;
+  purpose?: string;
+  purpose_type?: number | null;
   vehicle_type: string;
   year_of_manufacture: number;
   tonnage?: number;

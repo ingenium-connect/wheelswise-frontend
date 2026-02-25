@@ -1,6 +1,6 @@
+import Link from "next/link";
 import React from "react";
 import { Car, FileText, AlertTriangle, Plus, ArrowRight } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -60,7 +60,9 @@ const DashboardBanner = ({ name, vehicleCount, policyCount }: Props) => {
             >
               <CardContent className="p-6 flex flex-col items-center text-center gap-3">
                 <div className={`p-3 rounded-full ${stat.bg}`}>{stat.icon}</div>
-                <p className="text-3xl font-bold text-[#1e3a5f]">{stat.value ?? 0}</p>
+                <p className="text-3xl font-bold text-[#1e3a5f]">
+                  {stat.value ?? 0}
+                </p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
               </CardContent>
             </Card>
@@ -76,7 +78,11 @@ const DashboardBanner = ({ name, vehicleCount, policyCount }: Props) => {
         <Card className="border border-[#d7e8ee] shadow-sm">
           <CardContent className="p-6">
             <div className="grid sm:grid-cols-2 gap-4">
-              <Button asChild size="lg" className="w-full text-white justify-between">
+              <Button
+                asChild
+                size="lg"
+                className="w-full text-white justify-between"
+              >
                 <Link href="/cover-type">
                   <span className="flex items-center gap-2">
                     <Plus className="w-4 h-4" />

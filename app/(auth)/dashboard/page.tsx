@@ -11,6 +11,9 @@ import { ACCESS_TOKEN } from "@/utilities/constants";
 import StoreUserClient from "@/components/auth/StoreUserClient";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { Suspense } from "react";
+import StorePersonalDetailsClient from "@/components/auth/StorePersonalDetailsClient";
+import Link from "next/link";
+import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +53,7 @@ export default async function Page() {
   return (
     <>
       {profile && <StoreUserClient user={profile} />}
+      {profile && <StorePersonalDetailsClient user={profile} />}
 
       {/* Page gradient header */}
       <div className="px-4 md:px-8 pt-6 pb-2 bg-[#f0f6f9]">

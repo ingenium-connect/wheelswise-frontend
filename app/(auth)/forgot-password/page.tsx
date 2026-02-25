@@ -5,15 +5,57 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { axiosClient } from "@/utilities/axios-client";
+import { RESET_PASSWORD_ENDPOINT } from "@/utilities/endpoints";
+import { Loader2 } from "lucide-react";
 
 const ForgotPassword: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [msisdn, setPhoneNumber] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleReset = (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("If this email exists, a reset link has been sent.");
-    router.push("/login");
+    setIsLoading(true);
+    setError("");
+    try {
+      const payment_method_id =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem("payment_method_id")
+          : null;
+
+      const payload = {
+        msisdn,
+      };
+      const res = await axiosClient.post(RESET_PASSWORD_ENDPOINT, payload, {});
+
+      const data = res?.data;
+
+      if (res?.data?.error) {
+        setError(res?.data?.error ?? "Payment failed. Please try again.");
+      }
+      if (data) {
+        toast.success("Mpesa payment successful");
+        setTimeout(() => {
+          router.push("/dashboard/payment-summary");
+        }, 2000);
+      } else {
+        setError("Payment failed. Please try again.");
+      }
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        setError(
+          err?.response?.data?.error ?? "Network error. Please try again.",
+        );
+      } else {
+        setError("Network error. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,8 +76,10 @@ const ForgotPassword: React.FC = () => {
         <h2 className="text-2xl font-bold text-center mb-2 text-primary">
           Forgot Your Password?
         </h2>
+        {error && <p className="text-red-600 text-center">{error}</p>}
+
         <p className="text-sm text-center text-gray-600 mb-6">
-          Enter your registered email to receive a reset link.
+          Enter your registered phone number to receive a reset link.
         </p>
 
         {/* Reset Form */}
@@ -45,16 +89,21 @@ const ForgotPassword: React.FC = () => {
               Email Address
             </label>
             <input
-              type="email"
+              type="tel"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={msisdn}
+              onChange={(e) => setPhoneNumber(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-primary"
-              placeholder="you@example.com"
+              placeholder="e.g. 254712345678"
             />
           </div>
 
-          <Button type="submit" className="w-full transition">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full transition"
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send Reset Link
           </Button>
         </form>

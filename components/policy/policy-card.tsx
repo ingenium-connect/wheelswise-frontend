@@ -84,7 +84,13 @@ export const PolicyCard = ({ policy }: Props) => {
             label="Expires"
             value={policy.expiryDate}
             sub={`${policy.remainingDays} days remaining`}
-            subColor={isExpired ? "text-red-500" : isExpiringSoon ? "text-amber-500" : "text-emerald-600"}
+            subColor={
+              isExpired
+                ? "text-red-500"
+                : isExpiringSoon
+                  ? "text-amber-500"
+                  : "text-emerald-600"
+            }
           />
         </div>
       </CardContent>

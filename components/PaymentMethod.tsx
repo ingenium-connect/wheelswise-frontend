@@ -1,10 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Check, CreditCard, Smartphone } from "lucide-react";
+import { Check, CreditCard, Smartphone, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { axiosClient } from "@/utilities/axios-client";
+import {
+  POLICY_PAYMENT_ENDPOINT,
+  POLICY_PAYMENT_VERIFY_ENDPOINT,
+} from "@/utilities/endpoints";
+import { useVehicleStore } from "@/stores/vehicleStore";
+import { useInsuranceStore } from "@/stores/insuranceStore";
+import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
+import { isAxiosError } from "axios";
+import Image from "next/image";
+
+type Props = {
+  token?: string | undefined;
+};
 
 const methods = [
   {
@@ -23,15 +38,40 @@ const methods = [
   },
 ];
 
-const PaymentMethod = () => {
+const PaymentMethod = ({ token }: Props) => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const phoneNumber = usePersonalDetailsStore(
+    (s) => s.personalDetails.phoneNumber,
+  );
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expiry: "",
     cvv: "",
   });
 
+  const vehicleNumber = useVehicleStore((v) => v.vehicleDetails.vehicleNumber);
+  const cover = useInsuranceStore((s) => s.cover);
+  const motorSubType = useInsuranceStore((s) => s.motorSubtype);
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmationData, setConfirmationData] = useState<{
+    amount: number;
+    msisdn: string;
+    payment_reference?: string;
+  } | null>(null);
+
+  const amount = useMemo(() => {
+    return (
+      motorSubType?.underwriter_product?.premium_amount?.one_time_payment ??
+      motorSubType?.product_rate?.least_premium_amount ??
+      0
+    );
+  }, [motorSubType]);
+
+  const handleChoose = useCallback((method: string) => {
+    setSelectedMethod(method);
+  }, []);
   const handleCardDetailsChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -54,6 +94,7 @@ const PaymentMethod = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm p-6 md:p-8 space-y-6">
         {/* Method selector */}
+        {error && <p className="text-red-600 text-center">{error}</p>}
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
             Choose Payment Method
@@ -146,15 +187,19 @@ const PaymentMethod = () => {
             <div className="flex gap-3">
               <Button
                 onClick={handlePay}
-                className="flex-1 text-white"
+                disabled={isLoading}
+                className="flex-1 text-white hover:cursor-pointer"
               >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Send Payment Request
               </Button>
               <Button
                 variant="outline"
-                onClick={handlePay}
+                onClick={handleConfirmPayment}
+                disabled={!confirmationData?.payment_reference || isLoading}
                 className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
               >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Confirm Payment
               </Button>
             </div>

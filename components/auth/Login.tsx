@@ -101,14 +101,19 @@ const Login: React.FC = () => {
         <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
           <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-[#1e3a5f]">Welcome Back</CardTitle>
+            <CardTitle className="text-xl text-[#1e3a5f]">
+              Welcome Back
+            </CardTitle>
             <CardDescription>
               Login to continue managing your motor insurance.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="national_identifier"
@@ -136,7 +141,10 @@ const Login: React.FC = () => {
                     <FormItem>
                       <div className="flex justify-between items-center">
                         <FormLabel>Password</FormLabel>
-                        <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                        <Link
+                          href="/forgot-password"
+                          className="text-xs text-primary hover:underline"
+                        >
                           Forgot password?
                         </Link>
                       </div>
@@ -153,8 +161,14 @@ const Login: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isLoading} className="w-full text-white mt-2">
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full text-white mt-2"
+                >
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Login
                 </Button>
               </form>

@@ -37,7 +37,11 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const handleContinue = () => {
     let isValid = true;
 
-    if (!vehicleValue || isNaN(Number(vehicleValue)) || Number(vehicleValue) <= 0) {
+    if (
+      !vehicleValue ||
+      isNaN(Number(vehicleValue)) ||
+      Number(vehicleValue) <= 0
+    ) {
       isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
     } else if (
@@ -54,7 +58,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
     if (!isValid) return;
 
     setError("");
-    router.push(`/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`);
+    router.push(
+      `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
+    );
   };
 
   return (
@@ -70,7 +76,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
             <p className="font-semibold text-[#1e3a5f]">Vehicle Information</p>
             {selectedMotorType && (
               <p className="text-xs text-muted-foreground mt-0.5">
-                Motor type: <span className="font-medium">{selectedMotorType.name}</span>
+                Motor type:{" "}
+                <span className="font-medium">{selectedMotorType.name}</span>
               </p>
             )}
           </div>
@@ -80,7 +87,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
           <FieldSet>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="vehicleValue">Vehicle Value (KES)</FieldLabel>
+                <FieldLabel htmlFor="vehicleValue">
+                  Vehicle Value (KES)
+                </FieldLabel>
                 <Input
                   id="vehicleValue"
                   type="number"
@@ -90,7 +99,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="seatingCapacity">Seating Capacity</FieldLabel>
+                <FieldLabel htmlFor="seatingCapacity">
+                  Seating Capacity
+                </FieldLabel>
                 <Input
                   id="seatingCapacity"
                   type="number"
@@ -118,9 +129,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
           </FieldSet>
         </FieldGroup>
 
-        {error && (
-          <p className="text-red-600 text-sm mt-3">{error}</p>
-        )}
+        {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
 
         <div className="flex gap-3 mt-6">
           <Button

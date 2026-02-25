@@ -20,8 +20,8 @@ export default async function Page({
       />
       <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
         <div className="max-w-2xl mx-auto">
-        <VehicleValue product_type={product_type} motor_type={motor_type} />
-      </div>
+          <VehicleValue product_type={product_type} motor_type={motor_type} />
+        </div>
       </div>
     </>
   );

@@ -26,7 +26,11 @@ export default function VehicleSearch() {
 
       sessionStorage.setItem(
         "dashboard-vehicle-search",
-        JSON.stringify({ vehicle: vehicle ?? null, owner: owner ?? null, regNo: regNo ?? reg }),
+        JSON.stringify({
+          vehicle: vehicle ?? null,
+          owner: owner ?? null,
+          regNo: regNo ?? reg,
+        }),
       );
 
       if (!vehicle) {

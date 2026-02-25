@@ -228,7 +228,10 @@ const Signup: React.FC<Props> = ({
     return res.data;
   };
   return (
-    <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden" {...props}>
+    <Card
+      className="border border-[#d7e8ee] shadow-sm overflow-hidden"
+      {...props}
+    >
       <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
       <CardContent className="p-6">
         <form onSubmit={handleSignup} className="space-y-5">
@@ -301,20 +304,31 @@ const Signup: React.FC<Props> = ({
             />
             <span>
               I have read and agreed to the{" "}
-              <Link href="/terms" className="text-primary font-medium hover:underline" target="_blank">
+              <Link
+                href="/terms"
+                className="text-primary font-medium hover:underline"
+                target="_blank"
+              >
                 Privacy Policy, Disclaimer &amp; Cookies Policy
               </Link>
             </span>
           </label>
 
-          <Button type="submit" disabled={isLoading || !agreedToTerms} className="w-full text-white">
+          <Button
+            type="submit"
+            disabled={isLoading || !agreedToTerms}
+            className="w-full text-white"
+          >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Account
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link className="text-primary font-medium hover:underline" href="/login">
+            <Link
+              className="text-primary font-medium hover:underline"
+              href="/login"
+            >
               Sign in
             </Link>
           </p>

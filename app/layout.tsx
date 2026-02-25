@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
 import Header from "@/components/layout/Header";
+import ClearClientState from "@/components/auth/ClearClientState";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         <NextTopLoader color="#397397" />
         <main className="flex flex-col min-h-screen">
           <Header />
+          <ClearClientState />
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
         </main>
