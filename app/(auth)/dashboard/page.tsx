@@ -5,7 +5,7 @@ import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import { InsurancePolicy, UserProfile, Vehicle } from "@/types/data";
 import { PolicyCard } from "@/components/policy/policy-card";
 import { AccountCard } from "@/components/auth/profile-card";
-import { isAxiosError } from "axios";
+
 import {
   PROFILE_ENDPOINT,
   USER_POLICIES_ENDPOINT,
@@ -23,8 +23,6 @@ export default async function Page() {
   let profile: UserProfile | undefined = undefined;
   let vehicles: Vehicle[] | undefined = undefined;
 
-  let errorMsg: string = "Failed to load data.";
-
   try {
     const results = await Promise.allSettled([
       getData(PROFILE_ENDPOINT),
@@ -39,12 +37,8 @@ export default async function Page() {
     profile = profileRes;
     policies = policiesRes;
     vehicles = vehiclesRes;
-  } catch (err: unknown) {
-    if (isAxiosError(err)) {
-      if (err?.response?.status === 404) {
-        errorMsg = "Page not found";
-      }
-    }
+  } catch (_err: unknown) {
+    // silently handle fetch errors; pages gracefully show empty states
   }
 
   return (

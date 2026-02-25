@@ -78,11 +78,10 @@ const PaymentMethod = () => {
           relative w-1/2 rounded-2xl border p-6 text-center
           backdrop-blur-sm transition-all duration-200
           focus:outline-none focus:ring-2 focus:ring-[#2e5e74]/40
-          ${
-            isSelected
-              ? "border-[#2e5e74] bg-white/80 shadow-md scale-[1.01]"
-              : "border-[#c7dde5] bg-white/60 hover:bg-white/70 hover:border-[#9fc3d1]"
-          }
+          ${isSelected
+                      ? "border-[#2e5e74] bg-white/80 shadow-md scale-[1.01]"
+                      : "border-[#c7dde5] bg-white/60 hover:bg-white/70 hover:border-[#9fc3d1]"
+                    }
         `}
                 >
                   {/* Check Indicator */}
@@ -92,9 +91,11 @@ const PaymentMethod = () => {
                     </span>
                   )}
 
-                  <img
+                  <Image
                     src={method.image}
                     alt={method.label}
+                    width={120}
+                    height={48}
                     className="mx-auto mb-4 h-12 object-contain"
                   />
 

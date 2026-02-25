@@ -54,7 +54,7 @@ const SelectCoverType = ({ data }: Props) => {
 
   useEffect(() => {
     setCoverStep(0);
-  }, []);
+  }, [setCoverStep]);
 
   const handleSelect = (type: string, path: string) => {
     selectCover(type);

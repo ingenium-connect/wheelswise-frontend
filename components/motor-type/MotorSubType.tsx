@@ -38,7 +38,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
     };
 
     fetchProductBenefits();
-  }, []);
+  }, [productId]);
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -137,7 +137,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
       fetchSubtypes();
     }
     setCoverStep(3);
-  }, [motorType?.name, vehicleValue, additionalBenefits]);
+  }, [motorType?.name, vehicleValue, additionalBenefits, product_type, motor_type, seating_capacity, selectedCover, setCoverStep, tonnage, tpoCategory]);
 
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);

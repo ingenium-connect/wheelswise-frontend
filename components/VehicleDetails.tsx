@@ -85,7 +85,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       });
 
     setCoverStep(4);
-  }, []);
+  }, [setCoverStep]);
 
   // Fetch purpose categories whenever vehiclePurpose changes
   useEffect(() => {

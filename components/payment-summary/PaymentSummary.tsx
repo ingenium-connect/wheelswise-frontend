@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
@@ -68,6 +68,29 @@ const PaymentSummary = () => {
     }
   }, [motorSubType]);
 
+  const methodMapper = useCallback(
+    (payment_methods: PaymentMethods[]) => {
+      const enrichedPaymentMethods: UIMappedPaymentMethod[] = payment_methods
+        .map((method: UIMappedPaymentMethod) => {
+          const mapped = MappedPaymentMethods[method.name];
+
+          if (!mapped) return null;
+
+          return {
+            ...method,
+            name: mapped.name,
+            description: mapped.description,
+            uiKey: mapped.key,
+          };
+        })
+        .filter(Boolean) as UIMappedPaymentMethod[];
+      return enrichedPaymentMethods;
+    },
+    // MappedPaymentMethods is defined inline above and never changes, so this is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   useEffect(() => {
     const getPaymentMethods = () => {
       const underwriterId = motorSubType?.underwriter_product.underwriter_id;
@@ -86,25 +109,7 @@ const PaymentSummary = () => {
         });
     };
     getPaymentMethods();
-  }, [motorSubType]);
-
-  const methodMapper = (payment_methods: PaymentMethods[]) => {
-    const enrichedPaymentMethods: UIMappedPaymentMethod[] = payment_methods
-      .map((method: UIMappedPaymentMethod) => {
-        const mapped = MappedPaymentMethods[method.name];
-
-        if (!mapped) return null;
-
-        return {
-          ...method,
-          name: mapped.name,
-          description: mapped.description,
-          uiKey: mapped.key,
-        };
-      })
-      .filter(Boolean) as UIMappedPaymentMethod[];
-    return enrichedPaymentMethods;
-  };
+  }, [motorSubType, methodMapper]);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -119,11 +124,10 @@ const PaymentSummary = () => {
                 key={method.id}
                 onClick={() => setSelectedPaymentMethod(method.id)}
                 className={`p-8 cursor-pointer transition-all border-2 rounded-xl
-          ${
-            isSelected
-              ? "border-[#2e5e74] bg-white/80 scale-[1.01]"
-              : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
-          }
+          ${isSelected
+                    ? "border-[#2e5e74] bg-white/80 scale-[1.01]"
+                    : "border-[#c7dde5] bg-white/60 hover:border-[#9fc3d1]"
+                  }
         `}
               >
                 <h3 className="text-xl font-medium mb-4 text-[#2e5e74]">

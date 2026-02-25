@@ -110,7 +110,7 @@ const OtpVerify: React.FC = () => {
         setShake(true);
         setTimeout(() => setShake(false), 300);
       }
-    } catch (err) {
+    } catch (_err) {
       setAllowResend(true);
 
       setError("Network error. Please try again.");
