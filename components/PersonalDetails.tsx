@@ -41,7 +41,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 
   useEffect(() => {
     setCoverStep(5);
-  }, []);
+  }, [setCoverStep]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,

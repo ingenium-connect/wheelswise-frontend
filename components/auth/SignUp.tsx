@@ -66,7 +66,6 @@ const Signup: React.FC<Props> = ({
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -78,7 +77,6 @@ const Signup: React.FC<Props> = ({
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // clear inline errors
 
     try {
       // -------------------------------------
@@ -194,7 +192,7 @@ const Signup: React.FC<Props> = ({
       });
 
       if (res?.user?.id) {
-        setProfile({ id: res.user.id } as any);
+        setProfile({ id: res.user.id } as Parameters<typeof setProfile>[0]);
       }
 
       toast.success("Successfully registered!");

@@ -32,7 +32,7 @@ const SelectMotorType = ({ data, token }: Props) => {
     undefined,
   );
   const [vehicleTonnage, setVehicleTonnage] = useState<number>(0);
-  const { sending: sendingOtp, sendOtp, canSend, timeUntilResend } = useOtp();
+  const { sending: sendingOtp, sendOtp, canSend: _canSend, timeUntilResend: _timeUntilResend } = useOtp();
   const [commercialOptions, setCommercialOptions] = useState<
     { description: string; code: string }[]
   >([]);
@@ -58,7 +58,7 @@ const SelectMotorType = ({ data, token }: Props) => {
     };
     setCoverStep(1);
     getCommercialOptions();
-  }, []);
+  }, [setCoverStep]);
 
   /**
    * sets the vehicle tonnage var

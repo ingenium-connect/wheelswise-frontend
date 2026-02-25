@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Vehicle } from "@/types/data";
 import { Button } from "../ui/button";
 import Link from "next/link";
