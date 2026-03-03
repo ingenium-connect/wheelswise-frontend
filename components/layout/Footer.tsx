@@ -100,7 +100,8 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="text-center text-xs mt-6 border-t border-white/20 pt-4">
-        &copy; {new Date().getFullYear()} Wheelswise. All rights reserved.
+        &copy; {new Date().getFullYear()} Wheelswise. All rights reserved. | Powered by{" "}
+        <a href="https://ingeniumct.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Ingenium</a>
       </div>
     </footer>
   );
