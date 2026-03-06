@@ -3,20 +3,23 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { Check } from "lucide-react";
+import { Card, CardContent } from "./ui/card";
+import { Check, CreditCard, Smartphone } from "lucide-react";
 
 const methods = [
   {
     id: "mpesa",
-    label: "Mpesa",
+    label: "M-Pesa",
     description: "Pay instantly using your mobile wallet.",
     image: "/mpesa.png",
+    icon: <Smartphone className="w-4 h-4" />,
   },
   {
     id: "card",
     label: "Card",
     description: "Secure payment via debit or credit card.",
     image: "/card.png",
+    icon: <CreditCard className="w-4 h-4" />,
   },
 ];
 
@@ -29,8 +32,11 @@ const PaymentMethod = () => {
     cvv: "",
   });
 
-  const handleChoose = (method: string) => {
-    setSelectedMethod(method);
+  const handleCardDetailsChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { name, value } = event.target;
+    setCardDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePay = () => {
@@ -41,69 +47,51 @@ const PaymentMethod = () => {
     }
   };
 
-  const handleCardDetailsChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const { name, value } = event.target;
-    setCardDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
-  };
+  const inputClass =
+    "w-full border border-[#d7e8ee] rounded-lg px-3 py-2.5 text-sm text-[#1e3a5f] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white placeholder:text-muted-foreground";
 
   return (
-    <section className="max-w-2xl mx-auto">
-      <div className="flex flex-col items-center px-4">
-        {/* Method Selection */}
-        <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md mb-8">
-          <h2 className="text-lg font-semibold text-center mb-4">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm p-6 md:p-8 space-y-6">
+        {/* Method selector */}
+        <div>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
             Choose Payment Method
-          </h2>
-          <div
-            className="flex justify-center gap-4"
-            role="radiogroup"
-            aria-label="Payment method"
-          >
+          </p>
+          <div className="grid grid-cols-2 gap-4" role="radiogroup">
             {methods.map((method) => {
               const isSelected = selectedMethod === method.id;
-
               return (
                 <button
                   key={method.id}
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
-                  onClick={() => handleChoose(method.id)}
-                  className={`
-          relative w-1/2 rounded-2xl border p-6 text-center
-          backdrop-blur-sm transition-all duration-200
-          focus:outline-none focus:ring-2 focus:ring-[#2e5e74]/40
-          ${isSelected
-                      ? "border-[#2e5e74] bg-white/80 shadow-md scale-[1.01]"
-                      : "border-[#c7dde5] bg-white/60 hover:bg-white/70 hover:border-[#9fc3d1]"
-                    }
-        `}
+                  onClick={() => setSelectedMethod(method.id)}
+                  className={`relative rounded-xl border-2 p-5 text-center transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                    isSelected
+                      ? "border-primary bg-primary/5"
+                      : "border-[#d7e8ee] bg-white hover:border-primary/40"
+                  }`}
                 >
-                  {/* Check Indicator */}
                   {isSelected && (
-                    <span className="absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#2e5e74] text-white">
-                      <Check className="h-4 w-4" />
+                    <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+                      <Check className="h-3 w-3" />
                     </span>
                   )}
-
                   <Image
                     src={method.image}
                     alt={method.label}
                     width={120}
                     height={48}
-                    className="mx-auto mb-4 h-12 object-contain"
+                    className="mx-auto mb-3 h-10 object-contain"
                   />
-
-                  <h3 className="text-base font-medium text-[#2e5e74]">
+                  <p
+                    className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-[#1e3a5f]"}`}
+                  >
                     {method.label}
-                  </h3>
-
-                  <p className="mt-1 text-sm text-[#6b8b98]">
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {method.description}
                   </p>
                 </button>
@@ -112,35 +100,60 @@ const PaymentMethod = () => {
           </div>
         </div>
 
-        {/* Mpesa Form */}
+        {/* Divider */}
+        <div className="border-t border-[#d7e8ee]" />
+
+        {/* M-Pesa form */}
         {selectedMethod === "mpesa" && (
-          <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-primary mb-2">Mpesa</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              You will receive a push notification to your phone number.
-            </p>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="07XXXXXXXX"
-              className="w-full border border-primary rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring focus:border-[color:var(--tw-shadow-color)]"
-            />
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
+                M-Pesa Details
+              </p>
+              <Card className="border border-[#d7e8ee] shadow-sm">
+                <CardContent className="p-5 space-y-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-[#d7e8ee]">
+                    <div className="p-2.5 bg-primary/10 rounded-xl">
+                      <Smartphone className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#1e3a5f]">
+                        M-Pesa STK Push
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        You will receive a prompt on your phone to confirm
+                        payment.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="07XXXXXXXX"
+                      className={inputClass}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             <div className="flex gap-3">
               <Button
                 onClick={handlePay}
-                className="text-white transition mb-3"
+                className="flex-1 text-white"
               >
-                Pay
+                Send Payment Request
               </Button>
-
               <Button
+                variant="outline"
                 onClick={handlePay}
-                className="text-white transition bg-[#ccc]"
+                className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
               >
                 Confirm Payment
               </Button>
@@ -148,80 +161,95 @@ const PaymentMethod = () => {
           </div>
         )}
 
-        {/* Card Form (Disabled for now) */}
+        {/* Card form */}
         {selectedMethod === "card" && (
-          <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md opacity-70 pointer-events-none relative">
-            <div className="absolute top-0 left-0 right-0 bg-yellow-100 text-yellow-700 text-center py-2 rounded-t-xl text-sm font-medium">
-              Card payments coming soon
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
+                Card Details
+              </p>
+              <Card className="border border-amber-200 shadow-sm bg-amber-50">
+                <CardContent className="p-4">
+                  <p className="text-sm text-amber-700 font-medium">
+                    Card payments are coming soon. Please use M-Pesa for now.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
-            <h3 className="text-lg font-semibold textr-primary mt-6 mb-2">
-              Card Payment
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Enter your card details below to complete the payment.
-            </p>
+            <div className="opacity-50 pointer-events-none space-y-4">
+              <Card className="border border-[#d7e8ee] shadow-sm">
+                <CardContent className="p-5 space-y-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-[#d7e8ee]">
+                    <div className="p-2.5 bg-primary/10 rounded-xl">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#1e3a5f]">
+                        Debit / Credit Card
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Visa, Mastercard accepted.
+                      </p>
+                    </div>
+                  </div>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Card Number
-            </label>
-            <input
-              type="text"
-              placeholder="1234 5678 9012 3456"
-              value={cardDetails.cardNumber}
-              name="cardNumber"
-              onChange={handleCardDetailsChange}
-              disabled
-              className="w-full border rounded-lg px-4 py-2 mb-4 bg-gray-100 text-gray-500"
-            />
+                  <div>
+                    <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
+                      Card Number
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="1234 5678 9012 3456"
+                      value={cardDetails.cardNumber}
+                      name="cardNumber"
+                      onChange={handleCardDetailsChange}
+                      disabled
+                      className={inputClass}
+                    />
+                  </div>
 
-            <div className="flex gap-4 mb-4">
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expiry Date
-                </label>
-                <input
-                  type="text"
-                  placeholder="MM/YY"
-                  value={cardDetails.expiry}
-                  name="expiry"
-                  onChange={handleCardDetailsChange}
-                  disabled
-                  className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500"
-                />
-              </div>
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  CVV
-                </label>
-                <input
-                  type="text"
-                  placeholder="123"
-                  value={cardDetails.cvv}
-                  name="cvv"
-                  onChange={handleCardDetailsChange}
-                  disabled
-                  className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500"
-                />
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
+                        Expiry Date
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        value={cardDetails.expiry}
+                        name="expiry"
+                        onChange={handleCardDetailsChange}
+                        disabled
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
+                        CVV
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="123"
+                        value={cardDetails.cvv}
+                        name="cvv"
+                        onChange={handleCardDetailsChange}
+                        disabled
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button disabled className="w-full text-white cursor-not-allowed">
+                Pay
+              </Button>
             </div>
-            <Button
-              disabled
-              className="text-white w-full transition mb-3 cursor-not-allowed"
-            >
-              Pay
-            </Button>
-
-            <Button
-              disabled
-              className="text-white transition w-full cursor-not-allowed"
-            >
-              Confirm Payment
-            </Button>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 };
 

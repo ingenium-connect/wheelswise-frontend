@@ -12,19 +12,12 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Car, Loader2, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
 
@@ -328,342 +321,249 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           <AlertDescription>{searchMessage}</AlertDescription>
         </Alert>
       )}
-      <Card
-        className={`mx-auto mt-4 sm:mt-10 w-full bg-white/80 backdrop-blur-sm shadow-lg transition-all ${searchStatus === "idle" ? "max-w-md" : "max-w-3xl"
-          }`}
-      >
-        <CardContent>
+
+      <Card className="w-full border border-[#d7e8ee] shadow-sm overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+        <CardContent className="p-6">
+
+          {/* Search state */}
           {searchStatus === "idle" ? (
-            <form onSubmit={searchVehicle}>
-              <FieldGroup>
-                <FieldSet>
-                  <FieldLegend>Vehicle Search</FieldLegend>
-                  <FieldDescription>
-                    Enter your vehicle registration number.
-                  </FieldDescription>
-                  <Field>
-                    <FieldLabel>Vehicle Number</FieldLabel>
-                    <Input
-                      value={vehicleRegNumber}
-                      onChange={(e) => setVehicleRegNumber(e.target.value)}
-                      required
-                    />
-                  </Field>
-                </FieldSet>
-              </FieldGroup>
-              <Button
-                type="submit"
-                className="mt-4 w-full text-white"
-                disabled={loadingSearch}
-              >
-                {loadingSearch ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Search Vehicle"
-                )}
+            <form onSubmit={searchVehicle} className="space-y-5">
+              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
+                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
+                  <Search className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1e3a5f] text-sm">Search by Registration</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Enter your vehicle registration number to auto-fill details.</p>
+                </div>
+              </div>
+              <Field>
+                <FieldLabel htmlFor="vehicleReg">Vehicle Registration Number</FieldLabel>
+                <Input
+                  id="vehicleReg"
+                  value={vehicleRegNumber}
+                  onChange={(e) => setVehicleRegNumber(e.target.value)}
+                  placeholder="e.g. KAA 123A"
+                  required
+                />
+              </Field>
+              <Button type="submit" className="w-full text-white" disabled={loadingSearch}>
+                {loadingSearch ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Search Vehicle"}
               </Button>
             </form>
           ) : (
-            <form onSubmit={handleSubmit}>
-              <FieldGroup>
-                <FieldSet>
-                  <FieldLegend>Vehicle Details</FieldLegend>
-                  <FieldDescription>
-                    Please provide your vehicle details.
-                  </FieldDescription>
-                  <FieldGroup>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="vehicleValue">
-                          Vehicle Value
-                        </FieldLabel>
-                        <Input
-                          id="vehicleValue"
-                          name="vehicleValue"
-                          value={form.vehicleValue}
-                          disabled
-                          readOnly
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="engineCapacity">
-                          Engine Capacity
-                        </FieldLabel>
-                        <Input
-                          id="engineCapacity"
-                          type="text"
-                          name="engineCapacity"
-                          value={form.engineCapacity}
-                          onChange={handleChange}
-                          placeholder="Enter Engine cc e.g. 1800CC"
-                          required
-                          disabled={isFieldsDisabled}
-                        />
-                      </Field>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="vehicleNumber">
-                          Vehicle Number
-                        </FieldLabel>
-                        <Input
-                          id="vehicleNumber"
-                          name="vehicleNumber"
-                          type="text"
-                          onChange={handleChange}
-                          value={form.vehicleNumber}
-                          readOnly={isFieldsDisabled}
-                          placeholder="Vehicle Number"
-                          required
-                          disabled={isFieldsDisabled}
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="chassisNumber">
-                          Chassis Number
-                        </FieldLabel>
-                        <Input
-                          id="chassisNumber"
-                          type="text"
-                          name="chassisNumber"
-                          value={form.chassisNumber}
-                          onChange={handleChange}
-                          placeholder="Chassis Number"
-                          required
-                          disabled={isFieldsDisabled}
-                        />
-                      </Field>
-                    </div>
+            /* Details form */
+            <form onSubmit={handleSubmit} className="space-y-6">
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="vehicleMake">
-                          Select Make
-                        </FieldLabel>
-                        {isFieldsDisabled ? (
-                          <Input
-                            value={form.make}
-                            readOnly
-                            disabled
-                            className="bg-slate-50"
-                          />
-                        ) : (
-                          <Select
-                            onValueChange={(v) => handleSelectChange("make", v)}
-                            value={form.make}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select Make" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {modelMakeMap.map((m) => (
-                                <SelectItem key={m.make} value={m.make}>
-                                  {m.make}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="vehicleModel">
-                          Vehicle Model
-                        </FieldLabel>
-                        {isFieldsDisabled ? (
-                          <Input
-                            value={form.model}
-                            readOnly
-                            disabled
-                            className="bg-slate-50"
-                          />
-                        ) : (
-                          <Select
-                            onValueChange={(v) =>
-                              handleSelectChange("model", v)
-                            }
-                            value={form.model}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select Model" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {models.map((model) => (
-                                <SelectItem key={model} value={model}>
-                                  {model}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </Field>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="yearOfManufacture">
-                          Year of Manufacture
-                        </FieldLabel>
-                        {isFieldsDisabled ? (
-                          <Input
-                            value={form.year}
-                            readOnly
-                            disabled
-                            className="bg-slate-50"
-                          />
-                        ) : (
-                          <Select
-                            onValueChange={(v) => handleSelectChange("year", v)}
-                            value={form.year}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Year of manufacture" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from(
-                                {
-                                  length:
-                                    motorSubType?.underwriter_product
-                                      .yom_range ?? 0,
-                                },
-                                (_, i) => {
-                                  const year = currentYear - i;
-                                  return (
-                                    <SelectItem
-                                      key={year}
-                                      value={year.toString()}
-                                    >
-                                      {year}
-                                    </SelectItem>
-                                  );
-                                },
-                              )}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="bodyType">Body Type</FieldLabel>
-                        {isFieldsDisabled ? (
-                          <Input
-                            value={form.bodyType}
-                            readOnly
-                            disabled
-                            className="bg-slate-50"
-                          />
-                        ) : (
-                          <Select
-                            onValueChange={(v) =>
-                              handleSelectChange("bodyType", v)
-                            }
-                            value={form.bodyType}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select body type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {bodyTypes.map((type) => (
-                                <SelectItem key={type} value={type}>
-                                  {type}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </Field>
-                    </div>
-                    {/* Engine Number & Vehicle Purpose */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="engineNumber">
-                          Engine Number
-                        </FieldLabel>
-                        <Input
-                          id="engineNumber"
-                          type="text"
-                          name="engineNumber"
-                          value={form.engineNumber}
-                          onChange={handleChange}
-                          placeholder="Engine Number"
-                          required
-                          disabled={isFieldsDisabled && !!form.engineNumber}
-                          readOnly={isFieldsDisabled && !!form.engineNumber}
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="vehiclePurpose">
-                          Vehicle Purpose
-                        </FieldLabel>
-                        <Input
-                          id="vehiclePurpose"
-                          type="text"
-                          name="vehiclePurpose"
-                          value={form.vehiclePurpose}
-                          onChange={handleChange}
-                          placeholder="e.g. PSV, Private"
-                          required
-                          disabled={isFieldsDisabled && !!form.vehiclePurpose}
-                          readOnly={isFieldsDisabled && !!form.vehiclePurpose}
-                        />
-                      </Field>
-                    </div>
+              {/* Header */}
+              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
+                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
+                  <Car className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1e3a5f] text-sm">Vehicle Details</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Enter your vehicle details manually.</p>
+                </div>
+              </div>
 
-                    {/* Vehicle Purpose Category */}
-                    <div className="grid grid-cols-2 gap-4 mt-0">
-                      <Field>
-                        <FieldLabel htmlFor="vehiclePurposeCategory">
-                          Vehicle Purpose Category
-                        </FieldLabel>
-                        <Select
-                          onValueChange={(v) =>
-                            handleSelectChange("vehiclePurposeCategory", v)
+              {/* Section: Identification */}
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Identification</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="vehicleNumber">Vehicle Number</FieldLabel>
+                    <Input
+                      id="vehicleNumber"
+                      name="vehicleNumber"
+                      type="text"
+                      value={form.vehicleNumber}
+                      onChange={handleChange}
+                      placeholder="e.g. KAA 123A"
+                      required
+                      disabled={isFieldsDisabled}
+                      readOnly={isFieldsDisabled}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="chassisNumber">Chassis Number</FieldLabel>
+                    <Input
+                      id="chassisNumber"
+                      name="chassisNumber"
+                      type="text"
+                      value={form.chassisNumber}
+                      onChange={handleChange}
+                      placeholder="Chassis Number"
+                      required
+                      disabled={isFieldsDisabled}
+                    />
+                  </Field>
+                </div>
+              </div>
+
+              {/* Section: Vehicle Specs */}
+              <div className="border-t border-[#d7e8ee] pt-5">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Vehicle Specs</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="vehicleMake">Make</FieldLabel>
+                    {isFieldsDisabled ? (
+                      <Input value={form.make} readOnly disabled className="bg-[#f0f6f9]" />
+                    ) : (
+                      <Select onValueChange={(v) => handleSelectChange("make", v)} value={form.make}>
+                        <SelectTrigger><SelectValue placeholder="Select Make" /></SelectTrigger>
+                        <SelectContent>
+                          {modelMakeMap.map((m) => (
+                            <SelectItem key={m.make} value={m.make}>{m.make}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="vehicleModel">Model</FieldLabel>
+                    {isFieldsDisabled ? (
+                      <Input value={form.model} readOnly disabled className="bg-[#f0f6f9]" />
+                    ) : (
+                      <Select onValueChange={(v) => handleSelectChange("model", v)} value={form.model}>
+                        <SelectTrigger><SelectValue placeholder="Select Model" /></SelectTrigger>
+                        <SelectContent>
+                          {models.map((model) => (
+                            <SelectItem key={model} value={model}>{model}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="yearOfManufacture">Year of Manufacture</FieldLabel>
+                    {isFieldsDisabled ? (
+                      <Input value={form.year} readOnly disabled className="bg-[#f0f6f9]" />
+                    ) : (
+                      <Select onValueChange={(v) => handleSelectChange("year", v)} value={form.year}>
+                        <SelectTrigger><SelectValue placeholder="Year of manufacture" /></SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: motorSubType?.underwriter_product.yom_range ?? 0 }, (_, i) => {
+                            const year = currentYear - i;
+                            return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
+                          })}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="bodyType">Body Type</FieldLabel>
+                    {isFieldsDisabled ? (
+                      <Input value={form.bodyType} readOnly disabled className="bg-[#f0f6f9]" />
+                    ) : (
+                      <Select onValueChange={(v) => handleSelectChange("bodyType", v)} value={form.bodyType}>
+                        <SelectTrigger><SelectValue placeholder="Select body type" /></SelectTrigger>
+                        <SelectContent>
+                          {bodyTypes.map((type) => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="engineCapacity">Engine Capacity</FieldLabel>
+                    <Input
+                      id="engineCapacity"
+                      name="engineCapacity"
+                      type="text"
+                      value={form.engineCapacity}
+                      onChange={handleChange}
+                      placeholder="e.g. 1800CC"
+                      required
+                      disabled={isFieldsDisabled}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="engineNumber">Engine Number</FieldLabel>
+                    <Input
+                      id="engineNumber"
+                      name="engineNumber"
+                      type="text"
+                      value={form.engineNumber}
+                      onChange={handleChange}
+                      placeholder="Engine Number"
+                      required
+                      disabled={isFieldsDisabled && !!form.engineNumber}
+                      readOnly={isFieldsDisabled && !!form.engineNumber}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="vehicleValue">Vehicle Value (KES)</FieldLabel>
+                    <Input
+                      id="vehicleValue"
+                      name="vehicleValue"
+                      value={form.vehicleValue}
+                      disabled
+                      readOnly
+                      className="bg-[#f0f6f9]"
+                    />
+                  </Field>
+                </div>
+              </div>
+
+              {/* Section: Purpose */}
+              <div className="border-t border-[#d7e8ee] pt-5">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Purpose</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="vehiclePurpose">Vehicle Purpose</FieldLabel>
+                    <Input
+                      id="vehiclePurpose"
+                      name="vehiclePurpose"
+                      type="text"
+                      value={form.vehiclePurpose}
+                      onChange={handleChange}
+                      placeholder="e.g. PSV, Private"
+                      required
+                      disabled={isFieldsDisabled && !!form.vehiclePurpose}
+                      readOnly={isFieldsDisabled && !!form.vehiclePurpose}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="vehiclePurposeCategory">Purpose Category</FieldLabel>
+                    <Select
+                      onValueChange={(v) => handleSelectChange("vehiclePurposeCategory", v)}
+                      value={form.vehiclePurposeCategory}
+                      disabled={!form.vehiclePurpose || loadingCategories || purposeCategories.length === 0}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            loadingCategories ? "Loading…" : !form.vehiclePurpose ? "Enter purpose first" : "Select category"
                           }
-                          value={form.vehiclePurposeCategory}
-                          disabled={
-                            !form.vehiclePurpose ||
-                            loadingCategories ||
-                            purposeCategories.length === 0
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                                loadingCategories
-                                  ? "Loading categories…"
-                                  : !form.vehiclePurpose
-                                    ? "Enter vehicle purpose first"
-                                    : "Select category"
-                              }
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {purposeCategories.map((cat) => (
-                              <SelectItem
-                                key={cat.code}
-                                value={cat.code.toString()}
-                              >
-                                {cat.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                    </div>
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {purposeCategories.map((cat) => (
+                          <SelectItem key={cat.code} value={cat.code.toString()}>{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                </div>
+              </div>
 
-                    <div className="flex justify-between mt-4">
-                      <Button
-                        variant="outline"
-                        type="button"
-                        onClick={cancelAction}
-                      >
-                        Cancel
-                      </Button>
-                      <Button type="submit" disabled={!validDetails()}>
-                        Next
-                      </Button>
-                    </div>
-                  </FieldGroup>
-                </FieldSet>
-              </FieldGroup>
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
+                  onClick={cancelAction}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1 text-white" disabled={!validDetails()}>
+                  Next
+                </Button>
+              </div>
             </form>
           )}
         </CardContent>

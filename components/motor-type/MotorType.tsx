@@ -131,41 +131,44 @@ const SelectMotorType = ({ data, token }: Props) => {
 
   return (
     <>
-      {/* Main Content */}
-      <div className="pt-20 px-4 py-6 md:px-16 flex-grow">
-        {selectedCover === "THIRD_PARTY" && (
-          <div className="grid sm:grid-cols-2 gap-8 sm:max-w-4xl mx-auto">
-            <Card className="p-4">
-              <p className="font-bold text-primary text-center">PRIVATE</p>
-              <Image
-                src="https://wheelwise-files.s3.amazonaws.com/motortype@c7ef95d2-2413-4271-845a-806700a446e3"
-                alt="Private Motor"
-                width={400}
-                height={200}
-                className="object-contain p-4"
-              />
+      {selectedCover === "THIRD_PARTY" && (
+        <div className="grid sm:grid-cols-2 gap-6">
+          <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+            <div className="p-5 flex flex-col gap-4">
+              <p className="font-bold text-[#1e3a5f] text-center uppercase tracking-wide">Private</p>
+              <div className="relative h-44 w-full bg-[#f0f6f9] rounded-xl overflow-hidden">
+                <Image
+                  src="https://wheelwise-files.s3.amazonaws.com/motortype@c7ef95d2-2413-4271-845a-806700a446e3"
+                  alt="Private Motor"
+                  fill
+                  className="object-contain p-4"
+                />
+              </div>
               <Button
                 onClick={() => handleTPO("PRIVATE")}
                 disabled={sendingOtp}
-                className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
+                className="w-full text-white"
               >
                 {sendingOtp ? "Sending..." : "Select"}
               </Button>
-            </Card>
+            </div>
+          </Card>
 
-            <Card className="p-4">
-              <p className="font-bold text-primary text-center">COMMERCIAL</p>
-              <Image
-                src="https://wheelwise-files.s3.amazonaws.com/motortype@c0e45828-06f2-44fa-a491-df12d50063e5"
-                alt="Commercial option"
-                width={400}
-                height={200}
-              ></Image>
-              <Select
-                onValueChange={handleSelectComOption}
-                value={selectedOption}
-              >
-                <SelectTrigger className="w-full">
+          <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+            <div className="p-5 flex flex-col gap-4">
+              <p className="font-bold text-[#1e3a5f] text-center uppercase tracking-wide">Commercial</p>
+              <div className="relative h-44 w-full bg-[#f0f6f9] rounded-xl overflow-hidden">
+                <Image
+                  src="https://wheelwise-files.s3.amazonaws.com/motortype@c0e45828-06f2-44fa-a491-df12d50063e5"
+                  alt="Commercial option"
+                  fill
+                  className="object-contain p-4"
+                />
+              </div>
+              <Select onValueChange={handleSelectComOption} value={selectedOption}>
+                <SelectTrigger className="w-full border-[#d7e8ee]">
                   <SelectValue placeholder="Select commercial option" />
                 </SelectTrigger>
                 <SelectContent>
@@ -190,67 +193,60 @@ const SelectMotorType = ({ data, token }: Props) => {
                       onChange={handleTonnageChange}
                     />
                   </Field>
-                  {!vehicleTonnage ||
-                    (vehicleTonnage <= 0 && (
-                      <p className="text-red-600 text-sm mt-1">
-                        Please enter a valid tonnage for the selected vehicle.
-                      </p>
-                    ))}
+                  {(!vehicleTonnage || vehicleTonnage <= 0) && (
+                    <p className="text-red-600 text-sm">
+                      Please enter a valid tonnage for the selected vehicle.
+                    </p>
+                  )}
                   <Button
                     onClick={() => handleTPO(selectedOption)}
-                    disabled={
-                      sendingOtp || !vehicleTonnage || vehicleTonnage <= 0
-                    }
-                    className="flex items-center justify-center p-4 bg-primary text-white font-bold border border-gray-300 shadow-md rounded-md"
+                    disabled={sendingOtp || !vehicleTonnage || vehicleTonnage <= 0}
+                    className="w-full text-white"
                   >
                     {sendingOtp ? "Sending..." : "Continue"}
                   </Button>
                 </>
               )}
-            </Card>
-          </div>
-        )}
-        {selectedCover === "COMPREHENSIVE" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {(data?.motor_types ?? []).map((type) => (
-              <div
-                key={type.id}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl border border-gray-200 hover:border-[#397397] transition-transform transform hover:-translate-y-1 duration-300 flex flex-col overflow-hidden"
-              >
-                <div className="h-48 w-full overflow-hidden bg-white relative">
-                  <Image
-                    src={type.image_url}
-                    alt={type.name}
-                    fill
-                    className="object-contain p-4"
-                  />
-                </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
-                <div className="px-5 py-4 flex flex-col justify-between flex-grow">
-                  <div>
-                    <h2 className="text-lg font-bold uppercase tracking-wide text-[#397397]">
-                      {type.name}
-                    </h2>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {type.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      onClick={() => handleSelect(type)}
-                      disabled={sendingOtp}
-                      className="w-full text-white py-2 rounded-lg font-medium bg-[#397397] hover:bg-[#2e5e74] transition duration-200"
-                    >
-                      {sendingOtp ? "Sending..." : "Select"}
-                    </button>
-                  </div>
-                </div>
+      {selectedCover === "COMPREHENSIVE" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {(data?.motor_types ?? []).map((type) => (
+            <Card
+              key={type.id}
+              className="border border-[#d7e8ee] shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col"
+            >
+              <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+              <div className="relative h-44 w-full bg-[#f0f6f9]">
+                <Image
+                  src={type.image_url}
+                  alt={type.name}
+                  fill
+                  className="object-contain p-4"
+                />
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <div className="p-5 flex flex-col flex-grow">
+                <h2 className="text-base font-bold uppercase tracking-wide text-[#1e3a5f]">
+                  {type.name}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1 flex-grow">
+                  {type.description}
+                </p>
+                <Button
+                  onClick={() => handleSelect(type)}
+                  disabled={sendingOtp}
+                  className="w-full text-white mt-4"
+                >
+                  {sendingOtp ? "Sending..." : "Select"}
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </>
   );
 };

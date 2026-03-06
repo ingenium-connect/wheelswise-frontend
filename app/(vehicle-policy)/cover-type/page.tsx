@@ -1,5 +1,5 @@
 import SelectCoverType from "@/components/cover-type/CoverType";
-import { PageBreadCrumb } from "@/components/PageBreadCrumb";
+import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import { CoverTypesResponse } from "@/types/data";
 import { axiosServer } from "@/utilities/axios-server";
 import { COVER_TYPES_ENDPOINT } from "@/utilities/endpoints";
@@ -24,23 +24,15 @@ export default async function Page() {
     }
   }
 
-  const pages = [
-    { name: "Home", href: "/", isActive: false },
-    { name: "Cover Type", href: "/cover-type", isActive: true },
-  ];
-
   return response ? (
     <>
-      <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-        <PageBreadCrumb pages={pages} />
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#2e5e74]">Choose a Cover</h2>
-          <p className="text-muted-foreground mt-2">
-            Select your most convenient cover type.
-          </p>
-        </div>
+      <FlowStepHeader
+        title="Choose a Cover"
+        subtitle="Select the type of cover that suits your needs."
+      />
+      <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
         <SelectCoverType data={response} />
-      </section>
+      </div>
     </>
   ) : (
     <div>{errorMsg}</div>

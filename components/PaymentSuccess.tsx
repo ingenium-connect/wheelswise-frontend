@@ -15,11 +15,10 @@ const PaymentSuccess = () => {
             strokeWidth={1.5}
           />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Payment Recieved Successfully!!
+            Payment Received Successfully!!
           </h2>
           <p className="text-gray-600 mb-6">
-            Check your email to generate your certificate. Thank you for
-            choosing WheelsWise!
+            Check your email for your vehicle sticker. Thank you for choosing us!
           </p>
           <Link
             href="/"

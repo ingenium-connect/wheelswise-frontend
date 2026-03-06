@@ -2,16 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { CoverTypesResponse } from "@/types/data";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { CheckCircle2, Shield, ShieldCheck } from "lucide-react";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useEffect } from "react";
 
@@ -21,11 +14,17 @@ type Props = {
 
 const CoverMappings: Record<
   string,
-  { features: string[]; description: string; path: string }
+  {
+    features: string[];
+    description: string;
+    path: string;
+    icon: React.ReactNode;
+    accent: string;
+  }
 > = {
   THIRD_PARTY: {
     description:
-      "Essential coverage that protects against third-party damages.",
+      "Essential coverage that protects against third-party damages. Meets all legal requirements at an affordable premium.",
     features: [
       "Covers damage to other vehicles",
       "Covers injury to third parties",
@@ -33,17 +32,21 @@ const CoverMappings: Record<
       "Budget-friendly premiums",
     ],
     path: "/motor-type",
+    icon: <Shield className="w-7 h-7 text-primary" />,
+    accent: "from-primary/5 to-white",
   },
   COMPREHENSIVE: {
     description:
-      "Complete protection including third-party and accidental damage.",
+      "Complete protection including third-party, accidental damage, theft, fire, and natural disasters.",
     features: [
       "Third-party coverage included",
       "Covers theft and fire damage",
       "Personal accident protection",
-      "Covers natural disasters (flood, storm, etc.)",
+      "Covers natural disasters",
     ],
     path: "/motor-type",
+    icon: <ShieldCheck className="w-7 h-7 text-emerald-600" />,
+    accent: "from-emerald-50 to-white",
   },
 };
 
@@ -58,58 +61,62 @@ const SelectCoverType = ({ data }: Props) => {
 
   const handleSelect = (type: string, path: string) => {
     selectCover(type);
-
     router.push(`${path}/${type}`);
   };
 
   return (
-    <>
-      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+    <div className="grid md:grid-cols-2 gap-6">
         {(data?.coverTypes ?? []).map((type) => {
           const mapping = CoverMappings[type.type];
+          if (!mapping) return null;
+
           return (
             <Card
               key={type.id}
-              className="shadow-lg border border-[#d7e8ee] hover:shadow-xl transition duration-200"
+              className="border border-[#d7e8ee] shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
             >
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-semibold text-primary">
-                  {type.name}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {mapping?.description}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-left">
-                  {mapping?.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+              {/* Top accent bar */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+
+              <CardContent className="p-6 flex flex-col h-full">
+                {/* Header */}
+                <div className={`flex items-center gap-3 bg-gradient-to-br ${mapping.accent} rounded-xl p-4 mb-5`}>
+                  <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
+                    {mapping.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#1e3a5f] text-lg leading-tight">
+                      {type.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {mapping.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <ul className="space-y-2.5 mb-6 flex-1">
+                  {mapping.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                      <span className="text-sm text-[#1e3a5f]">{feature}</span>
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-              <CardFooter className="flex justify-center">
+
+                {/* CTA */}
                 <Button
                   size="lg"
-                  className="w-full bg-primary hover:bg-[#2e5e74] text-white font-semibold rounded-lg"
+                  className="w-full text-white"
                   onClick={() => handleSelect(type.type, mapping.path)}
                 >
                   Select {type.name}
                 </Button>
-              </CardFooter>
+              </CardContent>
             </Card>
           );
         })}
-      </div>
-
-      <div className="text-center mt-10">
-        <Badge className="bg-primary/10 text-[#2e5e74] px-3 py-1 rounded-full">
-          Secure your vehicle with trusted coverage
-        </Badge>
-      </div>
-    </>
+    </div>
   );
 };
 

@@ -30,14 +30,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <NextTopLoader color="#397397" />
         <main className="flex flex-col min-h-screen">
           <Header />
-          {children}
+          <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
         </main>
-        <Toaster richColors />
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );
