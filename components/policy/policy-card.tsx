@@ -1,44 +1,79 @@
-// components/policy-card.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InsurancePolicy } from "@/types/data";
+import { Shield, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 type Props = {
   policy: InsurancePolicy;
 };
 
 export const PolicyCard = ({ policy }: Props) => {
-  return (
-    <Card className="bg-transparent border border-black/60 rounded-2xl text-black">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between gap-6">
-          {/* Left section */}
-          <div className="flex gap-4">
-            {/* Logo placeholder */}
-            <div className="h-14 w-14 rounded-xl border border-black/60 flex items-center justify-center text-xs">
-              Logo
-            </div>
+  const isExpiringSoon = policy.remainingDays <= 30;
+  const isExpired = policy.remainingDays <= 0;
 
-            <div className="space-y-1">
-              <h3 className="font-semibold tracking-wide">
+  const statusBadge = isExpired ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+      <AlertTriangle className="w-3.5 h-3.5" />
+      Expired
+    </span>
+  ) : isExpiringSoon ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+      <AlertTriangle className="w-3.5 h-3.5" />
+      Expiring Soon
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+      <CheckCircle2 className="w-3.5 h-3.5" />
+      Active
+    </span>
+  );
+
+  return (
+    <Card className="border border-[#d7e8ee] shadow-md hover:shadow-xl transition-shadow duration-200 rounded-2xl overflow-hidden">
+      {/* Status bar */}
+      <div
+        className={`h-1.5 w-full ${
+          isExpired
+            ? "bg-red-500"
+            : isExpiringSoon
+              ? "bg-amber-400"
+              : "bg-emerald-500"
+        }`}
+      />
+
+      <CardContent className="p-5">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
+              <Shield className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[#1e3a5f]">
                 {policy.vehicleName}
               </h3>
-              <p className="text-sm text-black/70">{policy.registration}</p>
-              <p className="text-sm">{policy.insurer}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {policy.registration}
+              </p>
+              <p className="text-sm text-primary font-medium mt-0.5">
+                {policy.insurer}
+              </p>
             </div>
           </div>
-
-          {/* Action */}
-          <Button
-            variant="outline"
-            className="border-black/60 text-black hover:bg-black/10"
-          >
-            View Details
-          </Button>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            {statusBadge}
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-primary text-primary hover:bg-primary/5 text-xs"
+            >
+              View Details
+            </Button>
+          </div>
         </div>
 
-        {/* Divider */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+        {/* Info grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-[#d7e8ee] pt-4 text-sm">
           <InfoBlock label="Policy #" value={policy.policyNumber} />
           <InfoBlock label="Coverage" value={policy.coverage} />
           <InfoBlock
@@ -47,7 +82,9 @@ export const PolicyCard = ({ policy }: Props) => {
           />
           <InfoBlock
             label="Expires"
-            value={`${policy.expiryDate} (${policy.remainingDays} days)`}
+            value={policy.expiryDate}
+            sub={`${policy.remainingDays} days remaining`}
+            subColor={isExpired ? "text-red-500" : isExpiringSoon ? "text-amber-500" : "text-emerald-600"}
           />
         </div>
       </CardContent>
@@ -55,11 +92,22 @@ export const PolicyCard = ({ policy }: Props) => {
   );
 };
 
-const InfoBlock = ({ label, value }: { label: string; value: string }) => {
-  return (
-    <div className="space-y-1">
-      <p className="text-black/60 text-xs uppercase tracking-widest">{label}</p>
-      <p className="font-medium">{value}</p>
-    </div>
-  );
-};
+const InfoBlock = ({
+  label,
+  value,
+  sub,
+  subColor = "text-muted-foreground",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  subColor?: string;
+}) => (
+  <div>
+    <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">
+      {label}
+    </p>
+    <p className="font-semibold text-[#1e3a5f]">{value}</p>
+    {sub && <p className={`text-[11px] mt-0.5 ${subColor}`}>{sub}</p>}
+  </div>
+);

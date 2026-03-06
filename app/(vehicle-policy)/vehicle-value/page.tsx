@@ -1,4 +1,4 @@
-import { PageBreadCrumb } from "@/components/PageBreadCrumb";
+import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleValue from "@/components/value/VehicleValue";
 
 export default async function Page({
@@ -10,32 +10,19 @@ export default async function Page({
   const product_type = params?.product_type || "COMPREHENSIVE";
   const motor_type = params?.motor_type || "PRIVATE";
 
-  const pages = [
-    { name: "Home", href: "/", isActive: false },
-    { name: "Cover Type", href: "/cover-type", isActive: false },
-    {
-      name: "Motor Type",
-      href: `/motor-type/${product_type}`,
-      isActive: false,
-    },
-    { name: "Vehicle Value", href: "/vehicle-value", isActive: true },
-  ];
   return (
     <>
-      <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-        <PageBreadCrumb pages={pages} />
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#2e5e74]">Step Two</h2>
-          <p className="text-muted-foreground mt-2">
-            Enter Motor Vehicle Value
-          </p>
-        </div>
-        <div className="flex-grow flex items-center justify-center px-4 py-8">
-          <div className="w-full max-w-sm">
-            <VehicleValue product_type={product_type} motor_type={motor_type} />
-          </div>
-        </div>
-      </section>
+      <FlowStepHeader
+        step={2}
+        totalSteps={5}
+        title="Vehicle Value"
+        subtitle="Enter your vehicle's current market value."
+      />
+      <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
+        <div className="max-w-2xl mx-auto">
+        <VehicleValue product_type={product_type} motor_type={motor_type} />
+      </div>
+      </div>
     </>
   );
 }

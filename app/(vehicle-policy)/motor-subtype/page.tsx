@@ -1,5 +1,5 @@
 import MotorSubtype from "@/components/motor-type/MotorSubType";
-import { PageBreadCrumb } from "@/components/PageBreadCrumb";
+import FlowStepHeader from "@/components/layout/FlowStepHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -12,34 +12,22 @@ export default async function Page({
   const motor_type = params?.motor_type || "PRIVATE";
   const product_type = params.product_type || "COMPREHENSIVE";
 
-  const pages = [
-    { name: "Home", href: "/", isActive: false },
-    { name: "Cover Type", href: "/cover-type", isActive: false },
-    {
-      name: "Motor Type",
-      href: `/motor-type/${product_type}`,
-      isActive: false,
-    },
-    ...(product_type === "COMPREHENSIVE"
-      ? [
-        {
-          name: "Vehicle Value",
-          href: `/vehicle-value?product_type=${product_type}&motor_type=${motor_type}`,
-          isActive: false,
-        },
-      ]
-      : []),
-    { name: "Motor Subtype", href: "/motor-subtype", isActive: true },
-  ];
+  const step = product_type === "COMPREHENSIVE" ? 3 : 2;
+  const totalSteps = product_type === "COMPREHENSIVE" ? 5 : 4;
 
   return (
-    <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-      <PageBreadCrumb pages={pages} />
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h2 className="text-4xl font-bold text-[#2e5e74]">Step Three</h2>
-        <p className="text-muted-foreground mt-2">Choose Motor Subtype</p>
+    <>
+      <FlowStepHeader
+        step={step}
+        totalSteps={totalSteps}
+        title="Choose Your Plan"
+        subtitle="Select an underwriter plan that fits your budget."
+      />
+      <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
+        <div className="max-w-6xl">
+          <MotorSubtype product_type={product_type} motor_type={motor_type} />
+        </div>
       </div>
-      <MotorSubtype product_type={product_type} motor_type={motor_type} />
-    </section>
+    </>
   );
 }

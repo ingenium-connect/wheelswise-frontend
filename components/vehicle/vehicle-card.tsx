@@ -1,7 +1,8 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Vehicle } from "@/types/data";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { Car, CheckCircle2, ShieldOff } from "lucide-react";
 
 type Props = {
   vehicle: Vehicle;
@@ -17,56 +18,74 @@ export function VehicleCard({ vehicle }: Props) {
     tonnage,
     vehicle_value,
     year_of_manufacture,
+    purpose,
     active_policy,
   } = vehicle;
 
+  const isInsured = !!active_policy;
+
   return (
-    <Card className="bg-transparent p-6 relative rounded-2xl border border-black/60 text-black shadow-lg">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold tracking-wide">
-            {year_of_manufacture || "—"} {make} {model}
-          </h3>
-          <p className="mt-1 text-sm opacity-90">{registration_number}</p>
+    <Card className="border border-[#d7e8ee] shadow-md hover:shadow-xl transition-shadow duration-200 rounded-2xl overflow-hidden">
+      {/* Status bar */}
+      <div className={`h-1.5 w-full ${isInsured ? "bg-emerald-500" : "bg-amber-400"}`} />
+
+      <CardContent className="p-5">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-primary/10 rounded-xl">
+              <Car className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[#1e3a5f] leading-tight">
+                {year_of_manufacture} {make} {model}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {registration_number}
+              </p>
+            </div>
+          </div>
+
+          {isInsured ? (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Insured
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0">
+              <ShieldOff className="w-3.5 h-3.5" />
+              Uninsured
+            </span>
+          )}
         </div>
 
-        {active_policy && active_policy !== null ? (
-          <Button
-            variant="outline"
-            className="border-black text-black hover:bg-black/10"
-          >
-            Insured / Covered
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            asChild
-            className="border-black text-black hover:bg-black/10"
-          >
-            <Link href="/cover-type">Insure</Link>
+        {/* Details grid */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm border-t border-[#d7e8ee] pt-4 mb-5">
+          <Detail label="Body Type" value={body_type} />
+          <Detail label="Seating" value={seating_capacity ? `${seating_capacity} seats` : undefined} />
+          {tonnage && <Detail label="Tonnage" value={`${tonnage} T`} />}
+          {purpose && <Detail label="Purpose" value={purpose} />}
+          <Detail label="Value" value={`KES ${vehicle_value.toLocaleString()}`} />
+        </div>
+
+        {/* Action */}
+        {!isInsured && (
+          <Button asChild className="w-full text-white">
+            <Link href="/cover-type">Insure this Vehicle</Link>
           </Button>
         )}
-      </div>
-
-      {/* Details */}
-      <div className="grid grid-cols-2 gap-y-6 text-md">
-        <div className="opacity-80">Body Type:</div>
-        <div className="text-right font-medium">{body_type || "—"}</div>
-
-        <div className="opacity-80">Seating Capacity:</div>
-        <div className="text-right font-medium">{seating_capacity || "—"}</div>
-
-        <div className="opacity-80">Tonnage:</div>
-        <div className="text-right font-medium">
-          {tonnage ? `${tonnage} Tons` : "—"}
-        </div>
-
-        <div className="opacity-80">Vehicle Value:</div>
-        <div className="text-right font-medium">
-          KES {vehicle_value.toLocaleString()}
-        </div>
-      </div>
+      </CardContent>
     </Card>
+  );
+}
+
+function Detail({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">
+        {label}
+      </p>
+      <p className="font-medium text-[#1e3a5f]">{value || "—"}</p>
+    </div>
   );
 }

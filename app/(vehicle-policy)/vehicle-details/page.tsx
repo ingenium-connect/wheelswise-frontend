@@ -1,8 +1,8 @@
-import { PageBreadCrumb } from "@/components/PageBreadCrumb";
+import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleDetails from "@/components/VehicleDetails";
 import { axiosServer } from "@/utilities/axios-server";
 
-export const dynamic = "force-dynamic"; // Force dynamic rendering at page level
+export const dynamic = "force-dynamic";
 
 export default async function Page({
   searchParams,
@@ -13,41 +13,21 @@ export default async function Page({
   const motor_type = params?.motor_type || "PRIVATE";
   const product_type = params.product_type || "COMPREHENSIVE";
 
-  const pages = [
-    { name: "Home", href: "/", isActive: false },
-    { name: "Cover Type", href: "/cover-type", isActive: false },
-    {
-      name: "Motor Type",
-      href: `/motor-type/${product_type}`,
-      isActive: false,
-    },
-    ...(product_type === "COMPREHENSIVE"
-      ? [
-        {
-          name: "Vehicle Value",
-          href: `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
-          isActive: false,
-        },
-      ]
-      : []),
-    {
-      name: "Vehicle Details",
-      href: "/vehicle-details",
-      isActive: true,
-    },
-  ];
+  const step = product_type === "COMPREHENSIVE" ? 4 : 3;
+  const totalSteps = product_type === "COMPREHENSIVE" ? 5 : 4;
 
   const makeModelMapResponse = await axiosServer.get("/vehicle/make-model-map");
 
   return (
-    <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-      <PageBreadCrumb pages={pages} />
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h2 className="text-4xl font-bold text-[#2e5e74]">Step Four</h2>
-        <p className="text-muted-foreground mt-2">Enter Vehicle Details</p>
-      </div>
-      <div className="flex-grow flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-2xl">
+    <>
+      <FlowStepHeader
+        step={step}
+        totalSteps={totalSteps}
+        title="Vehicle Details"
+        subtitle="Search by registration or enter your vehicle details manually."
+      />
+      <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
+        <div className="max-w-4xl mx-auto">
           <VehicleDetails
             modelMakeMap={makeModelMapResponse.data}
             product_type={product_type}
@@ -55,6 +35,6 @@ export default async function Page({
           />
         </div>
       </div>
-    </section>
+    </>
   );
 }

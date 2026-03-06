@@ -1,4 +1,4 @@
-import { PageBreadCrumb } from "@/components/PageBreadCrumb";
+import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import PersonalDetails from "@/components/PersonalDetails";
 
 export default async function Page({
@@ -10,49 +10,22 @@ export default async function Page({
   const motor_type = params?.motor_type || "PRIVATE";
   const product_type = params.product_type || "COMPREHENSIVE";
 
-  const pages = [
-    { name: "Home", href: "/", isActive: false },
-    { name: "Cover Type", href: "/cover-type", isActive: false },
-    {
-      name: "Motor Type",
-      href: `/motor-type/${product_type}`,
-      isActive: false,
-    },
-    ...(product_type === "COMPREHENSIVE"
-      ? [
-        {
-          name: "Vehicle Value",
-          href: `/motor-subtype?product_type=${product_type}&motor_type=${motor_type}`,
-          isActive: false,
-        },
-      ]
-      : []),
-    {
-      name: "Vehicle Details",
-      href: `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`,
-      isActive: false,
-    },
-    {
-      name: "Personal Details",
-      href: "/personal-details",
-      isActive: true,
-    },
-  ];
+  const step = product_type === "COMPREHENSIVE" ? 5 : 4;
+  const totalSteps = product_type === "COMPREHENSIVE" ? 5 : 4;
+
   return (
-    <section className="flex-1 bg-gradient-to-br from-[#d7e8ee] via-white to-[#e5f0f3] py-12 px-4">
-      <PageBreadCrumb pages={pages} />
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h2 className="text-4xl font-bold text-[#2e5e74]">Step Five</h2>
-        <p className="text-muted-foreground mt-2">Enter Personal Details</p>
-      </div>
-      <div className="flex-grow flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-xl">
-          <PersonalDetails
-            product_type={product_type}
-            motor_type={motor_type}
-          />
+    <>
+      <FlowStepHeader
+        step={step}
+        totalSteps={totalSteps}
+        title="Personal Details"
+        subtitle="Tell us a bit about yourself to complete your profile."
+      />
+      <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
+        <div className="max-w-xl mx-auto">
+          <PersonalDetails product_type={product_type} motor_type={motor_type} />
         </div>
       </div>
-    </section>
+    </>
   );
 }

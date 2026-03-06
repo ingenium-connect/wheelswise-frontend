@@ -212,10 +212,11 @@ export type Vehicle = {
   owner: string;
   vehicle_value: number;
   seating_capacity: number;
-  tonnage: number;
+  tonnage?: number;
   body_type: string;
-  vehicle_type: string;
-  year_of_manufacture: string;
+  purpose?: string;
+  purpose_type?: number;
+  year_of_manufacture: number;
   active_policy?: InsurancePolicy | null;
 };
 
