@@ -122,96 +122,77 @@ const OtpVerify: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex-grow flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-center text-primary mb-2">
-            OTP Verification
-          </h2>
-          <p className="text-center text-sm text-gray-600 mb-6">
-            Enter the 6-digit code sent to your phone number
-          </p>
+    <div className="max-w-xl mx-auto">
+      <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+        <div className="p-8 space-y-6">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-3">
+              <span className="text-xl">📱</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Enter the 6-digit code sent to your phone
+            </p>
+          </div>
 
-          {loading ? (
-            <p className="text-center text-gray-600">Loading...</p>
-          ) : error ? (
-            <p className="text-red-600 text-center">{error}</p>
-          ) : (
-            <>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div
-                  className={`flex justify-center ${shake ? shakeClass : ""}`}
-                >
-                  <InputOTP
-                    maxLength={6}
-                    value={otp}
-                    onChange={(val) => {
-                      setOtp(val);
-                      if (error) setError("");
-                    }}
-                  >
-                    <InputOTPGroup>
-                      {[0, 1, 2].map((i) => (
-                        <InputOTPSlot key={i} index={i} />
-                      ))}
-                    </InputOTPGroup>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className={`flex justify-center ${shake ? shakeClass : ""}`}>
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(val) => {
+                  setOtp(val);
+                  if (error) setError("");
+                }}
+              >
+                <InputOTPGroup>
+                  {[0, 1, 2].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+                <InputOTPGroup>
+                  {[3, 4, 5].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
 
-                    <InputOTPGroup>
-                      {[3, 4, 5].map((i) => (
-                        <InputOTPSlot key={i} index={i} />
-                      ))}
-                    </InputOTPGroup>
-                  </InputOTP>
+            {error && (
+              <p className="text-center text-red-600 text-sm">{error}</p>
+            )}
+
+            <Button type="submit" className="w-full text-white" disabled={loading}>
+              {loading ? (
+                <div className="animate-pulse flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-white/60" />
+                  <div className="w-2 h-2 rounded-full bg-white/60" />
+                  <div className="w-2 h-2 rounded-full bg-white/60" />
                 </div>
+              ) : "Verify"}
+            </Button>
+          </form>
 
-                {error && (
-                  <p className="text-center text-red-600 text-sm">{error}</p>
-                )}
-
-                {/* Button skeleton loading */}
-                <Button
-                  type="submit"
-                  className="w-full text-white"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="animate-pulse flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
-                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
-                      <div className="w-4 h-4 rounded-full bg-white/50"></div>
-                    </div>
-                  ) : (
-                    "Verify"
-                  )}
-                </Button>
-              </form>
-
-              {/* Resend Timer */}
-              <p className="text-sm text-center text-gray-600 mt-4">
-                Didn’t receive code?{" "}
-                {allowResend ? (
-                  <span
-                    className="text-blue-700 font-medium cursor-pointer hover:underline"
-                    onClick={resendOtp}
-                  >
-                    Resend
-                  </span>
-                ) : (
-                  <span className="text-gray-400">Resend in {timer}s</span>
-                )}
-              </p>
-
-              {/* Alternative verification */}
-              <p className="text-center mt-4 text-sm">
-                <span className="text-primary cursor-pointer hover:underline">
-                  Verify using Email instead
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Didn&apos;t receive a code?{" "}
+              {allowResend ? (
+                <span className="text-primary font-medium cursor-pointer hover:underline" onClick={resendOtp}>
+                  Resend
                 </span>
-              </p>
-            </>
-          )}
+              ) : (
+                <span className="text-muted-foreground">Resend in {timer}s</span>
+              )}
+            </p>
+            <p className="text-sm">
+              <span className="text-primary cursor-pointer hover:underline">
+                Verify using Email instead
+              </span>
+            </p>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
