@@ -105,30 +105,29 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
-      <Card className="mx-auto mt-4 sm:mt-10 max-w-md w-full bg-white/80 backdrop-blur-sm shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <CardDescription>
-            Login to continue managing your motor insurance.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid gap-4">
+    <div className="bg-[#f0f6f9] flex-1 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl text-[#1e3a5f]">Welcome Back</CardTitle>
+            <CardDescription>
+              Login to continue managing your motor insurance.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="national_identifier"
                   render={({ field }) => (
-                    <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="national_identifier">
-                        National identifier
-                      </FormLabel>
+                    <FormItem>
+                      <FormLabel>National Identifier</FormLabel>
                       <FormControl>
                         <Input
                           id="national_identifier"
-                          placeholder="******"
+                          placeholder="ID / Passport number"
                           type="text"
                           required
                           autoComplete="national_identifier"
@@ -143,21 +142,18 @@ const Login: React.FC = () => {
                   control={form.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem className="grid gap-2">
+                    <FormItem>
                       <div className="flex justify-between items-center">
-                        <FormLabel htmlFor="password">Password</FormLabel>
-                        <Link
-                          href="/forgot-password"
-                          className="ml-auto inline-block text-sm underline"
-                        >
-                          Forgot your password?
+                        <FormLabel>Password</FormLabel>
+                        <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                          Forgot password?
                         </Link>
                       </div>
                       <FormControl>
                         <PasswordInput
                           id="password"
                           required
-                          placeholder="******"
+                          placeholder="••••••••"
                           autoComplete="current-password"
                           {...field}
                         />
@@ -166,21 +162,15 @@ const Login: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full cursor-pointer"
-                >
-                  {isLoading && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                <Button type="submit" disabled={isLoading} className="w-full text-white mt-2">
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Login
                 </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

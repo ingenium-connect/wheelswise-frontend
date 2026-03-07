@@ -371,7 +371,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
               {/* Section: Identification */}
               <div>
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Identification</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehicleNumber">Vehicle Number</FieldLabel>
                     <Input
@@ -511,7 +511,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
               {/* Section: Purpose */}
               <div className="border-t border-[#d7e8ee] pt-5">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">Purpose</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehiclePurpose">Vehicle Purpose</FieldLabel>
                     <Input
