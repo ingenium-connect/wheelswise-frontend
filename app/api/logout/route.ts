@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 
 export async function GET(req: NextRequest) {
-  const loginUrl = new URL("/login", req.nextUrl.origin);
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") ?? "https";
+  const origin = forwardedHost
+    ? `${forwardedProto}://${forwardedHost}`
+    : req.nextUrl.origin;
+  const loginUrl = new URL("/login", origin);
   const response = NextResponse.redirect(loginUrl);
 
   // Clear the access token cookie by setting it with maxAge 0
