@@ -91,10 +91,10 @@ const DashboardBanner = ({ name, vehicleCount, policyCount }: Props) => {
                 variant="outline"
                 className="w-full justify-between border-primary text-primary hover:bg-primary/5"
               >
-                <Link href="/dashboard/payment-summary">
+                <Link href="/dashboard?tab=policies">
                   <span className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    View Payment Summary
+                    View My Policies
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>

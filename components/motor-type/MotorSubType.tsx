@@ -12,7 +12,15 @@ import {
 import { POLICY_ENDPOINT } from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { axiosClient } from "@/utilities/axios-client";
-import { LucideChevronDown, LucideChevronUp } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+  Sparkles,
+  ShieldCheck,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   motor_type: string | undefined;
@@ -25,48 +33,110 @@ type BenefitsSectionProps = {
 
 const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
   const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProductBenefits = () => {
-      axiosClient
-        .get("benefit/extras", {
-          params: {
-            underwriter_product_id: productId,
-          },
-        })
-        .then((response) => setProductBenefits(response.data));
-    };
-
-    fetchProductBenefits();
+    axiosClient
+      .get("benefit/extras", { params: { underwriter_product_id: productId } })
+      .then((response) => setProductBenefits(response.data))
+      .finally(() => setLoading(false));
   }, [productId]);
 
+  if (loading) {
+    return (
+      <p className="text-xs text-muted-foreground py-2 animate-pulse">
+        Loading details…
+      </p>
+    );
+  }
+
+  if (!productBenefits) return null;
+
+  const { product_benefits, applicable_excesses } = productBenefits;
+
   return (
-    <div className="flex flex-wrap gap-4">
-      {productBenefits ? (
-        <>
-          <div>
-            <p className="font-bold">Product benefits</p>
-            {productBenefits.product_benefits.map((benefit) => (
-              <ul className="pl-4" key={benefit.id}>
-                <li className="cursor-pointer list-disc">{benefit.name}</li>
-              </ul>
+    <div className="space-y-5">
+      {/* Product Benefits */}
+      {product_benefits.length > 0 && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-3">
+            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+              Product Benefits
+            </p>
+          </div>
+          <div className="space-y-2">
+            {product_benefits.map((benefit) => (
+              <div
+                key={benefit.id}
+                className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
+              >
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-[#1e3a5f]">
+                    {benefit.name}
+                  </p>
+                  {benefit.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {benefit.description}
+                    </p>
+                  )}
+                  {benefit.limits && benefit.limits.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {benefit.limits.map((limit, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
+                        >
+                          {limit.label ? `${limit.label}: ` : ""}
+                          {Number(limit.amount).toLocaleString()} {limit.currency}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
-          <div>
-            <p className="font-bold">Applicable excesses</p>
-            {productBenefits.applicable_excesses.map((benefit) => (
-              <ul className="pl-4" key={benefit.id}>
-                <li className="cursor-pointer list-disc">
-                  {benefit.name}
-                  <p>{`${benefit.percentage}% of ${benefit.percentage_of}. Minimum amount ${benefit.minimum_amount}${benefit.currency}`}</p>
-                  {benefit.conditions && <p>Condition: {benefit.conditions}</p>}
-                </li>
-              </ul>
+        </div>
+      )}
+
+      {/* Applicable Excesses */}
+      {applicable_excesses.length > 0 && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-3">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+              Applicable Excesses
+            </p>
+          </div>
+          <div className="space-y-2">
+            {applicable_excesses.map((excess) => (
+              <div
+                key={excess.id}
+                className="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2.5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-medium text-[#1e3a5f]">
+                    {excess.name}
+                  </p>
+                  <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                    {excess.percentage}%
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {excess.percentage}% of {excess.percentage_of} · Min{" "}
+                  {excess.minimum_amount.toLocaleString()} {excess.currency}
+                </p>
+                {excess.conditions && (
+                  <p className="text-xs text-muted-foreground mt-0.5 italic">
+                    {excess.conditions}
+                  </p>
+                )}
+              </div>
             ))}
           </div>
-        </>
-      ) : (
-        <p>Loading benefits...</p>
+        </div>
       )}
     </div>
   );
@@ -77,7 +147,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const [subtypes, setSubtypes] = useState<MotorSubTypeItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showBenefits, setShowBenefits] = useState(false);
+  const [openBenefits, setOpenBenefits] = useState<Record<string, boolean>>({});
   const [additionalBenefits, setAdditionalBenefits] = useState<
     AdditionalBenefit[]
   >([]);
@@ -91,12 +161,10 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     (state) => state.setVehicleSubType,
   );
   const { seating_capacity, tonnage } = useVehicleStore();
-
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
   useEffect(() => {
     let API_URL = "";
-
     const BASE_URL = `${POLICY_ENDPOINT}/products/subtype/${motorType?.name}?product_type=${product_type}`;
 
     if (product_type === "COMPREHENSIVE" && motorType?.name) {
@@ -114,30 +182,32 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
       API_URL = `${BASE_URL}${urlString}`;
     }
 
-    const fetchSubtypes = () => {
+    if (API_URL !== "") {
       axiosClient
-        .post(API_URL, {
-          additional_benefits: additionalBenefits,
-        })
+        .post(API_URL, { additional_benefits: additionalBenefits })
         .then((res) => {
-          const data = res.data;
-          setSubtypes(data.underwriter_products || []);
+          setSubtypes(res.data.underwriter_products || []);
         })
         .catch((err: unknown) => {
-          const errorMessage =
-            err instanceof Error ? err.message : "An unknown error occurred";
-          setError(errorMessage);
+          setError(
+            err instanceof Error ? err.message : "An unknown error occurred",
+          );
         })
-        .finally(() => {
-          setLoading(false);
-        });
-    };
-
-    if (API_URL !== "") {
-      fetchSubtypes();
+        .finally(() => setLoading(false));
     }
     setCoverStep(3);
-  }, [motorType?.name, vehicleValue, additionalBenefits, product_type, motor_type, seating_capacity, selectedCover, setCoverStep, tonnage, tpoCategory]);
+  }, [
+    motorType?.name,
+    vehicleValue,
+    additionalBenefits,
+    product_type,
+    motor_type,
+    seating_capacity,
+    selectedCover,
+    setCoverStep,
+    tonnage,
+    tpoCategory,
+  ]);
 
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
@@ -146,25 +216,19 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     );
   };
 
-  /**
-   * Returns the year ranges for a specific product
-   * @param range the range of year of manufacture
-   */
   const getYomRange = (range: number) => {
     const now = new Date().getFullYear();
-    const startDate = now - range;
-    return `${startDate} - ${now}`;
+    return `${now - range} – ${now}`;
   };
 
-  /**
-   * adds additional benefits
-   * @param benefit an additional benefit object
-   */
+  const toggleBenefits = (id: string) => {
+    setOpenBenefits((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const addBenefit = (
     event: React.ChangeEvent<HTMLInputElement>,
     benefit: AdditionalBenefit,
   ) => {
-    // return early if benefit is already added
     if (additionalBenefits.includes(benefit)) return;
     if (event.target.checked) {
       setAdditionalBenefits([...additionalBenefits, benefit]);
@@ -178,15 +242,22 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   return (
     <>
       {loading ? (
-        <p className="text-center text-muted-foreground py-12">Loading plans...</p>
+        <p className="text-center text-muted-foreground py-12">
+          Loading plans…
+        </p>
       ) : error ? (
         <p className="text-red-600 text-center py-12">{error}</p>
       ) : subtypes.length === 0 ? (
-        <p className="text-center text-muted-foreground py-12">No plans available.</p>
+        <p className="text-center text-muted-foreground py-12">
+          No plans available.
+        </p>
       ) : (
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {subtypes.map((item, index) => {
             const product = item.underwriter_product;
+            const isOpen = openBenefits[product.id] ?? false;
+            const hasAdditionalBenefits =
+              product.additional_benefits.length > 0;
 
             return (
               <div
@@ -203,13 +274,18 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                         <h2 className="text-lg font-bold text-[#1e3a5f] uppercase tracking-wide">
                           {product.name}
                         </h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">{product.underwriter_name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {product.underwriter_name}
+                        </p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-xl font-bold text-primary">
-                          KES {product.premium_amount?.one_time_payment.toLocaleString()}
+                          KES{" "}
+                          {product.premium_amount?.one_time_payment.toLocaleString()}
                         </p>
-                        <p className="text-xs text-muted-foreground">one-time premium</p>
+                        <p className="text-xs text-muted-foreground">
+                          one-time premium
+                        </p>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
@@ -220,62 +296,118 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                   {/* Details grid */}
                   <div className="border-t border-[#d7e8ee] pt-4 mb-4 text-sm divide-y divide-[#d7e8ee]">
                     <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Subtype</p>
-                      <p className="font-medium text-[#1e3a5f]">{product.subtype}</p>
+                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                        Subtype
+                      </p>
+                      <p className="font-medium text-[#1e3a5f]">
+                        {product.subtype}
+                      </p>
                     </div>
                     <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Rate</p>
-                      <p className="font-bold text-[#1e3a5f]">{item.product_rate ? `${item.product_rate.rate}%` : "—"}</p>
+                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                        Rate
+                      </p>
+                      <p className="font-bold text-[#1e3a5f]">
+                        {item.product_rate ? `${item.product_rate.rate}%` : "—"}
+                      </p>
                     </div>
                     <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Period</p>
-                      <p className="font-medium text-[#1e3a5f]">{product.period} days</p>
+                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                        Period
+                      </p>
+                      <p className="font-medium text-[#1e3a5f]">
+                        {product.period} days
+                      </p>
                     </div>
                     <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">YOM Range</p>
-                      <p className="font-medium text-[#1e3a5f]">{getYomRange(product.yom_range)}</p>
+                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                        YOM Range
+                      </p>
+                      <p className="font-medium text-[#1e3a5f]">
+                        {getYomRange(product.yom_range)}
+                      </p>
                     </div>
                   </div>
 
                   {/* Additional benefits */}
-                  {item.underwriter_product.additional_benefits.length > 0 && (
+                  {hasAdditionalBenefits && (
                     <div className="mb-4">
-                      <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-2">
-                        Additional Benefits
-                      </p>
-                      <div className="space-y-1.5">
-                        {item.underwriter_product.additional_benefits.map((benefit) => (
-                          <label key={benefit.id} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              name={benefit.id}
-                              onChange={(event) => addBenefit(event, benefit)}
-                              type="checkbox"
-                              className="accent-primary cursor-pointer"
-                            />
-                            <span className="text-sm text-[#1e3a5f]">{benefit.name}</span>
-                          </label>
-                        ))}
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" />
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+                          Additional Benefits
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        {product.additional_benefits.map((benefit) => {
+                          const isChecked = additionalBenefits.some(
+                            (b) => b.id === benefit.id,
+                          );
+                          return (
+                            <label
+                              key={benefit.id}
+                              className={cn(
+                                "flex items-center gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors",
+                                isChecked
+                                  ? "border-primary bg-primary/5"
+                                  : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
+                              )}
+                            >
+                              <input
+                                name={benefit.id}
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => addBenefit(e, benefit)}
+                                className="accent-primary cursor-pointer shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-[#1e3a5f]">
+                                  {benefit.name}
+                                </p>
+                                {(benefit.base_amount > 0 ||
+                                  benefit.percentage > 0) && (
+                                  <p className="text-xs text-muted-foreground mt-0.5">
+                                    {benefit.base_amount > 0
+                                      ? `${benefit.base_amount.toLocaleString()} ${benefit.currency}`
+                                      : `${benefit.percentage}%`}
+                                    {benefit.duration_days > 0 &&
+                                      ` · ${benefit.duration_days} days`}
+                                  </p>
+                                )}
+                              </div>
+                              {isChecked && (
+                                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                              )}
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
 
                   {/* Toggle product benefits */}
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between text-primary hover:bg-primary/5 mb-4"
-                    onClick={() => setShowBenefits(!showBenefits)}
+                  <button
+                    type="button"
+                    onClick={() => toggleBenefits(product.id)}
+                    className="w-full flex items-center justify-between text-sm font-medium text-primary hover:bg-primary/5 rounded-lg px-3 py-2.5 transition-colors mb-2"
                   >
-                    {showBenefits ? "Hide" : "View"} product benefits
-                    {showBenefits ? <LucideChevronUp className="w-4 h-4" /> : <LucideChevronDown className="w-4 h-4" />}
-                  </Button>
+                    <span>
+                      {isOpen ? "Hide" : "View"} plan details
+                    </span>
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
 
-                  {showBenefits && (
-                    <div className="mb-4">
-                      <BenefitsSection productId={item.underwriter_product.id} />
+                  {isOpen && (
+                    <div className="mb-4 border border-[#d7e8ee] rounded-xl p-4">
+                      <BenefitsSection productId={product.id} />
                     </div>
                   )}
 
-                  <div className="mt-auto">
+                  <div className="mt-auto pt-2">
                     <Button
                       size="lg"
                       onClick={() => handleSelect(item)}
