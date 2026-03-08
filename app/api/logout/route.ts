@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 
 export async function GET(req: Request) {
-  const response = NextResponse.redirect(new URL("/", req.url));
+  const response = NextResponse.redirect(new URL("/login", req.url));
 
   // Clear the access token cookie by setting it with maxAge 0
   response.cookies.set({

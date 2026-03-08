@@ -39,11 +39,6 @@ import { loginFormSchema } from "@/utilities/validation-schemas";
 const formSchema = loginFormSchema;
 
 const Login: React.FC = () => {
-  const [userDetails, setUserDetails] = useState<LoginPayload>({
-    national_identifier: "",
-    password: "",
-    user_type: "CUSTOMER",
-  });
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -57,15 +52,11 @@ const Login: React.FC = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setUserDetails(() => ({
-      ...userDetails,
-      national_identifier: values.national_identifier,
-      password: values.password,
-    }));
     try {
-      const payload = {
-        ...values,
-        user_type: userDetails.user_type,
+      const payload: LoginPayload = {
+        national_identifier: values.national_identifier,
+        password: values.password,
+        user_type: "CUSTOMER",
       };
       const response = await loginSubmitHandler({ ...payload });
       if (response?.id) {
@@ -106,7 +97,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="bg-[#f0f6f9] flex-1 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
           <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
           <CardHeader className="pb-2">

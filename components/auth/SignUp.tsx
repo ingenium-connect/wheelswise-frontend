@@ -300,9 +300,9 @@ const Signup: React.FC<Props> = ({
               onChange={(e) => setAgreedToTerms(e.target.checked)}
             />
             <span>
-              I have read and agree to the{" "}
+              I have read and agreed to the{" "}
               <Link href="/terms" className="text-primary font-medium hover:underline" target="_blank">
-                Terms &amp; Conditions
+                Privacy Policy, Disclaimer &amp; Cookies Policy
               </Link>
             </span>
           </label>
