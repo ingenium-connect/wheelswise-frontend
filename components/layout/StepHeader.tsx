@@ -8,7 +8,7 @@ export default function StepHeader() {
   // get step from local storage store
   const step = useInsuranceStore((state) => state.coverStep);
   const stepsHeaders = [
-    "Step One: Choose a Motor Type",
+    "Step One: Choose Motor Type",
     "Step Two: Enter Motor Vehicle Value",
     "Step Three: Choose a Motor Sub Type",
     "Step Four: Enter Vehicle Details",

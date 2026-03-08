@@ -19,6 +19,10 @@ import {
   AlertCircle,
   Sparkles,
   ShieldCheck,
+  ArrowRight,
+  Building2,
+  Clock,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,11 +38,13 @@ type BenefitsSectionProps = {
 const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
   const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     axiosClient
       .get("benefit/extras", { params: { underwriter_product_id: productId } })
       .then((response) => setProductBenefits(response.data))
+      .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
   }, [productId]);
 
@@ -50,9 +56,24 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
     );
   }
 
-  if (!productBenefits) return null;
+  if (fetchError || !productBenefits) {
+    return (
+      <p className="text-xs text-muted-foreground py-2">
+        Plan details unavailable.
+      </p>
+    );
+  }
 
-  const { product_benefits, applicable_excesses } = productBenefits;
+  const product_benefits = productBenefits.product_benefits ?? [];
+  const applicable_excesses = productBenefits.applicable_excesses ?? [];
+
+  if (product_benefits.length === 0 && applicable_excesses.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground py-2">
+        No additional details available for this plan.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -74,22 +95,25 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
                 <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[#1e3a5f]">
-                    {benefit.name}
+                    {benefit.name ?? "—"}
                   </p>
                   {benefit.description && (
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {benefit.description}
                     </p>
                   )}
-                  {benefit.limits && benefit.limits.length > 0 && (
+                  {(benefit.limits?.length ?? 0) > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {benefit.limits.map((limit, i) => (
+                      {(benefit.limits ?? []).map((limit, i) => (
                         <span
                           key={i}
                           className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
                         >
                           {limit.label ? `${limit.label}: ` : ""}
-                          {Number(limit.amount).toLocaleString()} {limit.currency}
+                          {limit.amount != null
+                            ? Number(limit.amount).toLocaleString()
+                            : "—"}{" "}
+                          {limit.currency ?? ""}
                         </span>
                       ))}
                     </div>
@@ -118,15 +142,19 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm font-medium text-[#1e3a5f]">
-                    {excess.name}
+                    {excess.name ?? "—"}
                   </p>
-                  <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                    {excess.percentage}%
-                  </span>
+                  {excess.percentage != null && (
+                    <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                      {excess.percentage}%
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {excess.percentage}% of {excess.percentage_of} · Min{" "}
-                  {excess.minimum_amount.toLocaleString()} {excess.currency}
+                  {excess.percentage != null ? `${excess.percentage}% of ` : ""}
+                  {excess.percentage_of ?? "—"} · Min{" "}
+                  {excess.minimum_amount?.toLocaleString() ?? "—"}{" "}
+                  {excess.currency ?? ""}
                 </p>
                 {excess.conditions && (
                   <p className="text-xs text-muted-foreground mt-0.5 italic">
@@ -242,91 +270,108 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   return (
     <>
       {loading ? (
-        <p className="text-center text-muted-foreground py-12">
-          Loading plans…
-        </p>
+        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm overflow-hidden animate-pulse"
+            >
+              <div className="h-24 bg-[#f0f6f9]" />
+              <div className="p-5 space-y-3">
+                <div className="h-3 bg-[#f0f6f9] rounded w-3/4" />
+                <div className="h-3 bg-[#f0f6f9] rounded w-1/2" />
+                <div className="h-10 bg-[#f0f6f9] rounded mt-4" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : error ? (
-        <p className="text-red-600 text-center py-12">{error}</p>
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+          <p className="text-red-600 font-medium">Failed to load plans</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
       ) : subtypes.length === 0 ? (
-        <p className="text-center text-muted-foreground py-12">
-          No plans available.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <ShieldCheck className="w-8 h-8 text-muted-foreground/40" />
+          <p className="text-muted-foreground font-medium">No plans available</p>
+          <p className="text-sm text-muted-foreground">
+            No plans match your selection. Try adjusting your details.
+          </p>
+        </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto">
           {subtypes.map((item, index) => {
             const product = item.underwriter_product;
-            const isOpen = openBenefits[product.id] ?? false;
+            const isOpen = openBenefits[product?.id] ?? false;
             const hasAdditionalBenefits =
-              product.additional_benefits.length > 0;
+              (product?.additional_benefits?.length ?? 0) > 0;
 
             return (
               <div
                 key={index}
-                className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col"
+                className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col"
               >
-                <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
-
-                <div className="p-6 flex flex-col flex-grow">
-                  {/* Plan header */}
-                  <div className="mb-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h2 className="text-lg font-bold text-[#1e3a5f] uppercase tracking-wide">
-                          {product.name}
-                        </h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {product.underwriter_name}
+                {/* Card header — navy band */}
+                <div className="bg-[#1e3a5f] px-5 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="text-base font-bold text-white leading-tight truncate">
+                        {product?.name ?? "Unnamed Plan"}
+                      </h2>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Building2 className="w-3 h-3 text-white/50 shrink-0" />
+                        <p className="text-xs text-white/60 truncate">
+                          {product?.underwriter_name ?? "—"}
                         </p>
                       </div>
+                    </div>
+                    {product?.premium_amount?.one_time_payment != null && (
                       <div className="text-right shrink-0">
-                        <p className="text-xl font-bold text-primary">
+                        <p className="text-lg font-bold text-white">
                           KES{" "}
-                          {product.premium_amount?.one_time_payment.toLocaleString()}
+                          {product.premium_amount.one_time_payment.toLocaleString()}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] text-white/50 uppercase tracking-wide">
                           one-time premium
                         </p>
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-5 flex flex-col flex-grow">
+                  {/* Description */}
+                  {product?.description && (
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                       {product.description}
                     </p>
-                  </div>
+                  )}
 
-                  {/* Details grid */}
-                  <div className="border-t border-[#d7e8ee] pt-4 mb-4 text-sm divide-y divide-[#d7e8ee]">
-                    <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                        Subtype
-                      </p>
-                      <p className="font-medium text-[#1e3a5f]">
-                        {product.subtype}
-                      </p>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                        Rate
-                      </p>
-                      <p className="font-bold text-[#1e3a5f]">
-                        {item.product_rate ? `${item.product_rate.rate}%` : "—"}
-                      </p>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                        Period
-                      </p>
-                      <p className="font-medium text-[#1e3a5f]">
+                  {/* Stat chips */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {item.product_rate?.rate != null && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium bg-primary/5 text-primary border border-primary/15 px-2.5 py-1 rounded-full">
+                        <TrendingUp className="w-3 h-3" />
+                        {item.product_rate.rate}% rate
+                      </span>
+                    )}
+                    {product?.period != null && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium bg-[#f0f6f9] text-[#1e3a5f] border border-[#d7e8ee] px-2.5 py-1 rounded-full">
+                        <Clock className="w-3 h-3" />
                         {product.period} days
-                      </p>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                        YOM Range
-                      </p>
-                      <p className="font-medium text-[#1e3a5f]">
+                      </span>
+                    )}
+                    {product?.subtype && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium bg-[#f0f6f9] text-[#1e3a5f] border border-[#d7e8ee] px-2.5 py-1 rounded-full">
+                        {product.subtype}
+                      </span>
+                    )}
+                    {product?.yom_range != null && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium bg-[#f0f6f9] text-[#1e3a5f] border border-[#d7e8ee] px-2.5 py-1 rounded-full">
                         {getYomRange(product.yom_range)}
-                      </p>
-                    </div>
+                      </span>
+                    )}
                   </div>
 
                   {/* Additional benefits */}
@@ -335,11 +380,11 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Sparkles className="w-3.5 h-3.5 text-primary" />
                         <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-                          Additional Benefits
+                          Optional Add-ons
                         </p>
                       </div>
                       <div className="space-y-2">
-                        {product.additional_benefits.map((benefit) => {
+                        {(product?.additional_benefits ?? []).map((benefit) => {
                           const isChecked = additionalBenefits.some(
                             (b) => b.id === benefit.id,
                           );
@@ -362,15 +407,15 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                               />
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-[#1e3a5f]">
-                                  {benefit.name}
+                                  {benefit.name ?? "—"}
                                 </p>
-                                {(benefit.base_amount > 0 ||
-                                  benefit.percentage > 0) && (
+                                {((benefit.base_amount ?? 0) > 0 ||
+                                  (benefit.percentage ?? 0) > 0) && (
                                   <p className="text-xs text-muted-foreground mt-0.5">
-                                    {benefit.base_amount > 0
-                                      ? `${benefit.base_amount.toLocaleString()} ${benefit.currency}`
+                                    {(benefit.base_amount ?? 0) > 0
+                                      ? `${benefit.base_amount!.toLocaleString()} ${benefit.currency ?? ""}`
                                       : `${benefit.percentage}%`}
-                                    {benefit.duration_days > 0 &&
+                                    {(benefit.duration_days ?? 0) > 0 &&
                                       ` · ${benefit.duration_days} days`}
                                   </p>
                                 )}
@@ -385,15 +430,13 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     </div>
                   )}
 
-                  {/* Toggle product benefits */}
+                  {/* Toggle plan details */}
                   <button
                     type="button"
-                    onClick={() => toggleBenefits(product.id)}
-                    className="w-full flex items-center justify-between text-sm font-medium text-primary hover:bg-primary/5 rounded-lg px-3 py-2.5 transition-colors mb-2"
+                    onClick={() => toggleBenefits(product?.id)}
+                    className="w-full flex items-center justify-between text-sm font-medium text-primary hover:bg-primary/5 rounded-lg px-3 py-2.5 transition-colors border border-primary/15 mb-3"
                   >
-                    <span>
-                      {isOpen ? "Hide" : "View"} plan details
-                    </span>
+                    <span>{isOpen ? "Hide" : "View"} plan details</span>
                     {isOpen ? (
                       <ChevronUp className="w-4 h-4" />
                     ) : (
@@ -403,17 +446,17 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
                   {isOpen && (
                     <div className="mb-4 border border-[#d7e8ee] rounded-xl p-4">
-                      <BenefitsSection productId={product.id} />
+                      <BenefitsSection productId={product?.id} />
                     </div>
                   )}
 
-                  <div className="mt-auto pt-2">
+                  <div className="mt-auto">
                     <Button
                       size="lg"
                       onClick={() => handleSelect(item)}
-                      className="w-full text-white"
+                      className="w-full bg-[#1e3a5f] hover:bg-[#397397] text-white gap-2"
                     >
-                      Select Plan
+                      Select Plan <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
