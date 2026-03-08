@@ -39,7 +39,7 @@ export default async function MotorTypePage() {
           <PageBreadCrumb pages={pages} />
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-4xl font-bold text-[#2e5e74]">Step One</h2>
-            <p className="text-muted-foreground mt-2">Choose a Motor Type</p>
+            <p className="text-muted-foreground mt-2">Choose Motor Type</p>
           </div>
           <SelectMotorType data={motortypeData} token={token} />
         </section>

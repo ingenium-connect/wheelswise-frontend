@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Car,
   ShieldCheck,
@@ -20,6 +21,7 @@ import {
   Users,
   Bike,
 } from "lucide-react";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 
 const cars = ["/car.jpeg", "/lorry.jpeg", "/psv.jpeg"];
 const carLabels = ["Private Vehicle", "Commercial", "PSV"];
@@ -40,6 +42,7 @@ const steps = [
 
 const coverOptions = [
   {
+    coverTypeKey: "COMPREHENSIVE",
     icon: ShieldCheck,
     title: "Comprehensive",
     tag: "Most Popular",
@@ -59,6 +62,7 @@ const coverOptions = [
     ],
   },
   {
+    coverTypeKey: "THIRD_PARTY",
     icon: Shield,
     title: "Third Party Only (TPO)",
     tag: "Legal Minimum",
@@ -111,6 +115,8 @@ const features = [
 
 const LandingMain: React.FC = () => {
   const [slide, setSlide] = useState(0);
+  const selectCover = useInsuranceStore((state) => state.selectCover);
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -139,8 +145,8 @@ const LandingMain: React.FC = () => {
               Motor Insurance · Kenya
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
-              Drive Covered.{" "}
-              <span className="text-[#8bbfd8]">Drive Confident.</span>
+              Your Motor Insurance.{" "}
+              <span className="text-[#8bbfd8]">Simplified.</span>
             </h1>
             <p className="text-white/70 text-base md:text-lg max-w-lg mb-8 leading-relaxed">
               Kenya&apos;s fastest motor insurance platform. Compare plans from top underwriters, insure any vehicle, and get your certificate in minutes — entirely online.
@@ -260,12 +266,15 @@ const LandingMain: React.FC = () => {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href="/cover-type"
+                    <button
+                      onClick={() => {
+                        selectCover(opt.coverTypeKey);
+                        router.push(`/motor-type/${opt.coverTypeKey}`);
+                      }}
                       className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-colors ${opt.btnBg} ${opt.btnText}`}
                     >
                       Get Started <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </button>
                   </div>
                 </motion.div>
               );

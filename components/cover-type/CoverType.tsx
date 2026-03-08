@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Shield, ShieldCheck } from "lucide-react";
 import { useInsuranceStore } from "@/stores/insuranceStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 type Props = {
   data: CoverTypesResponse;
@@ -54,24 +54,15 @@ const SelectCoverType = ({ data }: Props) => {
   const router = useRouter();
   const selectCover = useInsuranceStore((state) => state.selectCover);
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
-  const cover = useInsuranceStore((state) => state.cover);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (cover) {
-      router.replace(`/motor-type/${cover}`);
-      return;
-    }
     setCoverStep(0);
-    setReady(true);
-  }, [cover, router, setCoverStep]);
+  }, [setCoverStep]);
 
   const handleSelect = (type: string, path: string) => {
     selectCover(type);
     router.push(`${path}/${type}`);
   };
-
-  if (!ready) return null;
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
