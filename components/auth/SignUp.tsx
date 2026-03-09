@@ -158,6 +158,7 @@ const Signup: React.FC<Props> = ({
         engine_capacity: vehicleDetails.engineCapacity
           ? Number(vehicleDetails.engineCapacity)
           : null,
+        engine_number: vehicleDetails.engineNumber?.trim() || undefined,
         body_type: vehicleDetails.bodyType.trim(),
         vehicle_value: Number.isFinite(+vehicleDetails.vehicleValue)
           ? +vehicleDetails.vehicleValue
@@ -165,6 +166,10 @@ const Signup: React.FC<Props> = ({
         seating_capacity: seating_capacity ? Number(seating_capacity) : null,
         vehicle_type: selectedMotorType.name,
         year_of_manufacture: Number(vehicleDetails.year),
+        purpose: vehicleDetails.vehiclePurpose?.trim() || undefined,
+        purpose_type: vehicleDetails.vehiclePurposeCategory
+          ? Number(vehicleDetails.vehiclePurposeCategory)
+          : null,
       };
 
       if (selectedMotorType.name === "COMMERCIAL") {
@@ -199,6 +204,7 @@ const Signup: React.FC<Props> = ({
       router.push(
         `/otp-verify?product_type=${product_type}&motor_type=${motor_type}`,
       );
+      router.refresh();
     } catch (error) {
       const errorMessage =
         error instanceof Error

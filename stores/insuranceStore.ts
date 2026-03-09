@@ -8,6 +8,7 @@ type InsuranceStoreState = {
   motorType: MotorType | null;
   vehicleValue: number;
   motorSubtype: MotorSubTypeItem | null;
+  selectedAdditionalBenefitIds: string[];
   coverStep: number;
   tpoOption: string;
   // Actions
@@ -15,6 +16,7 @@ type InsuranceStoreState = {
   setMotorType: (type: MotorType) => void;
   setVehicleValue: (value: number) => void;
   setVehicleSubType: (subtype: MotorSubTypeItem) => void;
+  setSelectedAdditionalBenefitIds: (ids: string[]) => void;
   nextCoverStep: () => void;
   previousCoverStep: () => void;
   setCoverStep: (step: number) => void;
@@ -32,6 +34,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       motorType: null,
       vehicleValue: 0,
       motorSubtype: null,
+      selectedAdditionalBenefitIds: [],
       coverStep: 0,
       tpoOption: "",
 
@@ -40,6 +43,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       setMotorType: (type) => set({ motorType: type }),
       setVehicleValue: (value) => set({ vehicleValue: value }),
       setVehicleSubType: (subtype) => set({ motorSubtype: subtype }),
+      setSelectedAdditionalBenefitIds: (ids) => set({ selectedAdditionalBenefitIds: ids }),
       nextCoverStep: () => set((state) => ({ coverStep: state.coverStep + 1 })),
       previousCoverStep: () =>
         set((state) => ({ coverStep: state.coverStep - 1 })),

@@ -188,6 +188,9 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const setVehicleSubType = useInsuranceStore(
     (state) => state.setVehicleSubType,
   );
+  const setSelectedAdditionalBenefitIds = useInsuranceStore(
+    (state) => state.setSelectedAdditionalBenefitIds,
+  );
   const { seating_capacity, tonnage } = useVehicleStore();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
 
@@ -239,6 +242,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
+    setSelectedAdditionalBenefitIds(additionalBenefits.map((b) => b.id));
     router.push(
       `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`,
     );
@@ -318,12 +322,12 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                 <div className="bg-[#1e3a5f] px-5 py-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h2 className="text-base font-bold text-white leading-tight truncate">
+                      <h2 className="text-base font-bold text-white leading-tight">
                         {product?.name ?? "Unnamed Plan"}
                       </h2>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Building2 className="w-3 h-3 text-white/50 shrink-0" />
-                        <p className="text-xs text-white/60 truncate">
+                      <div className="flex items-start gap-1.5 mt-1">
+                        <Building2 className="w-3 h-3 text-white/50 shrink-0 mt-0.5" />
+                        <p className="text-xs text-white/60">
                           {product?.underwriter_name ?? "—"}
                         </p>
                       </div>
@@ -355,7 +359,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     {item.product_rate?.rate != null && (
                       <span className="inline-flex items-center gap-1 text-xs font-medium bg-primary/5 text-primary border border-primary/15 px-2.5 py-1 rounded-full">
                         <TrendingUp className="w-3 h-3" />
-                        {item.product_rate.rate}% rate
+                        {item.product_rate?.rate}% rate
                       </span>
                     )}
                     {product?.period != null && (

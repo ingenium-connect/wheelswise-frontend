@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { useInsuranceStore } from "@/stores/insuranceStore";
-import { PaymentMethods, UIMappedPaymentMethod } from "@/types/data";
+import { AdditionalBenefit, PaymentMethods, UIMappedPaymentMethod } from "@/types/data";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useRouter } from "next/navigation";
 import {
@@ -14,9 +14,8 @@ import {
   CheckCircle2,
   CreditCard,
   Shield,
+  Sparkles,
 } from "lucide-react";
-import Link from "next/link";
-import { set } from "zod";
 
 const PaymentSummary = () => {
   const router = useRouter();
@@ -35,7 +34,11 @@ const PaymentSummary = () => {
 
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const cover = useInsuranceStore((s) => s.cover);
+  const selectedAdditionalBenefitIds = useInsuranceStore(
+    (s) => s.selectedAdditionalBenefitIds,
+  );
   const { vehicleDetails } = useVehicleStore();
+  const [additionalBenefits, setAdditionalBenefits] = useState<AdditionalBenefit[]>([]);
 
   const MappedPaymentMethods: Record<
     string,
@@ -53,7 +56,6 @@ const PaymentSummary = () => {
     },
   };
 
-  const today = new Date();
   useEffect(() => {
     if (motorSubType?.underwriter_product.premium_amount?.one_time_payment) {
       setSelectedPaymentMethod("onetime");
@@ -103,6 +105,14 @@ const PaymentSummary = () => {
       .catch(console.error);
   }, [motorSubType, methodMapper]);
 
+  useEffect(() => {
+    if (selectedAdditionalBenefitIds.length === 0) return;
+    axiosClient
+      .post("benefit/additional", { ids: selectedAdditionalBenefitIds })
+      .then((res) => setAdditionalBenefits(res.data ?? []))
+      .catch(console.error);
+  }, [selectedAdditionalBenefitIds]);
+
   const productName =
     motorSubType?.underwriter_product.name ?? "Insurance Plan";
   const underwriterName =
@@ -121,19 +131,21 @@ const PaymentSummary = () => {
         <Card className="border border-[#d7e8ee] shadow-sm overflow-hidden">
           <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
           <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-xl shrink-0">
-                <Shield className="w-6 h-6 text-primary" />
+            <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+              <div className="flex items-start gap-4 flex-1 min-w-0">
+                <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-[#1e3a5f] text-lg leading-tight">
+                    {productName}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {underwriterName}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#1e3a5f] text-lg leading-tight">
-                  {productName}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  {underwriterName}
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0 self-start">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 {coverLabel}
               </span>
@@ -209,6 +221,43 @@ const PaymentSummary = () => {
           </div>
         )}
 
+        {/* Additional benefits */}
+        {additionalBenefits.length > 0 && (
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium px-1">
+              Add-ons
+            </p>
+            <Card className="border border-[#d7e8ee] shadow-sm">
+              <CardContent className="p-5 space-y-3">
+                <div className="flex items-center gap-2 pb-3 border-b border-[#d7e8ee]">
+                  <Sparkles className="w-4 h-4 text-primary shrink-0" />
+                  <p className="text-sm font-semibold text-[#1e3a5f]">
+                    Selected Add-ons
+                  </p>
+                </div>
+                {additionalBenefits.map((benefit) => (
+                  <div
+                    key={benefit.id}
+                    className="flex items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                      <p className="text-sm text-[#1e3a5f] truncate">
+                        {benefit.name}
+                      </p>
+                    </div>
+                    <p className="text-sm font-medium text-[#1e3a5f] shrink-0">
+                      {benefit.base_amount > 0
+                        ? `${benefit.currency} ${benefit.base_amount.toLocaleString()}`
+                        : `${benefit.percentage}%`}
+                    </p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Cover start date */}
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium px-1">
@@ -231,7 +280,7 @@ const PaymentSummary = () => {
                     ref={dateInputRef}
                     type="date"
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    onChange={(e) => coverStartDate(e.target.value)}
                     min={formatDate(today)}
                     className="w-full border border-[#d7e8ee] rounded-lg px-3 py-2 text-sm text-[#1e3a5f] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white cursor-pointer"
                   />

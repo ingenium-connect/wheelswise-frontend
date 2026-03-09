@@ -101,6 +101,7 @@ const OtpVerify: React.FC = () => {
       if (data) {
         toast.success("OTP successfully verified");
         router.push("/dashboard/payment-summary");
+        router.refresh();
       } else {
         retryOtp();
       }
