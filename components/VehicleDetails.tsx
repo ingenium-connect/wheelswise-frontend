@@ -101,9 +101,11 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       .finally(() => setLoadingCategories(false));
   }, [form.vehiclePurpose]);
 
+  const isThirdParty = product_type === "THIRD_PARTY";
+
   const validDetails = () => {
     return (
-      form.vehicleValue > 0 &&
+      (isThirdParty || form.vehicleValue > 0) &&
       form.engineCapacity &&
       form.engineNumber &&
       form.vehicleNumber &&
@@ -581,19 +583,21 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       readOnly={isFieldsDisabled && !!form.engineNumber}
                     />
                   </Field>
-                  <Field>
-                    <FieldLabel htmlFor="vehicleValue">
-                      Vehicle Value (KES)
-                    </FieldLabel>
-                    <Input
-                      id="vehicleValue"
-                      name="vehicleValue"
-                      value={form.vehicleValue}
-                      disabled
-                      readOnly
-                      className="bg-[#f0f6f9]"
-                    />
-                  </Field>
+                  {!isThirdParty && (
+                    <Field>
+                      <FieldLabel htmlFor="vehicleValue">
+                        Vehicle Value (KES)
+                      </FieldLabel>
+                      <Input
+                        id="vehicleValue"
+                        name="vehicleValue"
+                        value={form.vehicleValue}
+                        disabled
+                        readOnly
+                        className="bg-[#f0f6f9]"
+                      />
+                    </Field>
+                  )}
                 </div>
               </div>
 

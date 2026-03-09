@@ -77,13 +77,23 @@ export type ProductBenefits = {
 };
 
 export type MotorSubTypeItem = {
-  product_rate: {
+  // Present for COMPREHENSIVE plans
+  product_rate?: {
     id: string;
     covertype_id: string;
     rate: number;
     min_sum_insured: number;
     max_sum_insured: number;
     least_premium_amount: number;
+  };
+  // Present for THIRD_PARTY plans
+  tpo_price_list?: {
+    id: string;
+    category: {
+      name: string;
+      options: { description: string; base_price: number }[];
+    };
+    product_id: string;
   };
   underwriter_product: {
     id: string;
@@ -128,6 +138,7 @@ export interface vehiclePayload {
   chassis_number: string;
   make: string;
   engine_capacity: number | null;
+  engine_number?: string;
   body_type: string;
   seating_capacity: number | null;
   purpose?: string;

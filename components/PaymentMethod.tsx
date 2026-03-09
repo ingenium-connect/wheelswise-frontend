@@ -52,13 +52,17 @@ const PaymentMethod = ({ token }: Props) => {
   const vehicleNumber = useVehicleStore((v) => v.vehicleDetails.vehicleNumber);
   const cover = useInsuranceStore((s) => s.cover);
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
+  const selectedAdditionalBenefitIds = useInsuranceStore(
+    (s) => s.selectedAdditionalBenefitIds,
+  );
   const router = useRouter();
+  const [localPhone, setLocalPhone] = useState(phoneNumber);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationData, setConfirmationData] = useState<{
-    amount: number;
-    msisdn: string;
-    payment_reference?: string;
+    payment_reference: string;
+    premium: number;
+    user: { msisdn: string };
   } | null>(null);
 
   const amount = useMemo(() => {
@@ -79,11 +83,71 @@ const PaymentMethod = ({ token }: Props) => {
     setCardDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePay = () => {
-    if (selectedMethod === "mpesa") {
-      alert(`Initiating Mpesa payment for ${phoneNumber}`);
-    } else {
-      alert("Card payments coming soon!");
+  const handlePay = async () => {
+    if (selectedMethod !== "mpesa") return;
+    setError("");
+    setIsLoading(true);
+    try {
+      const paymentMethodId = localStorage.getItem("payment_method_id");
+      const policyStartDate = localStorage.getItem("policy_start_date");
+      const isComprehensive = cover === "COMPREHENSIVE";
+
+      const payload: Record<string, unknown> = {
+        amount,
+        vehicle_registration_number: vehicleNumber,
+        product_id: motorSubType?.underwriter_product.id,
+        underwriter_id: motorSubType?.underwriter_product.underwriter_id,
+        start_date: policyStartDate,
+        cover_type: cover,
+        payment_method_id: paymentMethodId,
+        additional_benefits: selectedAdditionalBenefitIds,
+      };
+
+      if (isComprehensive) {
+        payload.product_rate_id = motorSubType?.product_rate?.id;
+      } else {
+        payload.tpo_price_list_id = motorSubType?.tpo_price_list?.id;
+      }
+      const res = await axiosClient.post(POLICY_PAYMENT_ENDPOINT, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setConfirmationData(res.data);
+      toast.success("STK push sent. Check your phone to confirm payment.");
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setError(err.response?.data?.message ?? "Failed to initiate payment.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!confirmationData?.payment_reference) return;
+    setError("");
+    setIsLoading(true);
+    try {
+      await axiosClient.post(
+        POLICY_PAYMENT_VERIFY_ENDPOINT,
+        {
+          msisdn: confirmationData.user.msisdn,
+          payment_reference: confirmationData.payment_reference,
+          amount: confirmationData.premium,
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success("Payment confirmed!");
+      router.push("/vehicle-policy/payment-success");
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setError(err.response?.data?.message ?? "Payment verification failed.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,8 +238,8 @@ const PaymentMethod = ({ token }: Props) => {
                     </label>
                     <input
                       type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      value={localPhone}
+                      onChange={(e) => setLocalPhone(e.target.value)}
                       placeholder="07XXXXXXXX"
                       className={inputClass}
                     />

@@ -12,12 +12,15 @@ type SelectedMotorType = {
 type VehicleDetails = {
   vehicleValue: number;
   engineCapacity: string;
+  engineNumber: string;
   vehicleNumber: string;
   chassisNumber: string;
   make: string;
   model: string;
   year: string;
   bodyType: string;
+  vehiclePurpose: string;
+  vehiclePurposeCategory: string;
   ntsaRegistered: boolean;
 };
 
@@ -54,12 +57,15 @@ type VehicleStore = {
 const initialVehicleDetails: VehicleDetails = {
   vehicleValue: 0,
   engineCapacity: "",
+  engineNumber: "",
   vehicleNumber: "",
   chassisNumber: "",
   make: "",
   model: "",
   year: "",
   bodyType: "",
+  vehiclePurpose: "",
+  vehiclePurposeCategory: "",
   ntsaRegistered: false,
 };
 
