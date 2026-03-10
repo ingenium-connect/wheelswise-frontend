@@ -1,22 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Card, CardContent } from "@/components/ui/card";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -234,113 +223,124 @@ const Signup: React.FC<Props> = ({
     return res.data;
   };
   return (
-    <Card
-      className="border border-[#d7e8ee] shadow-sm overflow-hidden"
-      {...props}
-    >
-      <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
-      <CardContent className="p-6">
-        <form onSubmit={handleSignup} className="space-y-5">
-          <Field>
-            <FieldLabel htmlFor="msisdn">Phone Number</FieldLabel>
-            <Input
-              id="msisdn"
-              type="tel"
-              readOnly
-              name="msisdn"
-              value={formData.msisdn}
-              onChange={handleChange}
-              placeholder="+254712***678"
-              required
-              className="bg-[#f0f6f9]"
-            />
-            <FieldDescription className="text-xs text-muted-foreground mt-1">
-              This is the number linked to your account.
-            </FieldDescription>
-          </Field>
+    <>
+      {personalDetails.phoneNumber ? (
+        <Card
+          className="border border-[#d7e8ee] shadow-sm overflow-hidden"
+          {...props}
+        >
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
+          <CardContent className="p-6">
+            <form onSubmit={handleSignup} className="space-y-5">
+              <Field>
+                <FieldLabel htmlFor="msisdn">Phone Number</FieldLabel>
+                <Input
+                  id="msisdn"
+                  type="tel"
+                  readOnly
+                  name="msisdn"
+                  value={formData.msisdn}
+                  onChange={handleChange}
+                  placeholder="+254712***678"
+                  required
+                  className="bg-[#f0f6f9]"
+                />
+                <FieldDescription className="text-xs text-muted-foreground mt-1">
+                  This is the number linked to your account.
+                </FieldDescription>
+              </Field>
 
-          <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <div className="relative">
-              <Input
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                type={showPassword ? "text" : "password"}
-                placeholder="Min. 8 characters"
-                required
-              />
-              <span
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 8 characters"
+                    required
+                  />
+                  <span
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </span>
+                </div>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="confirm_password">
+                  Confirm Password
+                </FieldLabel>
+                <div className="relative">
+                  <Input
+                    id="confirm_password"
+                    name="confirm_password"
+                    value={formData.confirm_password}
+                    onChange={handleChange}
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="Re-enter password"
+                    required
+                  />
+                  <span
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                  >
+                    {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </span>
+                </div>
+              </Field>
+
+              <label className="flex items-start gap-2 text-sm text-[#1e3a5f] cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 accent-primary cursor-pointer"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+                <span>
+                  I have read and agreed to the{" "}
+                  <Link
+                    href="/terms"
+                    className="text-primary font-medium hover:underline"
+                    target="_blank"
+                  >
+                    Privacy Policy, Disclaimer &amp; Cookies Policy
+                  </Link>
+                </span>
+              </label>
+
+              <Button
+                type="submit"
+                disabled={isLoading || !agreedToTerms}
+                className="w-full text-white"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </span>
-            </div>
-          </Field>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Account
+              </Button>
 
-          <Field>
-            <FieldLabel htmlFor="confirm_password">Confirm Password</FieldLabel>
-            <div className="relative">
-              <Input
-                id="confirm_password"
-                name="confirm_password"
-                value={formData.confirm_password}
-                onChange={handleChange}
-                type={showConfirm ? "text" : "password"}
-                placeholder="Re-enter password"
-                required
-              />
-              <span
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground cursor-pointer"
-                onClick={() => setShowConfirm(!showConfirm)}
-              >
-                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-              </span>
-            </div>
-          </Field>
-
-          <label className="flex items-start gap-2 text-sm text-[#1e3a5f] cursor-pointer pt-1">
-            <input
-              type="checkbox"
-              className="mt-0.5 accent-primary cursor-pointer"
-              checked={agreedToTerms}
-              onChange={(e) => setAgreedToTerms(e.target.checked)}
-            />
-            <span>
-              I have read and agreed to the{" "}
-              <Link
-                href="/terms"
-                className="text-primary font-medium hover:underline"
-                target="_blank"
-              >
-                Privacy Policy, Disclaimer &amp; Cookies Policy
-              </Link>
-            </span>
-          </label>
-
-          <Button
-            type="submit"
-            disabled={isLoading || !agreedToTerms}
-            className="w-full text-white"
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Account
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              className="text-primary font-medium hover:underline"
-              href="/login"
-            >
-              Sign in
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+              <p className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  className="text-primary font-medium hover:underline"
+                  href="/login"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {toast.error("Personal details not found please fill them.") &&
+            redirect("/#cover-types")}
+        </>
+      )}
+    </>
   );
 };
 

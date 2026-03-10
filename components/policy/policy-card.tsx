@@ -1,15 +1,21 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InsurancePolicy } from "@/types/data";
-import { Shield, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 
 type Props = {
   policy: InsurancePolicy;
 };
 
 export const PolicyCard = ({ policy }: Props) => {
-  const isExpiringSoon = policy.remainingDays <= 30;
-  const isExpired = policy.remainingDays <= 0;
+  const today = new Date();
+  const startDate = new Date(policy.start_date);
+  const expiryDate = new Date(policy.end_date);
+  const timeDiff = expiryDate.getTime() - today.getTime();
+  const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  const isExpiringSoon = timeDiff <= 30;
+  const isActive = startDate < today;
+  const isExpired = timeDiff <= 0;
 
   const statusBadge = isExpired ? (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
@@ -21,10 +27,15 @@ export const PolicyCard = ({ policy }: Props) => {
       <AlertTriangle className="w-3.5 h-3.5" />
       Expiring Soon
     </span>
-  ) : (
+  ) : isActive ? (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
       <CheckCircle2 className="w-3.5 h-3.5" />
       Active
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+      <CheckCircle2 className="w-3.5 h-3.5" />
+      Pending
     </span>
   );
 
@@ -48,18 +59,20 @@ export const PolicyCard = ({ policy }: Props) => {
             <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
               <Shield className="w-6 h-6 text-primary" />
             </div>
+
             <div>
               <h3 className="font-semibold text-[#1e3a5f]">
-                {policy.vehicleName}
+                {policy.vehicle_details.make} {policy.vehicle_details.model}
               </h3>
               <p className="text-sm text-muted-foreground mt-0.5">
-                {policy.registration}
-              </p>
-              <p className="text-sm text-primary font-medium mt-0.5">
-                {policy.insurer}
+                {policy.vehicle_details.registration_number}
               </p>
             </div>
           </div>
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+            <Clock className="w-3.5 h-3.5" />
+            {policy.days} days
+          </span>
           <div className="flex flex-col items-end gap-2 shrink-0">
             {statusBadge}
             <Button
@@ -73,17 +86,18 @@ export const PolicyCard = ({ policy }: Props) => {
         </div>
 
         {/* Info grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-[#d7e8ee] pt-4 text-sm">
+        <div className="flex flex-wrap justify-between gap-4 border-t border-[#d7e8ee] pt-4 text-sm">
           <InfoBlock label="Policy #" value={policy.policyNumber} />
-          <InfoBlock label="Coverage" value={policy.coverage} />
+          <InfoBlock label="Coverage" value={policy.policy_type} />
           <InfoBlock
             label="Premium"
             value={`KES ${policy.premium.toLocaleString()}`}
           />
+          <InfoBlock label="Start date" value={startDate.toDateString()} />
           <InfoBlock
             label="Expires"
-            value={policy.expiryDate}
-            sub={`${policy.remainingDays} days remaining`}
+            value={expiryDate.toDateString()}
+            sub={`${daysRemaining} days remaining`}
             subColor={
               isExpired
                 ? "text-red-500"
@@ -105,7 +119,7 @@ const InfoBlock = ({
   subColor = "text-muted-foreground",
 }: {
   label: string;
-  value: string;
+  value: string | number;
   sub?: string;
   subColor?: string;
 }) => (

@@ -25,6 +25,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = {
   motor_type: string | undefined;
@@ -280,11 +281,11 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
               key={i}
               className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm overflow-hidden animate-pulse"
             >
-              <div className="h-24 bg-[#f0f6f9]" />
+              <Skeleton className="h-24" />
               <div className="p-5 space-y-3">
-                <div className="h-3 bg-[#f0f6f9] rounded w-3/4" />
-                <div className="h-3 bg-[#f0f6f9] rounded w-1/2" />
-                <div className="h-10 bg-[#f0f6f9] rounded mt-4" />
+                <Skeleton className="h-3 rounded w-3/4" />
+                <Skeleton className="h-3 rounded w-1/2" />
+                <Skeleton className="h-10 rounded mt-4" />
               </div>
             </div>
           ))}

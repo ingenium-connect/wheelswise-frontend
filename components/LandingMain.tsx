@@ -22,6 +22,7 @@ import {
   Bike,
 } from "lucide-react";
 import { useInsuranceStore } from "@/stores/insuranceStore";
+import { Button } from "./ui/button";
 
 const cars = ["/car.jpeg", "/lorry.jpeg", "/psv.jpeg"];
 const carLabels = ["Private Vehicle", "Commercial", "PSV"];
@@ -288,7 +289,7 @@ const LandingMain: React.FC = () => {
                         </li>
                       ))}
                     </ul>
-                    <button
+                    <Button
                       onClick={() => {
                         selectCover(opt.coverTypeKey);
                         router.push(`/motor-type/${opt.coverTypeKey}`);
@@ -296,7 +297,7 @@ const LandingMain: React.FC = () => {
                       className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-colors ${opt.btnBg} ${opt.btnText}`}
                     >
                       Get Started <ArrowRight className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </motion.div>
               );

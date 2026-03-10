@@ -6,7 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Car, FileText, Home, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { InsurancePolicy, UserProfile, Vehicle } from "@/types/data";
+import {
+  InsurancePolicy,
+  policyResponse,
+  UserProfile,
+  Vehicle,
+} from "@/types/data";
 import { PolicyCard } from "@/components/policy/policy-card";
 import { AccountCard } from "@/components/auth/profile-card";
 import { VehicleCard } from "@/components/vehicle/vehicle-card";
@@ -18,18 +23,19 @@ type Tab = (typeof VALID_TABS)[number];
 type Props = {
   firstName: string;
   vehicles: Vehicle[] | undefined;
-  policies: InsurancePolicy[] | undefined;
+  policyPayload: policyResponse | undefined;
   profile: UserProfile | undefined;
 };
 
 export default function DashboardTabs({
   firstName,
   vehicles,
-  policies,
+  policyPayload,
   profile,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  console.log("DashboardTabs received policies:", policyPayload);
 
   const paramTab = searchParams.get("tab") as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -77,9 +83,9 @@ export default function DashboardTabs({
         >
           <FileText className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Policies</span>
-          {(policies?.length ?? 0) > 0 && (
+          {(policyPayload?.policies.length ?? 0) > 0 && (
             <span className="ml-1 bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {policies?.length}
+              {policyPayload?.policies.length}
             </span>
           )}
         </TabsTrigger>
@@ -97,7 +103,7 @@ export default function DashboardTabs({
         <DashboardBanner
           name={firstName}
           vehicleCount={vehicles?.length ?? 0}
-          policyCount={policies?.length ?? 0}
+          policyCount={policyPayload?.total_count ?? 0}
         />
       </TabsContent>
 
@@ -148,13 +154,13 @@ export default function DashboardTabs({
               Insurance Policies
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {policies?.length ?? 0} active polic
-              {(policies?.length ?? 0) !== 1 ? "ies" : "y"}
+              {policyPayload?.total_count ?? 0} active polic
+              {(policyPayload?.total_count ?? 0) !== 1 ? "ies" : "y"}
             </p>
           </div>
         </div>
 
-        {!Array.isArray(policies) || policies.length === 0 ? (
+        {!policyPayload?.total_count ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="p-5 bg-primary/10 rounded-full mb-4">
               <FileText className="w-10 h-10 text-primary" />
@@ -169,7 +175,7 @@ export default function DashboardTabs({
           </div>
         ) : (
           <div className="space-y-4">
-            {policies.map((policy) => (
+            {policyPayload?.policies.map((policy) => (
               <PolicyCard key={policy.id} policy={policy} />
             ))}
           </div>

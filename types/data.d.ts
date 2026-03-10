@@ -1,4 +1,4 @@
-import { int } from "zod";
+import { int, string } from "zod";
 
 export interface LoginPayload {
   national_identifier: string;
@@ -238,12 +238,22 @@ export type InsurancePolicy = {
   id: string;
   vehicleName: string;
   registration: string;
-  insurer: string;
+  days: number;
   policyNumber: string;
-  coverage: "COMPREHENSIVE" | "THIRD PARTY";
+  policy_type: "COMPREHENSIVE" | "THIRD PARTY";
   premium: number;
-  expiryDate: string;
-  remainingDays: number;
+  end_date: string;
+  start_date: string;
+  vehicle_details: {
+    make: string;
+    model: string;
+    registration_number: string;
+  };
+};
+
+export type policyResponse = {
+  policies: InsurancePolicy[];
+  total_count: number;
 };
 
 export type UserProfile = {
