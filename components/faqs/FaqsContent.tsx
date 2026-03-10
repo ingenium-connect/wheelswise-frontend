@@ -23,8 +23,8 @@ const CATEGORIES: Category[] = [
     emoji: "",
     faqs: [
       {
-        q: "What is MedGen?",
-        a: "MedGen is a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
+        q: "What is Wheelswise?",
+        a: "Wheelswise is a product of MedGen Insurance, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
       },
       {
         q: "How do I get a motor insurance quote?",
@@ -49,12 +49,12 @@ const CATEGORIES: Category[] = [
         a: "You can browse cover types and plans without an account. However, you will need to create an account to finalise your policy purchase and access your insurance certificate.",
       },
       {
-        q: "Who is eligible to purchase motor insurance through MedGen?",
+        q: "Who is eligible to purchase motor insurance through Wheelswise?",
         a: "Any individual or entity with a registered motor vehicle in Kenya is eligible. This includes private car owners, commercial vehicle operators, PSV operators, and fleet owners. You will need a valid national ID or passport and a Kenyan phone number.",
       },
       {
-        q: "Is MedGen licensed and regulated?",
-        a: "Yes. MedGen Insurance Agency is duly licensed and regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
+        q: "Is Wheelswise licensed and regulated?",
+        a: "Yes. Wheelswise is a product of MedGen Insurance Agency, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
       },
     ],
   },
@@ -224,8 +224,8 @@ const CATEGORIES: Category[] = [
     emoji: "⚙️",
     faqs: [
       {
-        q: "My vehicle was not found in the NTSA search. What should I do?",
-        a: "If your vehicle is not found via the NTSA registry, you can proceed to enter your vehicle details manually on the same page. All fields — registration number, chassis number, make, model, year of manufacture, and body type — can be filled in manually. Ensure accuracy as this information appears on your certificate.",
+        q: "My vehicle was not found in the search section. What should I do?",
+        a: "If your vehicle is not found via our search service, you can proceed to enter your vehicle details manually on the same page. All fields — registration number, chassis number, make, model, year of manufacture, and body type — can be filled in manually. Ensure accuracy as this information appears on your certificate.",
       },
       {
         q: "I did not receive my OTP. What should I do?",
@@ -255,12 +255,12 @@ const CATEGORIES: Category[] = [
         a: "Your data is protected using industry-standard encryption (TLS in transit, AES at rest). We follow strict data handling policies in line with Kenyan data protection law and our Privacy Policy. We never sell your personal data to third parties. Authentication tokens expire after one hour and are stored as HTTP-only cookies.",
       },
       {
-        q: "Why does the platform require NTSA data?",
-        a: "We integrate with the NTSA vehicle registry to auto-fill accurate vehicle details, reducing manual entry errors and speeding up your application. This also helps underwriters accurately assess risk and issue a valid policy. The data retrieved is used solely for your insurance application.",
+        q: "Why does the platform require valid vehicle data?",
+        a: "We have integrated search capabilities to help auto-fill accurate vehicle details, reducing manual entry errors and speeding up your application. This also helps underwriters accurately assess risk and issue a valid policy. The data retrieved is used solely for your insurance application.",
       },
       {
         q: "Which browsers and devices are supported?",
-        a: "MedGen is fully responsive and works on all modern browsers (Chrome, Firefox, Safari, Edge) on desktop, tablet, and mobile devices. For the best experience, we recommend keeping your browser up to date. Internet Explorer is not supported.",
+        a: "Wheelswise is fully responsive and works on all modern browsers (Chrome, Firefox, Safari, Edge) on desktop, tablet, and mobile devices. For the best experience, we recommend keeping your browser up to date. Internet Explorer is not supported.",
       },
     ],
   },

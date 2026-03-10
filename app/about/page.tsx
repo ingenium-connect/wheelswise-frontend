@@ -73,7 +73,7 @@ const steps = [
     number: "03",
     icon: ShieldCheck,
     title: "Enter Vehicle & Personal Details",
-    desc: "Search your vehicle via the NTSA registry for auto-fill, or enter details manually. Provide your personal information to complete the application.",
+    desc: "Search your vehicle for auto-fill, or enter details manually. Provide your personal information to complete the application.",
   },
   {
     number: "04",
@@ -100,10 +100,10 @@ export default function AboutPage() {
             About Us
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight max-w-2xl">
-            Reimagining Motor Insurance for Every Kenyan Driver
+            Reimagining Motor Insurance for Every Kenyan Car Owner
           </h1>
           <p className="text-white/70 text-base mt-4 max-w-xl leading-relaxed">
-            MedGen is a digital insurance intermediary that connects motorists
+            Wheelswise is a digital insurance platform that connects motorists
             with licensed underwriters — making motor insurance fast, fair, and
             fully online.
           </p>
@@ -171,7 +171,7 @@ export default function AboutPage() {
                 <div className="space-y-3">
                   {[
                     "Compare plans from multiple underwriters in one place",
-                    "NTSA-integrated vehicle lookup for faster onboarding",
+                    "Integrated vehicle lookup for faster onboarding",
                     "Instant digital certificates upon payment",
                     "M-Pesa and card payment support",
                     "Dedicated support team based",

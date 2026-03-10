@@ -22,11 +22,11 @@ const Footer: React.FC = () => {
               <div className="p-1.5 bg-white/10 rounded-lg">
                 <Shield className="w-4 h-4 text-[#8bbfd8]" />
               </div>
-              <span className="font-bold text-lg tracking-tight">MedGen</span>
+              <span className="font-bold text-lg tracking-tight">Wheelswise</span>
             </div>
             <p className="text-white/60 text-sm leading-relaxed mb-5">
               Kenya&apos;s digital motor insurance platform. Fast, transparent,
-              and fully regulated by the IRA.
+              and convenient.
             </p>
             <div className="flex gap-3">
               {[
@@ -148,7 +148,7 @@ const Footer: React.FC = () => {
       <div className="border-t border-white/10 px-6 md:px-16 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
           <span>
-            &copy; {new Date().getFullYear()} MedGen Insurance Agency. All
+            &copy; {new Date().getFullYear()} Wheelswise, A Product of MedGen Insurance Agency. All
             rights reserved.
           </span>
           <span>
