@@ -117,10 +117,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
   const handleVehicleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const v: any = {};
-    for (const [key, value] of formData.entries()) {
-      v[key] = value;
-    }
+    const v = Object.fromEntries(formData) as Record<string, string>;
     if (!v) {
       setError("Please fill vehicle details before registering.");
       return;

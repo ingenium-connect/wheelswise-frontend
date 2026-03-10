@@ -1,4 +1,9 @@
-import { InsurancePolicy, UserProfile, Vehicle } from "@/types/data";
+import {
+  InsurancePolicy,
+  policyResponse,
+  UserProfile,
+  Vehicle,
+} from "@/types/data";
 import {
   PROFILE_ENDPOINT,
   USER_POLICIES_ENDPOINT,
@@ -12,13 +17,11 @@ import StoreUserClient from "@/components/auth/StoreUserClient";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { Suspense } from "react";
 import StorePersonalDetailsClient from "@/components/auth/StorePersonalDetailsClient";
-import Link from "next/link";
-import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  let policies: InsurancePolicy[] | undefined = undefined;
+  let policies: policyResponse | undefined = undefined;
   let profile: UserProfile | undefined = undefined;
   let vehicles: Vehicle[] | undefined = undefined;
 
@@ -74,7 +77,7 @@ export default async function Page() {
             <DashboardTabs
               firstName={firstName}
               vehicles={vehicles}
-              policies={policies}
+              policyPayload={policies}
               profile={profile}
             />
           </Suspense>

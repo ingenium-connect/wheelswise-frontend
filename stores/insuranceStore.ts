@@ -43,7 +43,8 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       setMotorType: (type) => set({ motorType: type }),
       setVehicleValue: (value) => set({ vehicleValue: value }),
       setVehicleSubType: (subtype) => set({ motorSubtype: subtype }),
-      setSelectedAdditionalBenefitIds: (ids) => set({ selectedAdditionalBenefitIds: ids }),
+      setSelectedAdditionalBenefitIds: (ids) =>
+        set({ selectedAdditionalBenefitIds: ids }),
       nextCoverStep: () => set((state) => ({ coverStep: state.coverStep + 1 })),
       previousCoverStep: () =>
         set((state) => ({ coverStep: state.coverStep - 1 })),

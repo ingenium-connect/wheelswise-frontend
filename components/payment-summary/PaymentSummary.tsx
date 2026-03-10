@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { useInsuranceStore } from "@/stores/insuranceStore";
-import { AdditionalBenefit, PaymentMethods, UIMappedPaymentMethod } from "@/types/data";
+import {
+  AdditionalBenefit,
+  PaymentMethods,
+  UIMappedPaymentMethod,
+} from "@/types/data";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useRouter } from "next/navigation";
 import {
@@ -38,7 +42,9 @@ const PaymentSummary = () => {
     (s) => s.selectedAdditionalBenefitIds,
   );
   const { vehicleDetails } = useVehicleStore();
-  const [additionalBenefits, setAdditionalBenefits] = useState<AdditionalBenefit[]>([]);
+  const [additionalBenefits, setAdditionalBenefits] = useState<
+    AdditionalBenefit[]
+  >([]);
 
   const MappedPaymentMethods: Record<
     string,
@@ -325,6 +331,7 @@ const PaymentSummary = () => {
           <Button
             className="flex-1 text-white"
             onClick={() => router.push("/dashboard/payment-method")}
+            disabled={!date || paymentMethods.length === 0}
           >
             Proceed to Payment
           </Button>

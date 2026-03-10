@@ -238,9 +238,9 @@ const PaymentMethod = ({ token }: Props) => {
                     </label>
                     <input
                       type="tel"
-                      value={localPhone}
-                      onChange={(e) => setLocalPhone(e.target.value)}
+                      value={phoneNumber}
                       placeholder="07XXXXXXXX"
+                      disabled
                       className={inputClass}
                     />
                   </div>
