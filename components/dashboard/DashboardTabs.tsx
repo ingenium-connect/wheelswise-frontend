@@ -25,6 +25,7 @@ type Props = {
   vehicles: Vehicle[] | undefined;
   policyPayload: policyResponse | undefined;
   profile: UserProfile | undefined;
+  token: string;
 };
 
 export default function DashboardTabs({
@@ -32,6 +33,7 @@ export default function DashboardTabs({
   vehicles,
   policyPayload,
   profile,
+  token,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -154,7 +156,7 @@ export default function DashboardTabs({
               Insurance Policies
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {policyPayload?.total_count ?? 0} active polic
+              {policyPayload?.total_count ?? 0} polic
               {(policyPayload?.total_count ?? 0) !== 1 ? "ies" : "y"}
             </p>
           </div>
@@ -176,7 +178,7 @@ export default function DashboardTabs({
         ) : (
           <div className="space-y-4">
             {policyPayload?.policies.map((policy) => (
-              <PolicyCard key={policy.id} policy={policy} />
+              <PolicyCard key={policy.id} policy={policy} token={token} />
             ))}
           </div>
         )}
