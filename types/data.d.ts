@@ -236,18 +236,27 @@ export type Vehicle = {
 // types/policy.ts
 export type InsurancePolicy = {
   id: string;
-  vehicleName: string;
-  registration: string;
   days: number;
-  policyNumber: string;
-  policy_type: "COMPREHENSIVE" | "THIRD PARTY";
+  policy_number?: string;
+  certno?: string;
+  policy_type: "COMPREHENSIVE" | "THIRD_PARTY";
   premium: number;
+  onetime_underwriter_premium: number;
   end_date: string;
   start_date: string;
+  date_created: string;
+  is_paid: boolean;
+  is_active: boolean;
+  is_cancelled: boolean;
+  certificate_issued: boolean;
+  payment_reference: string;
   vehicle_details: {
     make: string;
     model: string;
     registration_number: string;
+    vehicle_value: number;
+    year_of_manufacture: number;
+    body_type: string;
   };
 };
 

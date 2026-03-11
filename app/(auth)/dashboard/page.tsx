@@ -79,6 +79,7 @@ export default async function Page() {
               vehicles={vehicles}
               policyPayload={policies}
               profile={profile}
+              token={token}
             />
           </Suspense>
         </div>
