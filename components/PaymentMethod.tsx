@@ -3,7 +3,8 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Check, CreditCard, Smartphone, Loader2 } from "lucide-react";
+import { Check, CreditCard, Smartphone, Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "./ui/alert";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { axiosClient } from "@/utilities/axios-client";
@@ -158,7 +159,12 @@ const PaymentMethod = ({ token }: Props) => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm p-6 md:p-8 space-y-6">
         {/* Method selector */}
-        {error && <p className="text-red-600 text-center">{error}</p>}
+        {error && (
+          <Alert variant="destructive" className="border-red-200 bg-red-50">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-red-700">{error}</AlertDescription>
+          </Alert>
+        )}
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
             Choose Payment Method

@@ -73,8 +73,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       .then((res) => {
         setBodyTypes(res.data);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
+        toast.error("Could not load vehicle body types. Please refresh the page.");
       });
 
     setCoverStep(4);
@@ -94,9 +94,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       .then((res) => {
         setPurposeCategories(res.data.categories ?? []);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         setPurposeCategories([]);
+        toast.error("Could not load purpose categories. Please try again.");
       })
       .finally(() => setLoadingCategories(false));
   }, [form.vehiclePurpose]);

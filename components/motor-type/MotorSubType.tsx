@@ -290,20 +290,14 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
             </div>
           ))}
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center gap-3 py-16 text-center">
-          <AlertCircle className="w-8 h-8 text-red-400" />
-          <p className="text-red-600 font-medium">Failed to load plans</p>
-          <p className="text-sm text-muted-foreground">{error}</p>
-        </div>
-      ) : subtypes.length === 0 ? (
+      ) : error || subtypes.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <ShieldCheck className="w-8 h-8 text-muted-foreground/40" />
           <p className="text-muted-foreground font-medium">
             No plans available
           </p>
           <p className="text-sm text-muted-foreground">
-            No plans match your selection. Try adjusting your details.
+            No plans match your selection.
           </p>
         </div>
       ) : (

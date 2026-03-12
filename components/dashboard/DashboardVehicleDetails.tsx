@@ -51,7 +51,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
     axiosClient
       .get("vehicle/body-type")
       .then((res) => setBodyTypes(res.data))
-      .catch(console.error);
+      .catch(() => toast.error("Could not load vehicle body types. Please refresh the page."));
 
     const raw = sessionStorage.getItem("dashboard-vehicle-search");
     if (!raw) return;
@@ -104,7 +104,10 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}`,
       )
       .then((res) => setPurposeCategories(res.data.categories ?? []))
-      .catch(() => setPurposeCategories([]))
+      .catch(() => {
+        setPurposeCategories([]);
+        toast.error("Could not load purpose categories. Please try again.");
+      })
       .finally(() => setLoadingCategories(false));
   }, [form.vehiclePurpose]);
 

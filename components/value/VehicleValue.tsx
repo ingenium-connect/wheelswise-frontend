@@ -26,9 +26,11 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const { seating_capacity, tonnage, setSeatingCapacity, setTonnage } =
     useVehicleStore();
 
-  const [isCommercial] = useState(
-    () => selectedMotorType?.name === "COMMERCIAL",
-  );
+  const motorTypeName = selectedMotorType?.name ?? motor_type ?? "";
+  const isCommercial = motorTypeName === "COMMERCIAL";
+  const isPSV = motorTypeName === "PSV";
+  const isMotorbike = motorTypeName === "MOTORBIKE";
+  const requiresSeating = isCommercial || isPSV || isMotorbike;
 
   useEffect(() => {
     setCoverStep(2);
@@ -45,7 +47,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
       isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
     } else if (
-      selectedMotorType?.name === "PSV" &&
+      requiresSeating &&
       (!seating_capacity || Number(seating_capacity) <= 0)
     ) {
       isValid = false;
@@ -101,6 +103,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
               <Field>
                 <FieldLabel htmlFor="seatingCapacity">
                   Seating Capacity
+                  {requiresSeating && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </FieldLabel>
                 <Input
                   id="seatingCapacity"
@@ -109,12 +114,15 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                   placeholder="e.g. 5"
                   value={seating_capacity}
                   onChange={(e) => setSeatingCapacity(e.target.value)}
-                  required
+                  required={requiresSeating}
                 />
               </Field>
               {isCommercial && (
                 <Field>
-                  <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
+                  <FieldLabel htmlFor="tonnage">
+                    Tonnage (tonnes)
+                    <span className="text-red-500 ml-1">*</span>
+                  </FieldLabel>
                   <Input
                     id="tonnage"
                     type="number"
@@ -142,7 +150,10 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
           <Button
             className="flex-1 text-white"
             onClick={handleContinue}
-            disabled={isCommercial && (!tonnage || tonnage <= 0)}
+            disabled={
+              (requiresSeating && (!seating_capacity || Number(seating_capacity) <= 0)) ||
+              (isCommercial && (!tonnage || tonnage <= 0))
+            }
           >
             Continue
           </Button>
