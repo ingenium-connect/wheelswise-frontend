@@ -22,6 +22,8 @@ import { useVehicleStore } from "@/stores/vehicleStore";
 import { useUserStore } from "@/stores/userStore";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { useOtp } from "@/hooks/useOtp";
+import { Bike } from "lucide-react";
+import { toast } from "sonner";
 
 type Props = {
   data: MotorTypesResponse;
@@ -70,8 +72,8 @@ const SelectMotorType = ({ data }: Props) => {
         .then((res) => {
           setCommercialOptions(res.data);
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
+          toast.error("Could not load commercial categories. Please refresh the page.");
         });
     };
     setCoverStep(1);
@@ -107,21 +109,12 @@ const SelectMotorType = ({ data }: Props) => {
 
   const handleTPO = async (category: string) => {
     const tpoCategory = category as TpoOption;
-    // setting placeholder information for TPO option
     if (tpoCategory === "PRIVATE") {
-      setMotorType({
-        id: "1",
-        name: "PRIVATE",
-        description: "",
-        image_url: "",
-      });
+      setMotorType({ id: "1", name: "PRIVATE", description: "", image_url: "" });
+    } else if (tpoCategory === "MOTORBIKE") {
+      setMotorType({ id: "3", name: "MOTORBIKE", description: "", image_url: "" });
     } else {
-      setMotorType({
-        id: "2",
-        name: "COMMERCIAL",
-        description: "",
-        image_url: "",
-      });
+      setMotorType({ id: "2", name: "COMMERCIAL", description: "", image_url: "" });
     }
     setTpoOption(tpoCategory);
     if (initialProfile && hasAuthToken) {
@@ -147,6 +140,10 @@ const SelectMotorType = ({ data }: Props) => {
     }
     setSelectedOption(undefined);
   };
+
+  const motorbikeImageUrl =
+    data?.motor_types?.find((t) => t.name.toUpperCase() === "MOTORBIKE")
+      ?.image_url ?? null;
 
   return (
     <>
@@ -300,6 +297,71 @@ const SelectMotorType = ({ data }: Props) => {
                   ) : (
                     <>
                       Continue <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Motorbike card */}
+          <Card className="group border border-[#d7e8ee] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl">
+            <div className="flex flex-col sm:flex-row">
+              {/* Image / icon panel */}
+              <div className="relative sm:w-56 h-48 sm:h-auto shrink-0 overflow-hidden bg-[#f0f6f9] flex items-center justify-center">
+                {motorbikeImageUrl ? (
+                  <Image
+                    src={motorbikeImageUrl}
+                    alt="Motorbike"
+                    fill
+                    className="object-contain p-5 group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <Bike className="w-24 h-24 text-[#397397] group-hover:scale-105 transition-transform duration-500" />
+                )}
+                <div className="absolute top-3 left-3">
+                  <span className="text-[10px] font-bold uppercase tracking-widest bg-[#1e3a5f] text-white px-2.5 py-1 rounded-full">
+                    TPO
+                  </span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 p-6 gap-4">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1e3a5f]">
+                    MOTORBIKES
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Motorcycles, boda bodas & two-wheelers
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {[
+                    "Covers third-party bodily injury",
+                    "Covers third-party property damage",
+                    "Meets Kenya's legal road requirements",
+                  ].map((point) => (
+                    <div key={point} className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-xs text-muted-foreground">
+                        {point}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={() => handleTPO("MOTORBIKE")}
+                  disabled={sendingOtp}
+                  className="bg-[#1e3a5f] hover:bg-[#397397] text-white gap-2 mt-auto self-start px-6"
+                >
+                  {sendingOtp ? (
+                    "Sending…"
+                  ) : (
+                    <>
+                      Select Motorbike <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </Button>

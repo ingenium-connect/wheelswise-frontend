@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { axiosClient } from "@/utilities/axios-client";
-import { POLICY_ENDPOINT } from "@/utilities/endpoints";
+import { POLICY_UPDATE_ENDPOINT } from "@/utilities/endpoints";
 
 type Props = {
   policy: InsurancePolicy;
@@ -104,7 +104,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
     const formatted = `${yyyy}-${mm}-${dd}`;
     try {
       await axiosClient.patch(
-        `${POLICY_ENDPOINT}/${policy.id}`,
+        `${POLICY_UPDATE_ENDPOINT}/${policy.id}`,
         { start_date: formatted },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -124,26 +124,30 @@ export const PolicyCard = ({ policy, token }: Props) => {
 
       <CardContent className="p-5">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
-              <Shield className="w-6 h-6 text-primary" />
+        <div className="mb-5 space-y-3">
+          {/* Row 1: vehicle info + days badge */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-[#1e3a5f] truncate">
+                  {policy.vehicle_details.make} {policy.vehicle_details.model}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                  {policy.vehicle_details.registration_number}
+                </p>
+              </div>
             </div>
-
-            <div>
-              <h3 className="font-semibold text-[#1e3a5f]">
-                {policy.vehicle_details.make} {policy.vehicle_details.model}
-              </h3>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {policy.vehicle_details.registration_number}
-              </p>
-            </div>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0">
+              <Clock className="w-3.5 h-3.5" />
+              {policy.days} days
+            </span>
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-            <Clock className="w-3.5 h-3.5" />
-            {policy.days} days
-          </span>
-          <div className="flex flex-col items-end gap-2 shrink-0">
+
+          {/* Row 2: status badge + action button */}
+          <div className="flex items-center justify-between gap-2">
             {statusBadge}
             {isPendingPayment ? (
               <Button
@@ -152,7 +156,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
                 disabled={!startDateIsValid}
                 onClick={!startDateIsValid ? () => setCalendarOpen(true) : undefined}
                 title={!startDateIsValid ? "Update start date before proceeding" : undefined}
-                className="text-white text-xs"
+                className="text-white text-xs shrink-0"
               >
                 {startDateIsValid ? (
                   <Link href="/dashboard/payment-summary">Complete Payment</Link>
@@ -164,7 +168,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-primary text-primary hover:bg-primary/5 text-xs"
+                className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
               >
                 View Details
               </Button>

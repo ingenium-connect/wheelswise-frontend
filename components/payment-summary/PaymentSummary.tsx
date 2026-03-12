@@ -20,6 +20,7 @@ import {
   Shield,
   Sparkles,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const PaymentSummary = () => {
   const router = useRouter();
@@ -108,7 +109,9 @@ const PaymentSummary = () => {
           setSelectedPaymentMethod(mappedMethods[0].uiKey);
         }
       })
-      .catch(console.error);
+      .catch(() => {
+        toast.error("Could not load payment methods. Please refresh the page.");
+      });
   }, [motorSubType, methodMapper]);
 
   useEffect(() => {
@@ -116,7 +119,9 @@ const PaymentSummary = () => {
     axiosClient
       .post("benefit/additional", { ids: selectedAdditionalBenefitIds })
       .then((res) => setAdditionalBenefits(res.data ?? []))
-      .catch(console.error);
+      .catch(() => {
+        toast.error("Could not load selected add-ons.");
+      });
   }, [selectedAdditionalBenefitIds]);
 
   const productName =
@@ -336,6 +341,11 @@ const PaymentSummary = () => {
             Proceed to Payment
           </Button>
         </div>
+        {paymentMethods.length === 0 && (
+          <p className="text-xs text-red-500 text-center -mt-2">
+            Payment methods unavailable. Please refresh the page to try again.
+          </p>
+        )}
       </div>
     </div>
   );

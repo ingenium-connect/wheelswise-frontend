@@ -22,4 +22,5 @@ export const REGISTER_VEHICLE_ENDPOINT = "/vehicle/new";
 export const USER_REGISTRATION_ENDPOINT = "/users/register";
 
 export const POLICY_PAYMENT_ENDPOINT = "policy/new";
+export const POLICY_UPDATE_ENDPOINT = "policy";
 export const POLICY_PAYMENT_VERIFY_ENDPOINT = "payments/verify";
