@@ -150,6 +150,7 @@ export interface vehiclePayload {
 
 export interface FinalVehiclePayload {
   source: string;
+  intended_policy_type: string;
   vehicle: vehiclePayload;
 }
 

@@ -1,9 +1,12 @@
 import TermsContent from "@/components/legal/TermsContent";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Legal Documents | Wheelswise",
+export const metadata: Metadata = {
+  title: "Privacy Policy & Legal Documents",
   description:
-    "Privacy Policy, General Disclaimer, and Cookies Policy for Wheelswise.",
+    "Read the Wheelswise Privacy Policy, General Disclaimer, and Cookies Policy. MedGen Insurance Agency is committed to transparent data handling and regulatory compliance.",
+  alternates: { canonical: "/terms" },
+  robots: { index: false, follow: false },
 };
 
 export default function TermsPage() {
