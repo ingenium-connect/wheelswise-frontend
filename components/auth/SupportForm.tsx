@@ -7,14 +7,17 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { HeadphonesIcon, Loader2 } from "lucide-react";
+import { axiosClient } from "@/utilities/axios-client";
+import { SUPPORT_REQUEST_ENDPOINT } from "@/utilities/endpoints";
 
-const CATEGORIES = [
-  "Policy Inquiry",
-  "Claim Assistance",
-  "Payment Issue",
-  "Account Access",
-  "Vehicle Registration",
-  "Other",
+const CATEGORIES: { label: string; value: string }[] = [
+  { label: "Policy Inquiry", value: "POLICY_INQUIRY" },
+  { label: "Claim Assistance", value: "CLAIM_ASSISTANCE" },
+  { label: "Payment Issue", value: "PAYMENT_ISSUE" },
+  { label: "Account Access", value: "ACCOUNT_ACCESS" },
+  { label: "Vehicle Registration", value: "VEHICLE_REGISTRATION" },
+  { label: "Technical Support", value: "TECHNICAL_SUPPORT" },
+  { label: "Other", value: "OTHER" },
 ];
 
 export default function SupportForm() {
@@ -26,7 +29,7 @@ export default function SupportForm() {
     phone: "",
     category: "",
     subject: "",
-    message: "",
+    description: "",
   });
 
   const handleChange = (
@@ -40,11 +43,15 @@ export default function SupportForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate submission
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    toast.success("Support request submitted. We'll be in touch shortly.");
-    router.push("/dashboard");
+    try {
+      await axiosClient.post(SUPPORT_REQUEST_ENDPOINT, form);
+      toast.success("Support request submitted. We'll be in touch shortly.");
+      router.push("/dashboard");
+    } catch {
+      toast.error("Failed to submit request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass =
@@ -140,8 +147,8 @@ export default function SupportForm() {
                   >
                     <option value="">Select a category</option>
                     {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
+                      <option key={c.value} value={c.value}>
+                        {c.label}
                       </option>
                     ))}
                   </select>
@@ -161,11 +168,11 @@ export default function SupportForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
-                    Message
+                    Description
                   </label>
                   <textarea
-                    name="message"
-                    value={form.message}
+                    name="description"
+                    value={form.description}
                     onChange={handleChange}
                     placeholder="Describe your issue in detail..."
                     required

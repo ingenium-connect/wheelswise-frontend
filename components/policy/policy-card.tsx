@@ -20,10 +20,12 @@ import {
   Pencil,
   Loader2,
 } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { axiosClient } from "@/utilities/axios-client";
-import { POLICY_UPDATE_ENDPOINT } from "@/utilities/endpoints";
+import {
+  POLICY_COMPLETE_PURCHASE_ENDPOINT,
+  POLICY_UPDATE_ENDPOINT,
+} from "@/utilities/endpoints";
 
 type Props = {
   policy: InsurancePolicy;
@@ -34,6 +36,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const [startDate, setStartDate] = useState(new Date(policy.start_date));
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [completingPayment, setCompletingPayment] = useState(false);
 
   const today = new Date();
   const expiryDate = new Date(policy.end_date);
@@ -94,6 +97,22 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const policyNumberDisplay = policy.policy_number ?? "—";
   const certDisplay = policy.certno ?? "—";
 
+  async function handleCompletePayment() {
+    setCompletingPayment(true);
+    try {
+      await axiosClient.post(
+        `${POLICY_COMPLETE_PURCHASE_ENDPOINT}/${policy.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success("Payment completed successfully.");
+    } catch {
+      toast.error("Failed to complete payment. Please try again.");
+    } finally {
+      setCompletingPayment(false);
+    }
+  }
+
   async function handleDateSelect(date: Date | undefined) {
     if (!date) return;
     setCalendarOpen(false);
@@ -151,18 +170,24 @@ export const PolicyCard = ({ policy, token }: Props) => {
             {statusBadge}
             {isPendingPayment ? (
               <Button
-                asChild={startDateIsValid}
                 size="sm"
-                disabled={!startDateIsValid}
-                onClick={!startDateIsValid ? () => setCalendarOpen(true) : undefined}
-                title={!startDateIsValid ? "Update start date before proceeding" : undefined}
+                disabled={!startDateIsValid || completingPayment}
+                onClick={
+                  startDateIsValid
+                    ? handleCompletePayment
+                    : () => setCalendarOpen(true)
+                }
+                title={
+                  !startDateIsValid
+                    ? "Update start date before proceeding"
+                    : undefined
+                }
                 className="text-white text-xs shrink-0"
               >
-                {startDateIsValid ? (
-                  <Link href="/dashboard/payment-summary">Complete Payment</Link>
-                ) : (
-                  "Complete Payment"
+                {completingPayment && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 )}
+                Complete Payment
               </Button>
             ) : (
               <Button
@@ -241,13 +266,11 @@ export const PolicyCard = ({ policy, token }: Props) => {
             </div>
           </div>
 
-          {policy.is_paid ? (
+          {policy.is_paid && (
             <InfoBlock
               label="Expires"
               value={expiryDate.toDateString()}
-              sub={
-                isExpired ? "Expired" : `${daysRemaining} days remaining`
-              }
+              sub={isExpired ? "Expired" : `${daysRemaining} days remaining`}
               subColor={
                 isExpired
                   ? "text-red-500"
@@ -255,13 +278,6 @@ export const PolicyCard = ({ policy, token }: Props) => {
                     ? "text-amber-500"
                     : "text-emerald-600"
               }
-            />
-          ) : (
-            <InfoBlock
-              label="Expires"
-              value={expiryDate.toDateString()}
-              sub="Awaiting payment"
-              subColor="text-blue-500"
             />
           )}
         </div>
