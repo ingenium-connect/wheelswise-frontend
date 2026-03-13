@@ -24,3 +24,9 @@ export const USER_REGISTRATION_ENDPOINT = "/users/register";
 export const POLICY_PAYMENT_ENDPOINT = "policy/new";
 export const POLICY_UPDATE_ENDPOINT = "policy";
 export const POLICY_PAYMENT_VERIFY_ENDPOINT = "payments/verify";
+
+// SUPPORT ENDPOINTS
+export const SUPPORT_REQUEST_ENDPOINT = "/support/request";
+
+// POLICY ACTIONS
+export const POLICY_COMPLETE_PURCHASE_ENDPOINT = "/policy/complete-purchase";
