@@ -40,6 +40,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
   const router = useRouter();
   const [models, setModels] = useState<string[]>([]);
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
+  const cover = useInsuranceStore((s) => s.cover);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
   const [motorTypes, setMotorTypes] = useState<MotorType[]>([]);
   const [vehicleTonnage, setVehicleTonnage] = useState<number>(0);
@@ -149,6 +150,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
 
     const vehiclePayload: FinalVehiclePayload = {
       source: "",
+      intended_policy_type: cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
       vehicle: {
         chassis_number: (v.chassisNumber || "").trim(),
         registration_number: (v.vehicleNumber || "").trim(),
