@@ -246,18 +246,45 @@ export type InsurancePolicy = {
   end_date: string;
   start_date: string;
   date_created: string;
+  updated_at?: string;
   is_paid: boolean;
   is_active: boolean;
   is_cancelled: boolean;
   certificate_issued: boolean;
   payment_reference: string;
+  payment_id?: string;
+  user_id?: string;
+  product_id?: string;
+  underwriter_id?: string;
+  tpo_price_list_id?: string;
   vehicle_details: {
+    id?: string;
     make: string;
     model: string;
     registration_number: string;
     vehicle_value: number;
     year_of_manufacture: number;
     body_type: string;
+    chassis_number?: string;
+    engine_capacity?: number;
+    engine_number?: string;
+    seating_capacity?: number;
+    purpose?: string;
+    purpose_type?: number;
+    owner?: string;
+    active_policy?: string | null;
+  };
+  user?: {
+    id: string;
+    name: string;
+    msisdn: string;
+    id_number: string;
+    email: string;
+    kra_pin: string;
+  };
+  payment_method?: {
+    id: string;
+    description: string;
   };
 };
 
