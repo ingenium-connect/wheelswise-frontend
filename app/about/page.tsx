@@ -172,8 +172,7 @@ export default function AboutPage() {
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     We do not underwrite policies ourselves. Instead, we partner
                     with established insurers to bring you vetted products with
-                    transparent pricing — no hidden fees, no surprise
-                    deductions.
+                    transparent pricing.
                   </p>
                 </div>
                 <div className="space-y-3">
