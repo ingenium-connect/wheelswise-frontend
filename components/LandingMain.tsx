@@ -387,11 +387,11 @@ const LandingMain: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Why MedGen ── */}
+      {/* ── Why Wheelswise ── */}
       <section className="bg-[#f0f6f9] px-4 md:px-8 py-14">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-xs uppercase tracking-widest text-primary font-semibold mb-2">
-            Why MedGen
+            Why Wheelswise
           </p>
           <h2 className="text-center text-2xl md:text-3xl font-bold text-[#1e3a5f] mb-3">
             Built for Kenyan Motorists

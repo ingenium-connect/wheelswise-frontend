@@ -1,5 +1,13 @@
 import Signup from "@/components/auth/SignUp";
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Create Your Account — Get Insured in Minutes",
+  description:
+    "Create a free Wheelswise account to purchase motor insurance online in Kenya. Comprehensive and TPO cover. Pay via M-Pesa.",
+  alternates: { canonical: "/signup" },
+};
 
 export default async function Page({
   searchParams,

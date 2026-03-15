@@ -42,6 +42,7 @@ const Signup: React.FC<Props> = ({
   const { tonnage, seating_capacity, vehicleDetails } = useVehicleStore();
 
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
+  const cover = useInsuranceStore((store) => store.cover);
   const { setProfile } = useUserStore();
 
   const router = useRouter();
@@ -175,6 +176,7 @@ const Signup: React.FC<Props> = ({
 
       const finalVehiclePayload: FinalVehiclePayload = {
         source: vehicleDetails.ntsaRegistered ? "NTSA" : "",
+        intended_policy_type: cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
         vehicle: vehiclePayload,
       };
       // -------------------------------------

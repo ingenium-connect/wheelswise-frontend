@@ -16,11 +16,19 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "About Us | MedGen",
+export const metadata: Metadata = {
+  title: "About Us — Kenya's Digital Motor Insurance Platform",
   description:
-    "Learn about MedGen Insurance Agency — Kenya's digital motor insurance platform.",
+    "Wheelswise is a product of MedGen Insurance Agency, an IRA-licensed digital insurance intermediary in Kenya. We connect motorists with reputable underwriters for fast, transparent motor insurance.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Wheelswise — IRA-Licensed Motor Insurance in Kenya",
+    description:
+      "Learn about Wheelswise — Kenya's digital motor insurance platform. Regulated by the Insurance Regulatory Authority (IRA), we make motor insurance fast, fair, and fully online.",
+    url: "/about",
+  },
 };
 
 const values = [

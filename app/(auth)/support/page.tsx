@@ -1,4 +1,12 @@
 import SupportForm from "@/components/auth/SupportForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Support",
+  description:
+    "Need help with your motor insurance? Submit a support request and our team will respond within 24 hours. Available for policy queries, claims guidance, payment issues, and more.",
+  alternates: { canonical: "/support" },
+};
 
 export default function SupportPage() {
   return (

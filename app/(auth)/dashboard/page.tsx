@@ -18,7 +18,14 @@ import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { Suspense } from "react";
 import StorePersonalDetailsClient from "@/components/auth/StorePersonalDetailsClient";
 
+import type { Metadata } from "next";
+
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "My Dashboard",
+  robots: { index: false, follow: false },
+};
 
 export default async function Page() {
   let policies: policyResponse | undefined = undefined;
