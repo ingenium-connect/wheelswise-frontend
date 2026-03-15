@@ -85,9 +85,9 @@ export default function DashboardTabs({
         >
           <FileText className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Policies</span>
-          {(policyPayload?.policies.length ?? 0) > 0 && (
+          {(policyPayload?.policies?.length ?? 0) > 0 && (
             <span className="ml-1 bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {policyPayload?.policies.length}
+              {policyPayload?.policies?.length}
             </span>
           )}
         </TabsTrigger>
@@ -105,7 +105,7 @@ export default function DashboardTabs({
         <DashboardBanner
           name={firstName}
           vehicleCount={vehicles?.length ?? 0}
-          policyCount={policyPayload?.total_count ?? 0}
+          policyCount={policyPayload?.policies?.length ?? 0}
         />
       </TabsContent>
 
@@ -156,13 +156,13 @@ export default function DashboardTabs({
               Insurance Policies
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {policyPayload?.total_count ?? 0} polic
-              {(policyPayload?.total_count ?? 0) !== 1 ? "ies" : "y"}
+              {policyPayload?.policies?.length ?? 0} polic
+              {(policyPayload?.policies?.length ?? 0) !== 1 ? "ies" : "y"}
             </p>
           </div>
         </div>
 
-        {!policyPayload?.total_count ? (
+        {!policyPayload?.policies?.length ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="p-5 bg-primary/10 rounded-full mb-4">
               <FileText className="w-10 h-10 text-primary" />
@@ -177,7 +177,7 @@ export default function DashboardTabs({
           </div>
         ) : (
           <div className="space-y-4">
-            {policyPayload?.policies.map((policy) => (
+            {policyPayload?.policies?.map((policy) => (
               <PolicyCard key={policy.id} policy={policy} token={token} />
             ))}
           </div>

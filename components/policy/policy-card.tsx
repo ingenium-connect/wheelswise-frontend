@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Popover,
   PopoverContent,
@@ -168,36 +169,40 @@ export const PolicyCard = ({ policy, token }: Props) => {
           {/* Row 2: status badge + action button */}
           <div className="flex items-center justify-between gap-2">
             {statusBadge}
-            {isPendingPayment ? (
-              <Button
-                size="sm"
-                disabled={!startDateIsValid || completingPayment}
-                onClick={
-                  startDateIsValid
-                    ? handleCompletePayment
-                    : () => setCalendarOpen(true)
-                }
-                title={
-                  !startDateIsValid
-                    ? "Update start date before proceeding"
-                    : undefined
-                }
-                className="text-white text-xs shrink-0"
-              >
-                {completingPayment && (
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                )}
-                Complete Payment
-              </Button>
-            ) : (
+            <div className="flex items-center gap-2 shrink-0">
+              {isPendingPayment && (
+                <Button
+                  size="sm"
+                  disabled={!startDateIsValid || completingPayment}
+                  onClick={
+                    startDateIsValid
+                      ? handleCompletePayment
+                      : () => setCalendarOpen(true)
+                  }
+                  title={
+                    !startDateIsValid
+                      ? "Update start date before proceeding"
+                      : undefined
+                  }
+                  className="text-white text-xs"
+                >
+                  {completingPayment && (
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  )}
+                  Complete Payment
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
-                className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
+                className="border-primary text-primary hover:bg-primary/5 text-xs"
+                asChild
               >
-                View Details
+                <Link href={`/dashboard/policy/${policy.id}`}>
+                  View Details
+                </Link>
               </Button>
-            )}
+            </div>
           </div>
         </div>
 

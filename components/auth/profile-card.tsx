@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types/data";
 import { User, Phone, Mail, CreditCard, Hash } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   user: UserProfile;
@@ -95,8 +96,9 @@ export function AccountCard({ user }: Props) {
           <Button
             variant="outline"
             className="w-full mt-6 border-primary text-primary hover:bg-primary/5"
+            asChild
           >
-            Change Password
+            <Link href="/forgot-password">Reset PIN</Link>
           </Button>
         </CardContent>
       </Card>
