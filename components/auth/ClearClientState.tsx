@@ -22,8 +22,6 @@ export default function ClearClientState() {
         localStorage.removeItem("policy_start_date");
         localStorage.removeItem("vehicleRegistrationNumber");
       } catch (e) {
-        // ignore localStorage errors
-        // eslint-disable-next-line no-console
         console.error("Failed to clear localStorage keys", e);
       }
 
@@ -32,14 +30,12 @@ export default function ClearClientState() {
         resetProfile();
         resetPersonal();
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.error("Failed to reset client stores", e);
       }
 
       // Remove the cookie so this runs only once
       document.cookie = "clear_client_state=; path=/; max-age=0; samesite=lax";
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
     }
   }, [resetProfile, resetPersonal]);

@@ -7,19 +7,6 @@ export default async function Page() {
 
   const token = cookiesData.get(ACCESS_TOKEN)?.value;
 
-  const pages = [
-    { name: "Dashboard", href: "/dashboard", isActive: false },
-    {
-      name: "Payment Summary",
-      href: "/dashboard/payment-summary",
-      isActive: false,
-    },
-    {
-      name: "Payment Method",
-      href: "/dashboard/payment-method",
-      isActive: true,
-    },
-  ];
   return (
     <>
       {/* Page gradient header */}

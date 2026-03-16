@@ -15,7 +15,6 @@ import LogoutButton from "@/components/auth/LogoutButton";
 import {
   HeadphonesIcon,
   UserCircle2,
-  LogOut,
   LayoutDashboard,
   ChevronDown,
 } from "lucide-react";

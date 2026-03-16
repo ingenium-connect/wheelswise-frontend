@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Check, CreditCard, Smartphone, Loader2, AlertCircle } from "lucide-react";
@@ -57,7 +57,6 @@ const PaymentMethod = ({ token }: Props) => {
     (s) => s.selectedAdditionalBenefitIds,
   );
   const router = useRouter();
-  const [localPhone, setLocalPhone] = useState(phoneNumber);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationData, setConfirmationData] = useState<{
@@ -74,9 +73,6 @@ const PaymentMethod = ({ token }: Props) => {
     );
   }, [motorSubType]);
 
-  const handleChoose = useCallback((method: string) => {
-    setSelectedMethod(method);
-  }, []);
   const handleCardDetailsChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
