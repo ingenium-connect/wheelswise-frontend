@@ -182,7 +182,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           setSearchMessage(
             `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`,
           );
-          toast.error("Vehicle exceeds age limit");
+          toast.error("Vehicle too old for this cover", { description: `Maximum allowed age is ${maxAgeAllowed} years.` });
           setLoadingSearch(false);
           setTimeout(() => {
             router.back();
@@ -272,7 +272,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         "Vehicle could not be found. Kindly enter the vehicle details manually.",
       );
 
-      toast.error("Vehicle not found");
+      toast.error("Vehicle not found", { description: "Please enter the details manually below." });
       console.error(error);
     } finally {
       setLoadingSearch(false);
