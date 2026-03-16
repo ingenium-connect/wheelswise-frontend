@@ -13,14 +13,43 @@ import {
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   CalendarDays,
   Car,
   CheckCircle2,
   CreditCard,
+  Loader2,
   Shield,
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+
+/* ── Types ── */
+
+type ConflictPolicy = {
+  cover_end_date: string;
+  insurance_certificate_no: string;
+  member_company_name: string;
+  registration_number: string;
+  chassis_number: string;
+};
+
+type DoubleInsuranceStatus = "idle" | "checking" | "conflict" | "clear";
+
+/* ── Date helpers ── */
+
+function toApiDate(iso: string) {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function addDays(iso: string, days: number) {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split("T")[0];
+}
+
+/* ── Component ── */
 
 const PaymentSummary = () => {
   const router = useRouter();
@@ -33,6 +62,12 @@ const PaymentSummary = () => {
   const [oneTimePayment, setOneTimePayment] = useState<number>(0);
   const [date, setDate] = useState("");
   const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const [doubleInsuranceStatus, setDoubleInsuranceStatus] =
+    useState<DoubleInsuranceStatus>("idle");
+  const [conflictPolicies, setConflictPolicies] = useState<ConflictPolicy[]>(
+    [],
+  );
 
   const formatDate = (date: Date) => date.toISOString().split("T")[0];
   const today = new Date();
@@ -124,6 +159,41 @@ const PaymentSummary = () => {
       });
   }, [selectedAdditionalBenefitIds]);
 
+  /* Double-insurance check */
+  useEffect(() => {
+    if (!date) return;
+
+    const period = motorSubType?.underwriter_product?.period;
+    const regNum = vehicleDetails.vehicleNumber;
+
+    if (period == null || !regNum) return;
+
+    fetch("/api/double-insurance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        policy_start_date: toApiDate(date),
+        policy_end_date: toApiDate(addDays(date, Number(period))),
+        vehicle_registration_number: regNum,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const conflicts: ConflictPolicy[] =
+          data.callback_obj?.double_insurance ?? [];
+        if (data.success && conflicts.length > 0) {
+          setDoubleInsuranceStatus("conflict");
+          setConflictPolicies(conflicts);
+        } else {
+          setDoubleInsuranceStatus("clear");
+        }
+      })
+      .catch(() => {
+        // On error let the user proceed — don't hard-block
+        setDoubleInsuranceStatus("clear");
+      });
+  }, [date, motorSubType, vehicleDetails.vehicleNumber]);
+
   const productName =
     motorSubType?.underwriter_product.name ?? "Insurance Plan";
   const underwriterName =
@@ -131,10 +201,23 @@ const PaymentSummary = () => {
   const coverLabel =
     cover === "COMPREHENSIVE" ? "Comprehensive" : "Third Party";
 
-  const coverStartDate = (date: string) => {
-    setDate(date);
-    localStorage.setItem("policy_start_date", date);
+  const coverStartDate = (selectedDate: string) => {
+    setDate(selectedDate);
+    localStorage.setItem("policy_start_date", selectedDate);
+    if (selectedDate) {
+      setDoubleInsuranceStatus("checking");
+      setConflictPolicies([]);
+    } else {
+      setDoubleInsuranceStatus("idle");
+    }
   };
+
+  const canProceed =
+    !!date &&
+    paymentMethods.length > 0 &&
+    doubleInsuranceStatus !== "checking" &&
+    doubleInsuranceStatus !== "conflict";
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm p-6 md:p-8 space-y-6">
@@ -299,6 +382,65 @@ const PaymentSummary = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Double-insurance check result */}
+          {doubleInsuranceStatus === "checking" && (
+            <div className="flex items-center gap-3 mt-3 px-4 py-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-blue-800">
+                  Checking for existing coverage
+                </p>
+                <p className="text-xs text-blue-600 mt-0.5">
+                  Verifying this vehicle has no active policy for the selected
+                  period...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {doubleInsuranceStatus === "clear" && (
+            <div className="flex items-center gap-2.5 mt-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <p className="text-sm font-medium text-emerald-700">
+                Coverage check complete.
+              </p>
+            </div>
+          )}
+
+          {doubleInsuranceStatus === "conflict" && (
+            <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <p className="text-sm font-semibold text-amber-800">
+                  Existing coverage detected
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {conflictPolicies.map((p) => (
+                  <div
+                    key={p.insurance_certificate_no}
+                    className="bg-white border border-amber-200 rounded-lg px-4 py-3 space-y-1"
+                  >
+                    <p className="text-sm font-semibold text-[#1e3a5f]">
+                      {p.member_company_name}
+                    </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+                      <span>Certificate: {p.insurance_certificate_no}</span>
+                      <span>Reg: {p.registration_number}</span>
+                      <span>Expires: {p.cover_end_date}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-xs text-amber-700">
+                This vehicle already has active coverage during the selected
+                period. Please choose a different start date.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Total payment */}
@@ -336,9 +478,11 @@ const PaymentSummary = () => {
           <Button
             className="flex-1 text-white"
             onClick={() => router.push("/dashboard/payment-method")}
-            disabled={!date || paymentMethods.length === 0}
+            disabled={!canProceed}
           >
-            Proceed to Payment
+            {doubleInsuranceStatus === "checking"
+              ? "Checking coverage..."
+              : "Proceed to Payment"}
           </Button>
         </div>
         {paymentMethods.length === 0 && (
