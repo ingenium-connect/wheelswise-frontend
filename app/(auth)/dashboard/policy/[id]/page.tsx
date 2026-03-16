@@ -1,11 +1,24 @@
 import { getData } from "@/utilities/api";
-import { POLICY_DETAIL_ENDPOINT } from "@/utilities/endpoints";
-import { InsurancePolicy } from "@/types/data";
+import {
+  ADDITIONAL_BENEFITS_ENDPOINT,
+  BENEFIT_EXTRAS_ENDPOINT,
+  POLICY_DETAIL_ENDPOINT,
+  SERVER_URL,
+} from "@/utilities/endpoints";
+import {
+  AdditionalBenefit,
+  BenefitExtras,
+  InsurancePolicy,
+} from "@/types/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { CompletePaymentButton } from "@/components/policy/complete-payment-button";
+import {
+  ApplicableExcessesList,
+  PolicyBenefitsList,
+} from "@/components/policy/policy-benefits-list";
 import {
   ArrowLeft,
   Car,
@@ -18,6 +31,9 @@ import {
   Clock,
   AlertTriangle,
   Hourglass,
+  ShieldCheck,
+  ListChecks,
+  BadgePercent,
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -28,16 +44,24 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-function fmt(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-KE", {
+function fmt(dateStr?: string | null) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-KE", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
-function fmtCurrency(amount: number) {
+function fmtCurrency(amount?: number | null) {
+  if (amount == null || isNaN(amount)) return "—";
   return `KES ${amount.toLocaleString("en-KE")}`;
+}
+
+function or(value: string | undefined | null, fallback = "—") {
+  return value?.trim() || fallback;
 }
 
 type Params = { id: string };
@@ -57,12 +81,53 @@ export default async function PolicyDetailPage({
 
   if (!policy?.id) notFound();
 
+  let additionalBenefits: AdditionalBenefit[] = [];
+  if (policy.policy_benefits && policy.policy_benefits.length > 0) {
+    try {
+      const res = await fetch(
+        `${SERVER_URL}${ADDITIONAL_BENEFITS_ENDPOINT}`,
+        {
+          method: "POST",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ids: policy.policy_benefits }),
+        },
+      );
+      if (res.ok) {
+        additionalBenefits = await res.json();
+      }
+    } catch {
+      // silently skip — benefits are supplemental
+    }
+  }
+
+  let benefitExtras: BenefitExtras | null = null;
+  if (policy.product_id) {
+    try {
+      benefitExtras = await getData(
+        `${BENEFIT_EXTRAS_ENDPOINT}?underwriter_product_id=${policy.product_id}&exclude=additional_benefits`,
+      );
+    } catch {
+      // silently skip — extras are supplemental
+    }
+  }
+
+  const productBenefits = benefitExtras?.product_benefits ?? [];
+  const applicableExcesses = benefitExtras?.applicable_excesses ?? [];
+
   const today = new Date();
-  const expiryDate = new Date(policy.end_date);
-  const timeDiff = expiryDate.getTime() - today.getTime();
-  const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  const isExpired = timeDiff <= 0;
-  const isExpiringSoon = !isExpired && timeDiff <= 30 * 24 * 3600 * 1000;
+  const expiryDate = policy.end_date ? new Date(policy.end_date) : null;
+  const timeDiff =
+    expiryDate && !isNaN(expiryDate.getTime())
+      ? expiryDate.getTime() - today.getTime()
+      : null;
+  const daysRemaining = timeDiff != null ? Math.ceil(timeDiff / (1000 * 3600 * 24)) : null;
+  const isExpired = timeDiff != null ? timeDiff <= 0 : false;
+  const isExpiringSoon =
+    !isExpired && timeDiff != null && timeDiff <= 30 * 24 * 3600 * 1000;
   const isCancelled = policy.is_cancelled;
   const isPendingPayment = !policy.is_paid && !isCancelled;
 
@@ -134,10 +199,15 @@ export default async function PolicyDetailPage({
                 {policy.policy_type.replace("_", " ")} Insurance
               </p>
               <h1 className="text-xl md:text-2xl font-bold text-white">
-                {policy.vehicle_details.make} {policy.vehicle_details.model}
+                {or(
+                  [policy.vehicle_details.make, policy.vehicle_details.model]
+                    .filter(Boolean)
+                    .join(" "),
+                  "Unknown Vehicle",
+                )}
               </h1>
               <p className="text-white/70 text-sm mt-1">
-                {policy.vehicle_details.registration_number}
+                {or(policy.vehicle_details.registration_number, "No Registration")}
               </p>
             </div>
             <div className="self-start sm:self-center flex flex-col items-end gap-3">
@@ -193,8 +263,10 @@ export default async function PolicyDetailPage({
               label="End Date"
               value={fmt(policy.end_date)}
             />
-            <Detail label="Duration" value={`${policy.days} days`} />
-            {policy.is_paid && (
+            {policy.days != null && (
+              <Detail label="Duration" value={`${policy.days} days`} />
+            )}
+            {policy.is_paid && timeDiff != null && (
               <Detail
                 label={isExpired ? "Status" : "Days Remaining"}
                 value={isExpired ? "Expired" : `${daysRemaining} days`}
@@ -241,56 +313,64 @@ export default async function PolicyDetailPage({
           <Grid>
             <Detail
               label="Make & Model"
-              value={`${policy.vehicle_details.make} ${policy.vehicle_details.model}`}
+              value={or(
+                [policy.vehicle_details.make, policy.vehicle_details.model]
+                  .filter(Boolean)
+                  .join(" "),
+              )}
             />
             <Detail
               label="Registration"
-              value={policy.vehicle_details.registration_number}
+              value={or(policy.vehicle_details.registration_number)}
             />
             <Detail
               label="Body Type"
-              value={policy.vehicle_details.body_type}
+              value={or(policy.vehicle_details.body_type)}
             />
             <Detail
               label="Year of Manufacture"
-              value={String(policy.vehicle_details.year_of_manufacture)}
+              value={
+                policy.vehicle_details.year_of_manufacture
+                  ? String(policy.vehicle_details.year_of_manufacture)
+                  : "—"
+              }
             />
             <Detail
               label="Vehicle Value"
               value={fmtCurrency(policy.vehicle_details.vehicle_value)}
             />
-            {policy.vehicle_details.engine_capacity && (
+            {policy.vehicle_details.engine_capacity ? (
               <Detail
                 label="Engine Capacity"
                 value={`${policy.vehicle_details.engine_capacity} cc`}
               />
-            )}
-            {policy.vehicle_details.seating_capacity && (
+            ) : null}
+            {policy.vehicle_details.seating_capacity ? (
               <Detail
                 label="Seating Capacity"
                 value={`${policy.vehicle_details.seating_capacity} seats`}
               />
-            )}
-            {policy.vehicle_details.chassis_number && (
+            ) : null}
+            {policy.vehicle_details.chassis_number?.trim() ? (
               <Detail
                 label="Chassis Number"
                 value={policy.vehicle_details.chassis_number}
                 mono
               />
-            )}
-            {policy.vehicle_details.engine_number && (
+            ) : null}
+            {policy.vehicle_details.engine_number?.trim() ? (
               <Detail
                 label="Engine Number"
                 value={policy.vehicle_details.engine_number}
                 mono
               />
-            )}
-            {policy.vehicle_details.purpose && (
+            ) : null}
+            {policy.vehicle_details.purpose?.trim() ? (
               <Detail
                 label="Purpose"
                 value={policy.vehicle_details.purpose}
               />
-            )}
+            ) : null}
           </Grid>
         </Section>
 
@@ -298,12 +378,68 @@ export default async function PolicyDetailPage({
         {policy.user && (
           <Section icon={User} title="Policyholder">
             <Grid>
-              <Detail label="Full Name" value={policy.user.name} />
-              <Detail label="Email" value={policy.user.email} />
-              <Detail label="Phone" value={policy.user.msisdn} />
-              <Detail label="ID Number" value={policy.user.id_number} />
-              <Detail label="KRA PIN" value={policy.user.kra_pin} mono />
+              <Detail label="Full Name" value={or(policy.user.name)} />
+              <Detail label="Email" value={or(policy.user.email)} />
+              <Detail label="Phone" value={or(policy.user.msisdn)} />
+              <Detail label="ID Number" value={or(policy.user.id_number)} />
+              <Detail label="KRA PIN" value={or(policy.user.kra_pin)} mono />
             </Grid>
+          </Section>
+        )}
+
+        {/* Policy Benefits */}
+        {productBenefits.length > 0 && (
+          <Section icon={ListChecks} title="Policy Benefits">
+            <PolicyBenefitsList benefits={productBenefits} />
+          </Section>
+        )}
+
+        {/* Applicable Excesses */}
+        {applicableExcesses.length > 0 && (
+          <Section icon={BadgePercent} title="Applicable Excesses">
+            <ApplicableExcessesList excesses={applicableExcesses} />
+          </Section>
+        )}
+
+        {/* Additional Benefits */}
+        {additionalBenefits.length > 0 && (
+          <Section icon={ShieldCheck} title="Additional Benefits">
+            <div className="divide-y divide-[#e8f0f5]">
+              {additionalBenefits.map((benefit) => (
+                <div
+                  key={benefit.id}
+                  className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#1e3a5f] truncate">
+                        {or(benefit.name, "Unnamed Benefit")}
+                      </p>
+                      {benefit.percentage != null && (
+                        <p className="text-[11px] text-muted-foreground">
+                          {benefit.percentage}% of vehicle value
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 text-right ml-4">
+                    <p className="text-sm font-semibold text-[#1e3a5f]">
+                      {benefit.base_amount != null
+                        ? `${benefit.currency ?? "KES"} ${benefit.base_amount.toLocaleString("en-KE")}`
+                        : "—"}
+                    </p>
+                    {benefit.duration_days != null && (
+                      <p className="text-[11px] text-muted-foreground">
+                        {benefit.duration_days} days
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </Section>
         )}
       </div>
@@ -350,7 +486,7 @@ function Detail({
   mono = false,
 }: {
   label: string;
-  value: string;
+  value?: string | null;
   valueClass?: string;
   mono?: boolean;
 }) {
@@ -362,7 +498,7 @@ function Detail({
       <p
         className={`text-sm font-semibold break-words ${valueClass} ${mono ? "font-mono text-xs" : ""}`}
       >
-        {value}
+        {value?.trim() || "—"}
       </p>
     </div>
   );

@@ -286,6 +286,51 @@ export type InsurancePolicy = {
     id: string;
     description: string;
   };
+  policy_benefits?: string[];
+};
+
+export type AdditionalBenefit = {
+  id: string;
+  name: string;
+  included: boolean;
+  duration_days: number;
+  base_amount: number;
+  currency: string;
+  underwriter_product_id: string;
+  percentage: number;
+};
+
+export type BenefitLimit = {
+  label?: string;
+  amount: number;
+  currency: string;
+};
+
+export type ProductBenefit = {
+  id: string;
+  name: string;
+  limits?: BenefitLimit[];
+  description?: string;
+  underwriter_product_id: string;
+};
+
+export type ApplicableExcess = {
+  id: string;
+  name: string;
+  percentage?: number;
+  percentage_of?: string;
+  minimum_amount?: number;
+  currency?: string;
+  additional_amount?: number;
+  conditions?: string;
+  underwriter_product_id: string;
+};
+
+export type BenefitExtras = {
+  underwriter_product_id: string;
+  product_benefits: ProductBenefit[] | null;
+  applicable_excesses: ApplicableExcess[] | null;
+  additional_benefits: null;
 };
 
 export type policyResponse = {
