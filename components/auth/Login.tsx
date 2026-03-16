@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "../forms/password-input";
 import { useState } from "react";
 import { loginSubmitHandler } from "@/utilities/api";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
@@ -42,6 +42,7 @@ const Login: React.FC = () => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +51,31 @@ const Login: React.FC = () => {
     },
   });
 
+  function extractApiError(response: Record<string, unknown>): string {
+    const raw =
+      (response?.error as string) ||
+      (response?.message as string) ||
+      (response?.detail as string) ||
+      ((response?.non_field_errors as string[])?.[0]);
+
+    if (!raw) return "Something went wrong. Please try again.";
+
+    const lower = raw.toLowerCase();
+    if (lower.includes("invalid") || lower.includes("credentials") || lower.includes("incorrect") || lower.includes("wrong password"))
+      return "Incorrect ID or password. Please try again.";
+    if (lower.includes("not found") || lower.includes("no account"))
+      return "No account found with that ID. Please check and try again.";
+    if (lower.includes("inactive") || lower.includes("disabled"))
+      return "Your account has been deactivated. Please contact support.";
+    if (lower.includes("locked") || lower.includes("too many"))
+      return "Too many failed attempts. Please wait a moment before trying again.";
+
+    return raw;
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    setLoginError("");
     try {
       const payload: LoginPayload = {
         national_identifier: values.national_identifier,
@@ -60,7 +84,6 @@ const Login: React.FC = () => {
       };
       const response = await loginSubmitHandler({ ...payload });
       if (response?.id) {
-        // Also store in cookies for backward compatibility
         const userData = {
           [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
           [USER_ID]: response?.id,
@@ -68,28 +91,23 @@ const Login: React.FC = () => {
           [NAME]: response?.name,
         };
 
-        // Set cookies with options to allow sending to backend (cross-site, secure, SameSite=None)
         Object.entries(userData).forEach(([key, value]) =>
           setCookie(null, key, value, {
-            maxAge: 60 * 60, // 1 hour
+            maxAge: 60 * 60,
             path: "/",
-            secure: process.env.NODE_ENV === "production", // Not using HTTPS locally
-            sameSite: "lax", // 'lax' is more permissive for local dev
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
           }),
         );
 
         toast.success("Successfully logged in!");
         router.push("/dashboard");
       } else {
-        toast.error("Submission Error", {
-          description: "Error in submitting request! Please try again.",
-        });
+        setLoginError(extractApiError(response));
       }
       form.reset();
-    } catch (error) {
-      toast.error("Submission Error", {
-        description: (error as Error)?.message || "An error occurred.",
-      });
+    } catch {
+      setLoginError("Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -114,6 +132,12 @@ const Login: React.FC = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
+                {loginError && (
+                  <div className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{loginError}</span>
+                  </div>
+                )}
                 <FormField
                   control={form.control}
                   name="national_identifier"
@@ -128,6 +152,7 @@ const Login: React.FC = () => {
                           required
                           autoComplete="national_identifier"
                           {...field}
+                          onChange={(e) => { field.onChange(e); setLoginError(""); }}
                         />
                       </FormControl>
                       <FormMessage />

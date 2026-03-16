@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { redirect, useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
@@ -19,7 +19,7 @@ import {
   FinalVehiclePayload,
   vehiclePayload,
 } from "@/types/data";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 interface SignupForm {
   msisdn: string;
@@ -52,6 +52,7 @@ const Signup: React.FC<Props> = ({
     confirm_password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [signupError, setSignupError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -65,8 +66,42 @@ const Signup: React.FC<Props> = ({
     return fields.filter((f) => !obj[f] || String(obj[f]).trim() === "");
   };
 
+  function extractSignupError(err: unknown): string {
+    if (isAxiosError(err)) {
+      const raw =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.response?.data?.detail;
+      if (raw) return friendlySignupError(String(raw));
+    }
+    if (err instanceof Error) return friendlySignupError(err.message);
+    return "Something went wrong. Please try again.";
+  }
+
+  function friendlySignupError(raw: string): string {
+    // Strip generic prefix added by postHandler
+    const msg = raw.replace(/^Failed to fetch data:\s*/i, "").trim();
+    const lower = msg.toLowerCase();
+    if (lower.includes("already exists") || lower.includes("already registered") || lower.includes("duplicate"))
+      return "An account with these details already exists. Please log in instead.";
+    if (lower.includes("phone") && (lower.includes("invalid") || lower.includes("format")))
+      return "The phone number format is invalid. Please use the format +254XXXXXXXXX.";
+    if (lower.includes("national_id") || lower.includes("id number") || lower.includes("identifier"))
+      return "The ID number provided is invalid or already in use.";
+    if (lower.includes("password") && lower.includes("short"))
+      return "Password must be at least 8 characters.";
+    if (lower.includes("token missing") || lower.includes("token"))
+      return "Registration failed. Please check your details and try again.";
+    if (lower.includes("network") || lower.includes("fetch"))
+      return "Network error. Please check your connection and try again.";
+    // Return the cleaned message if it's reasonably short and human-readable
+    if (msg.length < 120 && !msg.includes("status code")) return msg;
+    return "Registration failed. Please check your details and try again.";
+  }
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSignupError("");
 
     try {
       // -------------------------------------
@@ -197,14 +232,7 @@ const Signup: React.FC<Props> = ({
       );
       router.refresh();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred.";
-
-      toast.error("Registration Error", {
-        description: errorMessage,
-      });
+      setSignupError(extractSignupError(error));
     } finally {
       setIsLoading(false);
     }
@@ -234,6 +262,12 @@ const Signup: React.FC<Props> = ({
           <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
           <CardContent className="p-6">
             <form onSubmit={handleSignup} className="space-y-5">
+              {signupError && (
+                <div className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{signupError}</span>
+                </div>
+              )}
               <Field>
                 <FieldLabel htmlFor="msisdn">Phone Number</FieldLabel>
                 <Input

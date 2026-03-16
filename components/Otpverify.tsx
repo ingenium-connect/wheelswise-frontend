@@ -65,7 +65,7 @@ const OtpVerify: React.FC = () => {
         }
       } catch (err) {
         console.error(err);
-        toast.error("Failed to resend OTP");
+        toast.error("Failed to resend OTP. Please try again.");
         setAllowResend(true);
       }
     })();

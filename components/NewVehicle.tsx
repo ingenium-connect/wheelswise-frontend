@@ -19,6 +19,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { axiosClient } from "@/utilities/axios-client";
+import { isAxiosError } from "axios";
 import {
   MOTOR_TYPES_ENDPOINT,
   REGISTER_VEHICLE_ENDPOINT,
@@ -199,8 +200,13 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
       } else {
         setError("Vehicle registration failed. Please try again.");
       }
-    } catch (_err) {
-      setError("Network error. Please try again.");
+    } catch (err) {
+      if (isAxiosError(err)) {
+        const msg = err.response?.data?.message || err.response?.data?.error || err.response?.data?.detail;
+        setError(msg ?? "Vehicle registration failed. Please try again.");
+      } else {
+        setError("Network error. Please check your connection and try again.");
+      }
     }
   };
 
@@ -239,7 +245,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
       <div className="w-full">
         {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertTitle>Error Occured</AlertTitle>
+            <AlertTitle>Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
