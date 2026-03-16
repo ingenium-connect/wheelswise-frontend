@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,14 @@ import { useUserStore } from "@/stores/userStore";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 
 export default function ResetPinPage() {
+  return (
+    <Suspense>
+      <ResetPinForm />
+    </Suspense>
+  );
+}
+
+function ResetPinForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nationalId = searchParams.get("national_id") ?? "";

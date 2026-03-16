@@ -1,15 +1,7 @@
 import OtpVerify from "@/components/Otpverify";
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ motor_type?: string; product_type: string }>;
-}) {
-  const params = await searchParams;
-  const motor_type = params?.motor_type || "PRIVATE";
-  const product_type = params.product_type || "COMPREHENSIVE";
-
+export default async function Page() {
   return (
     <>
       <FlowStepHeader
