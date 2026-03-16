@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,14 @@ const shakeClass =
   "animate-[shake_0.3s_ease-in-out] @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}";
 
 export default function ResetPinVerifyPage() {
+  return (
+    <Suspense>
+      <ResetPinVerifyForm />
+    </Suspense>
+  );
+}
+
+function ResetPinVerifyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nationalId = searchParams.get("national_id") ?? "";
