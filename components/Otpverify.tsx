@@ -105,7 +105,7 @@ const OtpVerify: React.FC = () => {
       } else {
         retryOtp();
       }
-    } catch (err) {
+    } catch (_err) {
       retryOtp();
 
       setError("Network error. Please try again.");

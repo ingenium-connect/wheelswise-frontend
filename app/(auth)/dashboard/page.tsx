@@ -1,5 +1,4 @@
 import {
-  InsurancePolicy,
   policyResponse,
   UserProfile,
   Vehicle,

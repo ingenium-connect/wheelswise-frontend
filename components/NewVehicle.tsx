@@ -25,7 +25,7 @@ import {
 } from "@/utilities/endpoints";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { FinalVehiclePayload, MotorType, vehiclePayload } from "@/types/data";
+import { FinalVehiclePayload, MotorType } from "@/types/data";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { Card, CardContent } from "./ui/card";
@@ -199,7 +199,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
       } else {
         setError("Vehicle registration failed. Please try again.");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("Network error. Please try again.");
     }
   };

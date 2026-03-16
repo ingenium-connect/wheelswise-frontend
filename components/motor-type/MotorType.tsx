@@ -60,7 +60,7 @@ const SelectMotorType = ({ data }: Props) => {
       if (!present) {
         resetProfile();
       }
-    } catch (err) {
+    } catch (_err) {
       // ignore
     }
   }, [resetProfile]);

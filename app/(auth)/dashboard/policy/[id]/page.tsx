@@ -9,7 +9,6 @@ import { CompletePaymentButton } from "@/components/policy/complete-payment-butt
 import {
   ArrowLeft,
   Car,
-  Shield,
   Calendar,
   CreditCard,
   FileText,
