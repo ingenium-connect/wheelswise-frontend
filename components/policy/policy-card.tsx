@@ -167,8 +167,8 @@ export const PolicyCard = ({ policy, token }: Props) => {
           </div>
 
           {/* Row 2: status badge + action button */}
-          <div className="flex items-center justify-between gap-2">
-            {statusBadge}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="shrink-0">{statusBadge}</div>
             <div className="flex items-center gap-2 shrink-0">
               {isPendingPayment && (
                 <Button
