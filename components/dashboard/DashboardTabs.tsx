@@ -36,7 +36,6 @@ export default function DashboardTabs({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log("DashboardTabs received policies:", policyPayload);
 
   const paramTab = searchParams.get("tab") as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
