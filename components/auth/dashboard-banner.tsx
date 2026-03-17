@@ -8,9 +8,10 @@ type Props = {
   name: string;
   vehicleCount: number;
   policyCount: number;
+  expiringSoonCount: number;
 };
 
-const DashboardBanner = ({ name, vehicleCount, policyCount }: Props) => {
+const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }: Props) => {
   const stats = [
     {
       icon: <Car className="w-5 h-5 text-primary" />,
@@ -27,7 +28,7 @@ const DashboardBanner = ({ name, vehicleCount, policyCount }: Props) => {
     {
       icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
       label: "Expiring Soon",
-      value: 0,
+      value: expiringSoonCount,
       bg: "bg-amber-50",
     },
   ];

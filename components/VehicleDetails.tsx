@@ -153,7 +153,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       const { vehicle, owner, regNo } = res.data;
 
       if (!vehicle) {
-        setIsFieldsDisabled(false);
         reset();
 
         setVehicleDetails({ ntsaRegistered: false });
@@ -267,12 +266,13 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         ntsaRegistered: false,
       });
 
+      setIsFieldsDisabled(true);
       setSearchStatus("error");
       setSearchMessage(
-        "Vehicle could not be found. Kindly enter the vehicle details manually.",
+        "Vehicle not found. Please go back and enter a valid vehicle registration number.",
       );
 
-      toast.error("Vehicle not found", { description: "Please enter the details manually below." });
+      toast.error("Vehicle not found", { description: "Please enter a valid registration number and try again." });
       console.error(error);
     } finally {
       setLoadingSearch(false);
@@ -320,7 +320,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     <div className="w-full">
       {searchStatus === "error" && (
         <Alert variant="destructive" className="mb-4">
-          <AlertTitle>Error Occured</AlertTitle>
+          <AlertTitle>Vehicle Not Found</AlertTitle>
           <AlertDescription>{searchMessage}</AlertDescription>
         </Alert>
       )}

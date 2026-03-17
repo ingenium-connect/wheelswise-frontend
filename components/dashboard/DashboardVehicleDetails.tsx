@@ -13,10 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
-import { axiosClient } from "@/utilities/axios-client";
-import { useInsuranceStore } from "@/stores/insuranceStore";
+import { axiosClient, axiosAuthClient } from "@/utilities/axios-client";
 import { toast } from "sonner";
-import { Car } from "lucide-react";
+import { Car, Loader2 } from "lucide-react";
 
 type Props = {
   modelMakeMap: { make: string; models: string[] }[];
@@ -27,8 +26,6 @@ const YEAR_RANGE = 20;
 
 export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   const router = useRouter();
-  const cover = useInsuranceStore((s) => s.cover);
-  const intendedPolicyType = cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY";
   const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
   const [purposeCategories, setPurposeCategories] = useState<
@@ -36,6 +33,8 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   >([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [isFieldsDisabled, setIsFieldsDisabled] = useState(false);
+  const [seatingCapacity, setSeatingCapacity] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     engineCapacity: "",
@@ -145,12 +144,43 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       form.vehiclePurposeCategory
     );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    sessionStorage.setItem("intended_policy_type", intendedPolicyType);
-    sessionStorage.removeItem("dashboard-vehicle-search");
-    toast.success("Vehicle details saved.");
-    router.push("/dashboard?tab=vehicle");
+    setSubmitting(true);
+
+    const ntsaRaw = sessionStorage.getItem("dashboard-vehicle-search");
+    const ntsaData = ntsaRaw ? JSON.parse(ntsaRaw) : null;
+    const isNtsa = !!(ntsaData?.vehicle);
+
+    const payload = {
+      source: isNtsa ? "NTSA" : "",
+      vehicle: {
+        chassis_number: form.chassisNumber.trim(),
+        registration_number: form.vehicleNumber.trim(),
+        make: form.make.trim(),
+        model: form.model.trim(),
+        engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
+        engine_number: form.engineNumber?.trim() || undefined,
+        body_type: form.bodyType.trim(),
+        vehicle_value: null,
+        seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
+        vehicle_type: "PRIVATE",
+        year_of_manufacture: Number(form.year),
+        purpose: form.vehiclePurpose?.trim() || undefined,
+        purpose_type: form.vehiclePurposeCategory ? Number(form.vehiclePurposeCategory) : null,
+      },
+    };
+
+    try {
+      await axiosAuthClient.post("/vehicle/new", payload);
+      sessionStorage.removeItem("dashboard-vehicle-search");
+      toast.success("Vehicle saved successfully.");
+      router.push("/dashboard?tab=vehicle");
+    } catch {
+      toast.error("Failed to save vehicle. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -355,6 +385,19 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                     readOnly={isFieldsDisabled && !!form.engineNumber}
                   />
                 </Field>
+                <Field>
+                  <FieldLabel htmlFor="seatingCapacity">
+                    Seating Capacity
+                  </FieldLabel>
+                  <Input
+                    id="seatingCapacity"
+                    type="number"
+                    min={1}
+                    value={seatingCapacity}
+                    onChange={(e) => setSeatingCapacity(e.target.value)}
+                    placeholder="e.g. 5"
+                  />
+                </Field>
               </div>
             </div>
 
@@ -428,9 +471,13 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               <Button
                 type="submit"
                 className="flex-1 text-white"
-                disabled={!isValid()}
+                disabled={!isValid() || submitting}
               >
-                Save Vehicle
+                {submitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Save Vehicle"
+                )}
               </Button>
             </div>
           </form>
