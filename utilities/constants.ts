@@ -1,4 +1,5 @@
 export const ACCESS_TOKEN = "__server_token__";
+export const REFRESH_TOKEN = "__refresh_token__";
 export const SIGNUP_TOKEN = "__signup_token__";
 
 export const USER_ID = "__user_id__";

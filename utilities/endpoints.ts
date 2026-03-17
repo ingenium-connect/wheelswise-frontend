@@ -2,6 +2,7 @@ export const SERVER_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // AUTH ENDPOINTS
 export const LOGIN_ENDPOINT = "/users/login";
+export const REFRESH_TOKEN_ENDPOINT = "/auth/refresh";
 
 // USER ENDPOINTS
 

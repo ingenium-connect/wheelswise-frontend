@@ -3,9 +3,10 @@
 import { LoginPayload, PayloadT } from "@/types/data";
 import { destroyCookie, parseCookies } from "nookies";
 
-import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "./constants";
+import { ACCESS_TOKEN, EMAIL, NAME, REFRESH_TOKEN, USER_ID } from "./constants";
 import { LOGIN_ENDPOINT, SERVER_URL } from "./endpoints";
 import { cookies } from "next/headers";
+import { refreshAccessToken } from "./refresh-token";
 
 /**
  * Reusable function used to resolve data fetching promise and handle errors
@@ -30,12 +31,23 @@ export const apiHandler = async (url: string, requiresAuth: boolean = true) => {
     const data = await response.json();
 
     if (response.status === 401) {
-      [ACCESS_TOKEN, USER_ID, EMAIL, NAME].forEach((cookie) =>
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        const retryResponse = await fetch(url, {
+          method: "GET",
+          cache: "no-cache",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${newToken}`,
+          },
+        });
+        if (retryResponse.ok) return retryResponse.json();
+      }
+      [ACCESS_TOKEN, USER_ID, EMAIL, NAME, REFRESH_TOKEN].forEach((cookie) =>
         destroyCookie(null, cookie),
       );
-      throw new Error(
-        `Failed to fetch data: ${response?.status} ${response?.statusText}`,
-      );
+      throw new Error("Session expired. Please log in again.");
     }
 
     if (!response.ok) {
@@ -80,9 +92,24 @@ export const postHandler = async (
     const data = await response.json();
 
     if (response.status === 401) {
-      throw new Error(
-        "Unauthorized access: You are not authorized to access this service.",
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        const retryResponse = await fetch(url, {
+          method: method,
+          cache: "no-cache",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${newToken}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        if (retryResponse.ok) return retryResponse.json();
+      }
+      [ACCESS_TOKEN, USER_ID, EMAIL, NAME, REFRESH_TOKEN].forEach((cookie) =>
+        destroyCookie(null, cookie),
       );
+      throw new Error("Session expired. Please log in again.");
     }
 
     if (data?.error) {
