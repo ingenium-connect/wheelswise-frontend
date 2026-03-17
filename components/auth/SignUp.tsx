@@ -140,14 +140,20 @@ const Signup: React.FC<Props> = ({
       // -------------------------------------
       // 3. Validate vehicle details
       // -------------------------------------
-      const missingVehicleFields = requiredFields(vehicleDetails, [
-        "vehicleValue",
+      const vehicleRequiredFields: (keyof typeof vehicleDetails)[] = [
         "vehicleNumber",
         "make",
         "model",
         "chassisNumber",
         "year",
-      ]);
+      ];
+      if (cover !== "THIRD_PARTY") {
+        vehicleRequiredFields.push("vehicleValue");
+      }
+      const missingVehicleFields = requiredFields(
+        vehicleDetails,
+        vehicleRequiredFields,
+      );
 
       if (missingVehicleFields.length > 0) {
         throw new Error(

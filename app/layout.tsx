@@ -67,9 +67,7 @@ export const metadata: Metadata = {
       "Compare and buy comprehensive motor insurance and third party (TPO) cover in Kenya. Instant quotes from IRA-licensed underwriters. Pay via M-Pesa.",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        url: "/logo.png",
         alt: "Wheelswise — Kenya's Digital Motor Insurance Platform",
         type: "image/png",
       },
@@ -80,7 +78,7 @@ export const metadata: Metadata = {
     title: "Wheelswise — Buy Motor Insurance Online in Kenya",
     description:
       "Compare motor insurance plans from top Kenyan underwriters. Instant quotes, M-Pesa payment, instant certificate.",
-    images: ["/og-image.png"],
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
@@ -95,11 +93,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png" }],
+    apple: [{ url: "/logo.png" }],
   },
   manifest: "/manifest.webmanifest",
   alternates: {

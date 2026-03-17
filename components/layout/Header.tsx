@@ -35,12 +35,12 @@ export default async function Header() {
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <Image
-            src="/logo.png"
-            alt="Logo"
+            src="/logo.svg"
+            alt="Wheelswise"
             priority
             width={80}
             height={80}
-            className="h-20 md:h-36 w-auto brightness-0 invert"
+            className="h-40 md:h-40 w-auto"
           />
         </Link>
 
