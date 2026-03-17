@@ -14,6 +14,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
 import { axiosClient } from "@/utilities/axios-client";
+import { useInsuranceStore } from "@/stores/insuranceStore";
 import { toast } from "sonner";
 import { Car } from "lucide-react";
 
@@ -26,6 +27,8 @@ const YEAR_RANGE = 20;
 
 export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   const router = useRouter();
+  const cover = useInsuranceStore((s) => s.cover);
+  const intendedPolicyType = cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY";
   const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
   const [purposeCategories, setPurposeCategories] = useState<
@@ -144,6 +147,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    sessionStorage.setItem("intended_policy_type", intendedPolicyType);
     sessionStorage.removeItem("dashboard-vehicle-search");
     toast.success("Vehicle details saved.");
     router.push("/dashboard?tab=vehicle");

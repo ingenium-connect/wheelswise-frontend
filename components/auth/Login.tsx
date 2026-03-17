@@ -33,7 +33,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
-import { ACCESS_TOKEN, EMAIL, NAME, USER_ID } from "@/utilities/constants";
+import { ACCESS_TOKEN, EMAIL, NAME, REFRESH_TOKEN, USER_ID } from "@/utilities/constants";
 import { loginFormSchema } from "@/utilities/validation-schemas";
 
 const formSchema = loginFormSchema;
@@ -86,14 +86,15 @@ const Login: React.FC = () => {
       if (response?.id) {
         const userData = {
           [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
+          [REFRESH_TOKEN]: response?.auth_credentials?.refreshToken,
           [USER_ID]: response?.id,
           [EMAIL]: response?.email,
           [NAME]: response?.name,
         };
 
         Object.entries(userData).forEach(([key, value]) =>
-          setCookie(null, key, value, {
-            maxAge: 60 * 60,
+          setCookie(null, key, value ?? "", {
+            maxAge: key === REFRESH_TOKEN ? 30 * 24 * 60 * 60 : 60 * 60,
             path: "/",
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",

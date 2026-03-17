@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ACCESS_TOKEN } from "@/utilities/constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/utilities/constants";
 
 export async function GET(req: NextRequest) {
   const forwardedHost = req.headers.get("x-forwarded-host");
@@ -13,6 +13,17 @@ export async function GET(req: NextRequest) {
   // Clear the access token cookie by setting it with maxAge 0
   response.cookies.set({
     name: ACCESS_TOKEN,
+    value: "",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+
+  // Clear the refresh token cookie
+  response.cookies.set({
+    name: REFRESH_TOKEN,
     value: "",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
