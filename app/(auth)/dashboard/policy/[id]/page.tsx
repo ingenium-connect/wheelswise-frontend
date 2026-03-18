@@ -15,6 +15,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { CompletePaymentButton } from "@/components/policy/complete-payment-button";
+import { CancelCertificateButton } from "@/components/policy/cancel-certificate-button";
 import {
   ApplicableExcessesList,
   PolicyBenefitsList,
@@ -219,6 +220,9 @@ export default async function PolicyDetailPage({
               </span>
               {isPendingPayment && (
                 <CompletePaymentButton policyId={policy.id} token={token} />
+              )}
+              {!isCancelled && policy.certificate_issued && (
+                <CancelCertificateButton policyId={policy.id} />
               )}
             </div>
           </div>

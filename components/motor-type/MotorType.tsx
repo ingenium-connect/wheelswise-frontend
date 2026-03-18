@@ -126,7 +126,7 @@ const SelectMotorType = ({ data }: Props) => {
       }
     } else {
       router.push(
-        `/motor-subtype?product_type=${selectedCover}&motor_type=${tpoCategory}&tonnge=${vehicleTonnage}`,
+        `/vehicle-value?product_type=${selectedCover}&motor_type=${tpoCategory}`,
       );
     }
   };

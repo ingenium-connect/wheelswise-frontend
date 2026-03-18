@@ -103,7 +103,20 @@ export default function DashboardTabs({
         <DashboardBanner
           name={firstName}
           vehicleCount={vehicles?.length ?? 0}
-          policyCount={policyPayload?.policies?.length ?? 0}
+          policyCount={
+            (policyPayload?.policies ?? []).filter((p) => {
+              const isExpired = new Date(p.end_date) <= new Date();
+              return p.is_paid && p.is_active && !p.is_cancelled && !isExpired;
+            }).length
+          }
+          expiringSoonCount={
+            (policyPayload?.policies ?? []).filter((p) => {
+              const now = new Date();
+              const endDate = new Date(p.end_date);
+              const daysLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+              return p.is_paid && p.is_active && !p.is_cancelled && daysLeft > 0 && daysLeft <= 14;
+            }).length
+          }
         />
       </TabsContent>
 
