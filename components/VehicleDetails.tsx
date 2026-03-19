@@ -36,8 +36,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
 
-  const { setVehicleDetails } = useVehicleStore();
+  const { setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
   const { setPersonalDetails } = usePersonalDetailsStore();
+  const [seatingCapacity, setSeatingCapacity] = useState("");
 
   const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
@@ -235,6 +236,11 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         vehiclePurposeCategory: "",
       }));
 
+      const seats = vehicle.passengerCapacity || vehicle.seatingCapacity;
+      if (seats) {
+        setSeatingCapacity(seats.toString());
+      }
+
       setVehicleDetails({ ntsaRegistered: true });
 
       if (owner) {
@@ -284,6 +290,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
     // default behaviour: save to store and navigate
     setVehicleDetails({ ...form });
+    if (seatingCapacity) {
+      storeSetSeatingCapacity(seatingCapacity);
+    }
 
     setTimeout(() => {
       toast.success("Vehicle details saved.", { duration: 2000 });
@@ -598,6 +607,19 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       />
                     </Field>
                   )}
+                  <Field>
+                    <FieldLabel htmlFor="seatingCapacity">
+                      Seating Capacity
+                    </FieldLabel>
+                    <Input
+                      id="seatingCapacity"
+                      type="number"
+                      min={1}
+                      value={seatingCapacity}
+                      onChange={(e) => setSeatingCapacity(e.target.value)}
+                      placeholder="e.g. 5"
+                    />
+                  </Field>
                 </div>
               </div>
 

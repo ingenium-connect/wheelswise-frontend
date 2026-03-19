@@ -18,18 +18,21 @@ const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }:
       label: "Total Vehicles",
       value: vehicleCount,
       bg: "bg-primary/10",
+      href: "/dashboard?tab=vehicle",
     },
     {
       icon: <FileText className="w-5 h-5 text-emerald-600" />,
       label: "Active Policies",
       value: policyCount,
       bg: "bg-emerald-50",
+      href: "/dashboard?tab=policies",
     },
     {
       icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
       label: "Expiring Soon",
       value: expiringSoonCount,
       bg: "bg-amber-50",
+      href: "/dashboard?tab=policies",
     },
   ];
 
@@ -55,18 +58,17 @@ const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }:
         </p>
         <div className="grid grid-cols-3 gap-4">
           {stats.map((stat, i) => (
-            <Card
-              key={i}
-              className="border border-[#d7e8ee] shadow-sm hover:shadow-md transition-shadow"
-            >
-              <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                <div className={`p-3 rounded-full ${stat.bg}`}>{stat.icon}</div>
-                <p className="text-3xl font-bold text-[#1e3a5f]">
-                  {stat.value ?? 0}
-                </p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-              </CardContent>
-            </Card>
+            <Link key={i} href={stat.href}>
+              <Card className="border border-[#d7e8ee] shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+                <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                  <div className={`p-3 rounded-full ${stat.bg}`}>{stat.icon}</div>
+                  <p className="text-3xl font-bold text-[#1e3a5f]">
+                    {stat.value ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>
@@ -77,33 +79,33 @@ const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }:
           Quick Actions
         </p>
         <Card className="border border-[#d7e8ee] shadow-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="grid sm:grid-cols-2 gap-4">
               <Button
                 asChild
                 size="lg"
-                className="w-full text-white justify-between"
+                className="w-full text-white justify-between whitespace-normal h-auto py-3"
               >
                 <Link href="/cover-type">
                   <span className="flex items-center gap-2">
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 shrink-0" />
                     Insure a New Vehicle
                   </span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full justify-between border-primary text-primary hover:bg-primary/5"
+                className="w-full justify-between border-primary text-primary hover:bg-primary/5 whitespace-normal h-auto py-3"
               >
                 <Link href="/dashboard?tab=policies">
                   <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
+                    <FileText className="w-4 h-4 shrink-0" />
                     View My Policies
                   </span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </Link>
               </Button>
             </div>
