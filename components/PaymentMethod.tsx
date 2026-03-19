@@ -250,11 +250,11 @@ const PaymentMethod = ({ token }: Props) => {
               </Card>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handlePay}
                 disabled={isLoading}
-                className="flex-1 text-white hover:cursor-pointer"
+                className="w-full sm:flex-1 text-white hover:cursor-pointer"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Send Payment Request
@@ -263,7 +263,7 @@ const PaymentMethod = ({ token }: Props) => {
                 variant="outline"
                 onClick={handleConfirmPayment}
                 disabled={!confirmationData?.payment_reference || isLoading}
-                className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
+                className="w-full sm:flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Confirm Payment
