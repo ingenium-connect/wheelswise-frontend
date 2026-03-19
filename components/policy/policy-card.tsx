@@ -53,7 +53,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const todayMidnight = new Date(new Date().setHours(0, 0, 0, 0));
   const startDateIsValid = startDate >= todayMidnight;
 
-  const statusBadge = isCancelled ? (
+  const primaryBadge = isCancelled ? (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-full">
       <XCircle className="w-3.5 h-3.5" />
       Cancelled
@@ -68,11 +68,6 @@ export const PolicyCard = ({ policy, token }: Props) => {
       <AlertTriangle className="w-3.5 h-3.5" />
       Expired
     </span>
-  ) : isExpiringSoon ? (
-    <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-      <AlertTriangle className="w-3.5 h-3.5" />
-      Expiring Soon
-    </span>
   ) : isActive ? (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -85,15 +80,27 @@ export const PolicyCard = ({ policy, token }: Props) => {
     </span>
   );
 
+  const statusBadge = (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {primaryBadge}
+      {isExpiringSoon && (
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+          <AlertTriangle className="w-3.5 h-3.5" />
+          Expiring Soon
+        </span>
+      )}
+    </div>
+  );
+
   const statusBarColor = isCancelled
     ? "bg-gray-300"
     : isPendingPayment
       ? "bg-blue-400"
       : isExpired
         ? "bg-red-500"
-        : isExpiringSoon
-          ? "bg-amber-400"
-          : "bg-emerald-500";
+        : isActive
+          ? "bg-emerald-500"
+          : "bg-amber-400";
 
   const policyNumberDisplay = policy.policy_number ?? "—";
   const certDisplay = policy.certno ?? "—";
@@ -146,8 +153,8 @@ export const PolicyCard = ({ policy, token }: Props) => {
         {/* Header */}
         <div className="mb-5 space-y-3">
           {/* Row 1: vehicle info + days badge */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
@@ -160,49 +167,47 @@ export const PolicyCard = ({ policy, token }: Props) => {
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0">
-              <Clock className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0 self-start">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
               {policy.days} days
             </span>
           </div>
 
-          {/* Row 2: status badge + action button */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="shrink-0">{statusBadge}</div>
-            <div className="flex items-center gap-2 shrink-0">
-              {isPendingPayment && (
-                <Button
-                  size="sm"
-                  disabled={!startDateIsValid || completingPayment}
-                  onClick={
-                    startDateIsValid
-                      ? handleCompletePayment
-                      : () => setCalendarOpen(true)
-                  }
-                  title={
-                    !startDateIsValid
-                      ? "Update start date before proceeding"
-                      : undefined
-                  }
-                  className="text-white text-xs"
-                >
-                  {completingPayment && (
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  )}
-                  Complete Payment
-                </Button>
-              )}
+          {/* Row 2: status badges + action buttons — all wrap freely */}
+          <div className="flex flex-wrap items-center gap-2">
+            {statusBadge}
+            {isPendingPayment && (
               <Button
-                variant="outline"
                 size="sm"
-                className="border-primary text-primary hover:bg-primary/5 text-xs"
-                asChild
+                disabled={!startDateIsValid || completingPayment}
+                onClick={
+                  startDateIsValid
+                    ? handleCompletePayment
+                    : () => setCalendarOpen(true)
+                }
+                title={
+                  !startDateIsValid
+                    ? "Update start date before proceeding"
+                    : undefined
+                }
+                className="text-white text-xs shrink-0"
               >
-                <Link href={`/dashboard/policy/${policy.id}`}>
-                  View Details
-                </Link>
+                {completingPayment && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
+                Complete Payment
               </Button>
-            </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
+              asChild
+            >
+              <Link href={`/dashboard/policy/${policy.id}`}>
+                View Details
+              </Link>
+            </Button>
           </div>
         </div>
 

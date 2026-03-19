@@ -7,7 +7,7 @@ import type { ApplicableExcess, ProductBenefit } from "@/types/data";
 const INITIAL_VISIBLE = 3;
 
 const pill =
-  "text-[11px] font-medium bg-[#f0f6f9] text-[#1e3a5f] border border-[#d7e8ee] px-2 py-0.5 rounded-full whitespace-nowrap";
+  "text-[11px] font-medium bg-[#f0f6f9] text-[#1e3a5f] border border-[#d7e8ee] px-2 py-0.5 rounded-full";
 
 function ToggleButton({
   expanded,
@@ -47,7 +47,7 @@ function BenefitRow({ benefit }: { benefit: ProductBenefit }) {
   const hasDescription = !!benefit.description?.trim();
 
   return (
-    <div className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 py-3 first:pt-0 last:pb-0">
       <div className="flex items-start gap-2.5 min-w-0">
         <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -57,7 +57,7 @@ function BenefitRow({ benefit }: { benefit: ProductBenefit }) {
         </p>
       </div>
 
-      <div className="flex-shrink-0 flex flex-wrap justify-end gap-1.5">
+      <div className="flex flex-wrap gap-1.5 pl-7 sm:pl-0 sm:flex-shrink-0 sm:justify-end">
         {hasLimits
           ? benefit.limits!.map((limit, i) => (
               <span key={i} className={pill}>

@@ -99,7 +99,7 @@ export function CancelCertificateButton({ policyId }: { policyId: string }) {
     <>
       <Button
         variant="outline"
-        className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 gap-2"
+        className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 gap-2 shrink-0"
         onClick={() => setOpen(true)}
       >
         <XCircle className="w-4 h-4" />

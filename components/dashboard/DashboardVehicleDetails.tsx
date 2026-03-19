@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
-import { axiosClient, axiosAuthClient } from "@/utilities/axios-client";
+import { axiosClient } from "@/utilities/axios-client";
 import { toast } from "sonner";
 import { Car, Loader2 } from "lucide-react";
 
@@ -34,6 +34,8 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [isFieldsDisabled, setIsFieldsDisabled] = useState(false);
   const [seatingCapacity, setSeatingCapacity] = useState("");
+  const [vehicleValue, setVehicleValue] = useState("");
+  const [tonnage, setTonnage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -91,6 +93,11 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       vehiclePurpose: vehicle.purpose || "",
       vehiclePurposeCategory: "",
     });
+
+    const seats = vehicle.passengerCapacity || vehicle.seatingCapacity;
+    if (seats) {
+      setSeatingCapacity(seats.toString());
+    }
 
     setIsFieldsDisabled(true);
   }, [modelMakeMap]);
@@ -162,8 +169,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
         engine_number: form.engineNumber?.trim() || undefined,
         body_type: form.bodyType.trim(),
-        vehicle_value: null,
+        vehicle_value: vehicleValue ? Number(vehicleValue) : null,
         seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
+        tonnage: tonnage ? Number(tonnage) : null,
         vehicle_type: "PRIVATE",
         year_of_manufacture: Number(form.year),
         purpose: form.vehiclePurpose?.trim() || undefined,
@@ -172,7 +180,16 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
     };
 
     try {
-      await axiosAuthClient.post("/vehicle/new", payload);
+      await fetch("/api/vehicle/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).then(async (res) => {
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.error ?? "Failed to save vehicle");
+        }
+      });
       sessionStorage.removeItem("dashboard-vehicle-search");
       toast.success("Vehicle saved successfully.");
       router.push("/dashboard?tab=vehicle");
@@ -398,6 +415,42 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                     placeholder="e.g. 5"
                   />
                 </Field>
+              </div>
+            </div>
+
+            {/* Valuation */}
+            <div className="border-t border-[#d7e8ee] pt-5">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                Valuation
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="vehicleValue">
+                    Vehicle Value (KES)
+                  </FieldLabel>
+                  <Input
+                    id="vehicleValue"
+                    type="number"
+                    min={0}
+                    value={vehicleValue}
+                    onChange={(e) => setVehicleValue(e.target.value)}
+                    placeholder="e.g. 1500000"
+                  />
+                </Field>
+                {form.vehiclePurpose.toUpperCase() === "COMMERCIAL" && (
+                  <Field>
+                    <FieldLabel htmlFor="tonnage">Tonnage</FieldLabel>
+                    <Input
+                      id="tonnage"
+                      type="number"
+                      min={0}
+                      step="0.1"
+                      value={tonnage}
+                      onChange={(e) => setTonnage(e.target.value)}
+                      placeholder="e.g. 3.5"
+                    />
+                  </Field>
+                )}
               </div>
             </div>
 

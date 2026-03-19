@@ -155,14 +155,7 @@ export default async function PolicyDetailPage({
             className: "text-red-700 bg-red-50 border-red-200",
             barColor: "bg-red-500",
           }
-        : isExpiringSoon
-          ? {
-              label: "Expiring Soon",
-              icon: AlertTriangle,
-              className: "text-amber-700 bg-amber-50 border-amber-200",
-              barColor: "bg-amber-400",
-            }
-          : isActive
+        : isActive
             ? {
                 label: "Active",
                 icon: CheckCircle2,
@@ -194,8 +187,8 @@ export default async function PolicyDetailPage({
       {/* Hero header */}
       <div className="px-4 md:px-8 pt-4 pb-6 max-w-4xl mx-auto">
         <div className="bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74] rounded-2xl px-6 md:px-10 py-8 shadow-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
+          <div className="flex flex-col gap-4">
+            <div className="min-w-0">
               <p className="text-white/60 text-xs uppercase tracking-widest mb-1">
                 {policy.policy_type.replace("_", " ")} Insurance
               </p>
@@ -211,13 +204,19 @@ export default async function PolicyDetailPage({
                 {or(policy.vehicle_details.registration_number, "No Registration")}
               </p>
             </div>
-            <div className="self-start sm:self-center flex flex-col items-end gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <span
                 className={`inline-flex items-center gap-1.5 text-sm font-medium border px-3 py-1.5 rounded-full ${statusConfig.className}`}
               >
                 <StatusIcon className="w-4 h-4" />
                 {statusConfig.label}
               </span>
+              {isExpiringSoon && (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium border px-3 py-1.5 rounded-full text-amber-700 bg-amber-50 border-amber-200">
+                  <AlertTriangle className="w-4 h-4" />
+                  Expiring Soon
+                </span>
+              )}
               {isPendingPayment && (
                 <CompletePaymentButton policyId={policy.id} token={token} />
               )}
