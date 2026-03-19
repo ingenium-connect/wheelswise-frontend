@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { axiosAuthClient } from "@/utilities/axios-client";
+import { axiosClient } from "@/utilities/axios-client";
+import { parseCookies } from "nookies";
+import { ACCESS_TOKEN } from "@/utilities/constants";
+import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
+import { useOtp } from "@/hooks/useOtp";
+import { useUserStore } from "@/stores/userStore";
 import { toast } from "sonner";
+import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 
 const CANCEL_REASONS = [
   {
@@ -57,26 +67,111 @@ const CANCEL_REASONS = [
   { value: "MOTOR_VEHICLE_WAS_STOLEN", label: "Motor vehicle was stolen" },
 ] as const;
 
-const CONFIRM_WORD = "delete";
-
 export function CancelCertificateButton({ policyId }: { policyId: string }) {
   const router = useRouter();
+  const { profile } = useUserStore();
+  const { sendOtp, timeUntilResend } = useOtp();
+
   const [open, setOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const [confirmText, setConfirmText] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const confirmed = confirmText === CONFIRM_WORD;
-  const canSubmit = confirmed && !!cancelReason && !loading;
+  // Resend timer
+  const [timer, setTimer] = useState(60);
+  const [allowResend, setAllowResend] = useState(false);
+
+  const nationalId = profile?.id_number ?? "";
+
+  // Countdown timer
+  useEffect(() => {
+    if (!open) return;
+    if (timer === 0) {
+      setAllowResend(true);
+      return;
+    }
+    const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+    return () => clearInterval(interval);
+  }, [timer, open]);
+
+  // Auto-send OTP when dialog opens
+  useEffect(() => {
+    if (!open || !nationalId) return;
+    setTimer(60);
+    setAllowResend(false);
+    sendOtp(nationalId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const handleResend = () => {
+    setAllowResend(false);
+    (async () => {
+      try {
+        const res = await sendOtp(nationalId);
+        if (res.ok) {
+          setTimer(Math.ceil(OTP_RESEND_WINDOW_MS / 1000));
+        } else if (res.reason === "recently-sent") {
+          toast.success("OTP already sent recently");
+          const until = timeUntilResend(nationalId);
+          setTimer(Math.ceil(until / 1000));
+        }
+      } catch {
+        toast.error("Failed to resend OTP. Please try again.");
+        setAllowResend(true);
+      }
+    })();
+  };
+
+  const canSubmit = otpVerified && !!cancelReason && !loading;
+
+  const verifyOtp = async (code: string) => {
+    setVerifying(true);
+    setOtpError("");
+    try {
+      const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, {
+        user_id: profile?.id ?? "",
+        otp: code,
+        user_type: "CUSTOMER",
+      });
+      if (res?.data) {
+        setOtpVerified(true);
+      } else {
+        setOtpVerified(false);
+        setOtpError("Invalid OTP. Please try again.");
+      }
+    } catch {
+      setOtpVerified(false);
+      setOtpError("Invalid or expired OTP. Please try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleOtpChange = (val: string) => {
+    setOtp(val);
+    setOtpVerified(false);
+    if (otpError) setOtpError("");
+    if (val.length === 6) {
+      verifyOtp(val);
+    }
+  };
 
   const handleCancel = async () => {
     if (!canSubmit) return;
     setLoading(true);
     try {
-      await axiosAuthClient.post("/policy/cancel-certificate", {
-        policy_id: policyId,
-        cancel_reason: cancelReason,
-      });
+      const token = parseCookies()[ACCESS_TOKEN];
+      await axiosClient.post(
+        "/policy/cancel-certificate",
+        { policy_id: policyId, cancel_reason: cancelReason },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: false,
+        },
+      );
       toast.success("Certificate cancelled successfully.");
       setOpen(false);
       router.refresh();
@@ -90,7 +185,12 @@ export function CancelCertificateButton({ policyId }: { policyId: string }) {
   const handleOpenChange = (next: boolean) => {
     if (!next) {
       setCancelReason("");
-      setConfirmText("");
+      setOtp("");
+      setOtpError("");
+      setOtpVerified(false);
+      setVerifying(false);
+      setTimer(60);
+      setAllowResend(false);
     }
     setOpen(next);
   };
@@ -142,19 +242,50 @@ export function CancelCertificateButton({ policyId }: { policyId: string }) {
             </Field>
 
             <Field>
-              <FieldLabel>
-                Type{" "}
-                <span className="font-mono font-bold text-red-600">
-                  {CONFIRM_WORD}
-                </span>{" "}
-                to confirm
-              </FieldLabel>
-              <Input
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder={CONFIRM_WORD}
-                autoComplete="off"
-              />
+              <FieldLabel>Enter the OTP sent to your phone</FieldLabel>
+              <div className="flex justify-center pt-1">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={handleOtpChange}
+                  disabled={verifying || otpVerified}
+                >
+                  <InputOTPGroup>
+                    {[0, 1, 2].map((i) => (
+                      <InputOTPSlot key={i} index={i} />
+                    ))}
+                  </InputOTPGroup>
+                  <InputOTPGroup>
+                    {[3, 4, 5].map((i) => (
+                      <InputOTPSlot key={i} index={i} />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              {verifying && (
+                <p className="text-center text-sm text-muted-foreground mt-2">Verifying…</p>
+              )}
+              {otpVerified && (
+                <p className="text-center text-sm text-emerald-600 font-medium mt-2">OTP verified</p>
+              )}
+              {otpError && (
+                <p className="text-center text-red-600 text-sm mt-2">{otpError}</p>
+              )}
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                {allowResend ? (
+                  <>
+                    Didn&apos;t receive a code?{" "}
+                    <span
+                      className="text-primary font-medium cursor-pointer hover:underline"
+                      onClick={handleResend}
+                    >
+                      Resend
+                    </span>
+                  </>
+                ) : (
+                  <>Resend in {timer}s</>
+                )}
+              </p>
             </Field>
 
             <div className="flex gap-3 pt-1">
