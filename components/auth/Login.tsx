@@ -35,12 +35,14 @@ import { setCookie } from "nookies";
 import { LoginPayload } from "@/types/data";
 import { ACCESS_TOKEN, EMAIL, NAME, REFRESH_TOKEN, USER_ID } from "@/utilities/constants";
 import { loginFormSchema } from "@/utilities/validation-schemas";
+import { useOtp } from "@/hooks/useOtp";
 
 const formSchema = loginFormSchema;
 
 const Login: React.FC = () => {
   const router = useRouter();
 
+  const { sendOtp } = useOtp();
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
@@ -84,6 +86,23 @@ const Login: React.FC = () => {
       };
       const response = await loginSubmitHandler({ ...payload });
       if (response?.id) {
+        // absent field (Go omitempty) === false
+        const otpVerified = response?.otp_verified === true;
+        const isActive = response?.is_active === true;
+
+        if (!otpVerified) {
+          sessionStorage.setItem("__login_national_id__", values.national_identifier);
+          await sendOtp(values.national_identifier);
+          router.push("/otp-verify?from=login");
+          return;
+        }
+
+        if (!isActive) {
+          setLoginError("Your account has been deactivated. Please contact support.");
+          form.reset();
+          return;
+        }
+
         const userData = {
           [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
           [REFRESH_TOKEN]: response?.auth_credentials?.refreshToken,
@@ -104,6 +123,13 @@ const Login: React.FC = () => {
         toast.success("Successfully logged in!");
         router.push("/dashboard");
       } else {
+        const errorMsg = (response?.error as string) ?? "";
+        if (errorMsg.toLowerCase().includes("not verified")) {
+          sessionStorage.setItem("__login_national_id__", values.national_identifier);
+          await sendOtp(values.national_identifier);
+          router.push("/otp-verify?from=login");
+          return;
+        }
         setLoginError(extractApiError(response));
       }
       form.reset();

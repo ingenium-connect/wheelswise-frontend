@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, FormEvent, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
 
 import {
@@ -27,6 +27,12 @@ const OtpVerify: React.FC = () => {
   const { sendOtp, timeUntilResend } = useOtp();
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isLoginFlow = searchParams.get("from") === "login";
+  const loginNationalId = isLoginFlow
+    ? (typeof window !== "undefined" ? sessionStorage.getItem("__login_national_id__") ?? "" : "")
+    : "";
+
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,15 +58,16 @@ const OtpVerify: React.FC = () => {
   }, [timer]);
 
   const resendOtp = () => {
+    const nationalId = isLoginFlow ? loginNationalId : personalDetails.idNumber;
     setAllowResend(false);
     (async () => {
       try {
-        const res = await sendOtp(personalDetails.idNumber);
+        const res = await sendOtp(nationalId);
         if (res.ok) {
           setTimer(Math.ceil(OTP_RESEND_WINDOW_MS / 1000));
         } else if (res.reason === "recently-sent") {
           toast.success("OTP already sent recently");
-          const until = timeUntilResend(personalDetails.idNumber);
+          const until = timeUntilResend(nationalId);
           setTimer(Math.ceil(until / 1000));
         }
       } catch (err) {
@@ -88,11 +95,9 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
-      const payload = {
-        user_id: profile?.id ?? "",
-        otp: otp,
-        user_type: "CUSTOMER",
-      };
+      const payload = isLoginFlow
+        ? { national_id: loginNationalId, otp, user_type: "CUSTOMER" }
+        : { user_id: profile?.id ?? "", otp, user_type: "CUSTOMER" };
 
       const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
 
@@ -100,8 +105,13 @@ const OtpVerify: React.FC = () => {
 
       if (data) {
         toast.success("OTP successfully verified");
-        router.push("/dashboard/payment-summary");
-        router.refresh();
+        if (isLoginFlow) {
+          sessionStorage.removeItem("__login_national_id__");
+          router.push("/login");
+        } else {
+          router.push("/dashboard/payment-summary");
+          router.refresh();
+        }
       } else {
         retryOtp();
       }
