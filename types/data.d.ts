@@ -99,6 +99,7 @@ export type MotorSubTypeItem = {
     id: string;
     type: string;
     underwriter_name: string;
+    underwriter?: { id: string; name: string; [key: string]: unknown };
     name: string;
     description: string;
     period: any;

@@ -323,7 +323,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                       <div className="flex items-start gap-1.5 mt-1">
                         <Building2 className="w-3 h-3 text-white/50 shrink-0 mt-0.5" />
                         <p className="text-xs text-white/60">
-                          {product?.underwriter_name ?? "—"}
+                          {product?.underwriter?.name ?? "—"}
                         </p>
                       </div>
                     </div>
