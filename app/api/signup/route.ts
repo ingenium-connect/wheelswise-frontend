@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import {
-  REGISTER_VEHICLE_ENDPOINT,
-  USER_REGISTRATION_ENDPOINT,
-} from "@/utilities/endpoints";
-import { handleRegisterVehicle, postHandler } from "@/utilities/api";
+import { USER_REGISTRATION_ENDPOINT } from "@/utilities/endpoints";
+import { postHandler } from "@/utilities/api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/utilities/constants";
 
 export async function POST(req: Request) {
   try {
-    const { userPayload, vehiclePayload } = await req.json();
+    const { userPayload } = await req.json();
 
     const userResponse = await postHandler(
       USER_REGISTRATION_ENDPOINT,
@@ -25,15 +22,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const vehicleResponse = await handleRegisterVehicle(
-      REGISTER_VEHICLE_ENDPOINT,
-      token,
-      vehiclePayload,
-    );
-
     const response = NextResponse.json({
       user: userResponse,
-      vehicle: vehicleResponse,
     });
 
     // ACCESS_TOKEN: non-httpOnly so client JS can read it for Authorization headers

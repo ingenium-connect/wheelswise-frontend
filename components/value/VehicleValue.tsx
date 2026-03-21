@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
@@ -32,9 +32,20 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const isMotorbike = motorTypeName === "MOTORBIKE";
   const requiresSeating = isCommercial || isPSV || isMotorbike;
 
+  // Track if tonnage was pre-filled from MotorType page (TPO COMMERCIAL)
+  const tonnagePreFilled = useRef(tonnage > 0);
+
   useEffect(() => {
     setCoverStep(2);
-  }, [setCoverStep]);
+    // Clear page values so the user enters them afresh when navigating back
+    setVehicleValue(0);
+    setSeatingCapacity("");
+    // Preserve tonnage if already set from MotorType page (TPO COMMERCIAL flow)
+    if (!tonnage || tonnage <= 0) {
+      setTonnage(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setCoverStep, setVehicleValue, setSeatingCapacity, setTonnage]);
 
   const handleContinue = () => {
     let isValid = true;
@@ -96,7 +107,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                   id="vehicleValue"
                   type="number"
                   placeholder="e.g. 800000"
-                  defaultValue={vehicleValue}
+                  value={vehicleValue || ""}
                   onChange={(e) => setVehicleValue(Number(e.target.value))}
                 />
               </Field>
@@ -130,6 +141,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                     placeholder="e.g. 3"
                     value={tonnage as number}
                     onChange={(e) => setTonnage(Number(e.target.value))}
+                    disabled={tonnagePreFilled.current}
+                    readOnly={tonnagePreFilled.current}
+                    className={tonnagePreFilled.current ? "bg-[#f0f6f9]" : ""}
                   />
                 </Field>
               )}

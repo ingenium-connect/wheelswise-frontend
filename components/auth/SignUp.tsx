@@ -221,11 +221,18 @@ const Signup: React.FC<Props> = ({
         vehicle: vehiclePayload,
       };
       // -------------------------------------
-      // 6. Server action — capture result to persist user_id
+      // 6. Store vehicle payload for registration after OTP
+      // -------------------------------------
+      sessionStorage.setItem(
+        "__pending_vehicle_payload__",
+        JSON.stringify(finalVehiclePayload),
+      );
+
+      // -------------------------------------
+      // 7. Register user
       // -------------------------------------
       const res = await signupAction({
         userPayload: finalUserPayload,
-        vehiclePayload: finalVehiclePayload,
       });
 
       if (res?.user?.id) {
@@ -246,14 +253,11 @@ const Signup: React.FC<Props> = ({
 
   const signupAction = async ({
     userPayload,
-    vehiclePayload,
   }: {
     userPayload: FinalUserPayload;
-    vehiclePayload: FinalVehiclePayload;
   }) => {
     const res = await axios.post("/api/signup", {
       userPayload,
-      vehiclePayload,
     });
 
     return res.data;

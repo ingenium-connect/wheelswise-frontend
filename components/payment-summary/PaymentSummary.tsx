@@ -197,7 +197,9 @@ const PaymentSummary = () => {
   const productName =
     motorSubType?.underwriter_product.name ?? "Insurance Plan";
   const underwriterName =
-    motorSubType?.underwriter_product.underwriter_name ?? "—";
+    motorSubType?.underwriter_product.underwriter_name ||
+    motorSubType?.underwriter_product.underwriter?.name ||
+    "—";
   const coverLabel =
     cover === "COMPREHENSIVE" ? "Comprehensive" : "Third Party";
 

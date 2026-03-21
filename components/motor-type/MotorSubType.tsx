@@ -206,12 +206,18 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
           : ["COMMERCIAL", "PRIME COMMERCIAL VEHICLES"].includes(motorType.name)
             ? `tonnage=${tonnage}`
             : "";
-      API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}&${urlString}`;
+      API_URL = `${BASE_URL}&vehicle_value=${vehicleValue}${urlString ? `&${urlString}` : ""}`;
     }
 
     if (selectedCover === "THIRD_PARTY") {
-      const urlString = `&tpo_category=${tpoCategory}&tonnage=${tonnage}`;
-      API_URL = `${BASE_URL}${urlString}`;
+      const params = `&tpo_category=${tpoCategory}`;
+      const specParam =
+        tpoCategory?.startsWith("COMMERCIAL")
+          ? `&tonnage=${tonnage}`
+          : seating_capacity
+            ? `&seating_capacity=${seating_capacity}`
+            : "";
+      API_URL = `${BASE_URL}${params}${specParam}`;
     }
 
     if (API_URL !== "") {
