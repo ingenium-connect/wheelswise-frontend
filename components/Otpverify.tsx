@@ -12,10 +12,13 @@ import {
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { axiosClient } from "@/utilities/axios-client";
 import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
+import axios from "axios";
 import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 import { useUserStore } from "@/stores/userStore";
+
+const PENDING_VEHICLE_KEY = "__pending_vehicle_payload__";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -78,26 +81,31 @@ const OtpVerify: React.FC = () => {
     })();
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const registerPendingVehicle = async () => {
+    const raw = sessionStorage.getItem(PENDING_VEHICLE_KEY);
+    if (!raw) return;
 
-    if (otp.length < 6) {
-      setError("Please enter all 6 digits.");
-
-      // Trigger shake animation
-      setShake(true);
-      setTimeout(() => setShake(false), 300);
-
-      return;
+    try {
+      await axios.post("/api/vehicle/new", JSON.parse(raw));
+      sessionStorage.removeItem(PENDING_VEHICLE_KEY);
+    } catch (err) {
+      console.error("Vehicle registration failed:", err);
+      toast.error(
+        "Vehicle registration failed. Please try again from the dashboard.",
+      );
     }
+  };
+
+  const verifyOtp = async (otpValue: string) => {
+    if (otpValue.length < 6 || loading) return;
 
     setLoading(true);
     setError("");
 
     try {
       const payload = isLoginFlow
-        ? { national_id: loginNationalId, otp, user_type: "CUSTOMER" }
-        : { user_id: profile?.id ?? "", otp, user_type: "CUSTOMER" };
+        ? { national_id: loginNationalId, otp: otpValue, user_type: "CUSTOMER" }
+        : { user_id: profile?.id ?? "", otp: otpValue, user_type: "CUSTOMER" };
 
       const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
 
@@ -109,6 +117,7 @@ const OtpVerify: React.FC = () => {
           sessionStorage.removeItem("__login_national_id__");
           router.push("/login");
         } else {
+          await registerPendingVehicle();
           router.push("/dashboard/payment-summary");
           router.refresh();
         }
@@ -121,6 +130,27 @@ const OtpVerify: React.FC = () => {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (otp.length < 6) {
+      setError("Please enter all 6 digits.");
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
+      return;
+    }
+
+    await verifyOtp(otp);
+  };
+
+  const handleOtpChange = (val: string) => {
+    setOtp(val);
+    if (error) setError("");
+    if (val.length === 6) {
+      verifyOtp(val);
     }
   };
 
@@ -150,10 +180,7 @@ const OtpVerify: React.FC = () => {
               <InputOTP
                 maxLength={6}
                 value={otp}
-                onChange={(val) => {
-                  setOtp(val);
-                  if (error) setError("");
-                }}
+                onChange={handleOtpChange}
               >
                 <InputOTPGroup>
                   {[0, 1, 2].map((i) => (

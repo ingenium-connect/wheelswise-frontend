@@ -36,9 +36,12 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
 
-  const { setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
+  const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
+  const motorType = useInsuranceStore((s) => s.motorType);
   const { setPersonalDetails } = usePersonalDetailsStore();
   const [seatingCapacity, setSeatingCapacity] = useState("");
+
+  const isCommercial = motorType?.name === "COMMERCIAL";
 
   const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
@@ -620,6 +623,21 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       placeholder="e.g. 5"
                     />
                   </Field>
+                  {isCommercial && tonnage > 0 && (
+                    <Field>
+                      <FieldLabel htmlFor="tonnage">
+                        Tonnage (tonnes)
+                      </FieldLabel>
+                      <Input
+                        id="tonnage"
+                        type="number"
+                        value={tonnage}
+                        disabled
+                        readOnly
+                        className="bg-[#f0f6f9]"
+                      />
+                    </Field>
+                  )}
                 </div>
               </div>
 
