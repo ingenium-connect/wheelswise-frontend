@@ -17,7 +17,7 @@ import { Card, CardContent } from "./ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
-import { Car, Loader2, Search } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Car, Loader2, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
 
@@ -27,7 +27,7 @@ type Props = {
   modelMakeMap: { make: string; models: string[] }[];
 };
 
-type SearchStatus = "idle" | "success" | "error";
+type SearchStatus = "idle" | "success" | "error" | "mismatch";
 
 const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const router = useRouter();
@@ -35,10 +35,13 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const vehicleValue = useInsuranceStore((s) => s.vehicleValue);
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
+  const cover = useInsuranceStore((s) => s.cover);
+  const selectCover = useInsuranceStore((s) => s.selectCover);
+  const resetInsuranceStore = useInsuranceStore((s) => s.reset);
 
-  const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
+  const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity, reset: resetVehicleStore } = useVehicleStore();
   const motorType = useInsuranceStore((s) => s.motorType);
-  const { setPersonalDetails } = usePersonalDetailsStore();
+  const { setPersonalDetails, resetPersonalDetails } = usePersonalDetailsStore();
   const [seatingCapacity, setSeatingCapacity] = useState("");
 
   const isCommercial = motorType?.name === "COMMERCIAL";
@@ -69,6 +72,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     bodyType: "",
     vehiclePurpose: "",
     vehiclePurposeCategory: "",
+    vehicleType: "",
   });
 
   useEffect(() => {
@@ -107,6 +111,33 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const isThirdParty = product_type === "THIRD_PARTY";
 
+  /**
+   * Returns true if the NTSA vehicleType is compatible with the selected motor type.
+   *
+   * NTSA vehicleType values:
+   *   Motor vehicles : "MOTOR", "MOTOR VEHICLE", "MOTORVEHICLE"
+   *   Motorbikes     : "MOTOR CYCLES", "MOTORCYCLE", "MOTORBIKE"
+   *
+   * Motor type → expected category:
+   *   MOTORBIKE  → must be a motorbike type
+   *   All others → must be a motor vehicle type
+   */
+  const vehicleTypeMatchesMotorType = (
+    vehicleType: string,
+    selectedMotorType: string,
+  ): boolean => {
+    const vt = vehicleType.toLowerCase().replace(/[\s-]/g, "");
+    const isMotorbike =
+      vt === "motorcycles" ||
+      vt === "motorcycle" ||
+      vt === "motorbike" ||
+      vt.includes("cycle");
+
+    const selectedIsMotorbike = selectedMotorType.toUpperCase() === "MOTORBIKE";
+
+    return selectedIsMotorbike ? isMotorbike : !isMotorbike;
+  };
+
   const validDetails = () => {
     return (
       (isThirdParty || form.vehicleValue > 0) &&
@@ -118,6 +149,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       form.model &&
       form.year &&
       form.bodyType &&
+      form.vehicleType &&
       form.vehiclePurpose &&
       form.vehiclePurposeCategory
     );
@@ -173,6 +205,34 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         throw new Error("Vehicle not found");
       }
 
+      // 1. Validate vehicleType against selected motor type — checked first
+      const rawVehicleType = vehicle.vehicleType || "";
+
+      if (motor_type && rawVehicleType) {
+        const typeIsValid = vehicleTypeMatchesMotorType(rawVehicleType, motor_type);
+
+        if (!typeIsValid) {
+          const savedCover = cover;
+
+          resetInsuranceStore();
+          resetVehicleStore();
+          resetPersonalDetails();
+
+          if (savedCover) selectCover(savedCover);
+
+          setSearchStatus("mismatch");
+          setSearchMessage(
+            `This vehicle is registered as "${rawVehicleType}" with NTSA, which is not compatible with the selected motor type. Please select the correct motor type to continue.`,
+          );
+          setLoadingSearch(false);
+          setTimeout(() => {
+            router.push(`/motor-type/${product_type}`);
+          }, 4000);
+          return;
+        }
+      }
+
+      // 2. Check vehicle age against cover's allowed YOM range
       const vehicleYear = parseInt(vehicle.yearOfManufacture);
       const maxAgeAllowed = motorSubType?.underwriter_product.yom_range;
 
@@ -190,23 +250,22 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           setTimeout(() => {
             router.back();
           }, 3000);
-          return; // Prevent the form from populating
+          return;
         }
       }
 
-      // 1. Find the Make in your map using case-insensitive search
+      // 3. Find the Make in your map using case-insensitive search
       const matchingMakeEntry = modelMakeMap.find(
         (m) => m.make.toLowerCase() === vehicle.carMake?.toLowerCase(),
       );
 
-      // 2. Determine the correctly cased Make and populate Model list
+      // 4. Determine the correctly cased Make and populate Model list
       const correctlyCasedMake = matchingMakeEntry
         ? matchingMakeEntry.make
         : vehicle.carMake;
 
       const availableModels = matchingMakeEntry ? matchingMakeEntry.models : [];
 
-      // Set the list of models for the dropdown options
       setModels(availableModels);
 
       const correctlyCasedModel =
@@ -214,7 +273,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           (mod) => mod.toLowerCase() === vehicle.carModel?.toLowerCase(),
         ) || vehicle.carModel;
 
-      // 3. Find correctly cased Body Type from your fetched bodyTypes list
+      // 5. Find correctly cased Body Type from your fetched bodyTypes list
       const correctlyCasedBodyType =
         bodyTypes.find(
           (bt) => bt.toLowerCase() === vehicle.bodyType?.toLowerCase(),
@@ -230,13 +289,13 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         engineNumber: vehicle.engineNumber || "",
         vehicleNumber: regNo || "",
         chassisNumber: vehicle.ChassisNo || "",
-        // Ensure the strings match exactly what is in your modelMakeMap
         make: correctlyCasedMake || "",
         model: correctlyCasedModel || "",
         year: vehicle.yearOfManufacture?.toString() || "",
         bodyType: correctlyCasedBodyType || "",
         vehiclePurpose: vehicle.purpose || "",
         vehiclePurposeCategory: "",
+        vehicleType: rawVehicleType,
       }));
 
       const seats = vehicle.passengerCapacity || vehicle.seatingCapacity;
@@ -319,6 +378,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       bodyType: "",
       vehiclePurpose: "",
       vehiclePurposeCategory: "",
+      vehicleType: "",
     });
     setPurposeCategories([]);
   };
@@ -335,6 +395,28 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           <AlertTitle>Vehicle Not Found</AlertTitle>
           <AlertDescription>{searchMessage}</AlertDescription>
         </Alert>
+      )}
+
+      {searchStatus === "mismatch" && (
+        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 flex gap-4">
+          <div className="shrink-0 mt-0.5">
+            <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-amber-900 text-sm">
+              Motor type doesn&apos;t match
+            </p>
+            <p className="text-amber-800 text-sm mt-1 leading-relaxed">
+              {searchMessage}
+            </p>
+            <div className="mt-3 flex items-center gap-2 text-xs text-amber-700">
+              <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+              <span>Taking you back to motor type selection…</span>
+            </div>
+          </div>
+        </div>
       )}
 
       <Card className="w-full border border-[#d7e8ee] shadow-sm overflow-hidden">
@@ -433,6 +515,23 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       placeholder="Chassis Number"
                       required
                       disabled={isFieldsDisabled}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="vehicleType">
+                      Vehicle Type
+                    </FieldLabel>
+                    <Input
+                      id="vehicleType"
+                      name="vehicleType"
+                      type="text"
+                      value={form.vehicleType}
+                      onChange={handleChange}
+                      placeholder="e.g. Motor Vehicle"
+                      required
+                      disabled={isFieldsDisabled && !!form.vehicleType}
+                      readOnly={isFieldsDisabled && !!form.vehicleType}
+                      className={isFieldsDisabled && !!form.vehicleType ? "bg-[#f0f6f9]" : ""}
                     />
                   </Field>
                 </div>

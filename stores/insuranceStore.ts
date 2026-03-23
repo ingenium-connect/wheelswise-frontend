@@ -21,6 +21,7 @@ type InsuranceStoreState = {
   previousCoverStep: () => void;
   setCoverStep: (step: number) => void;
   setTpoOption: (option: TpoOption) => void;
+  reset: () => void;
 };
 
 /**
@@ -50,6 +51,16 @@ const useInsuranceStore = create<InsuranceStoreState>()(
         set((state) => ({ coverStep: state.coverStep - 1 })),
       setCoverStep: (step) => set({ coverStep: step }),
       setTpoOption: (option) => set({ tpoOption: option }),
+      reset: () =>
+        set({
+          cover: null,
+          motorType: null,
+          vehicleValue: 0,
+          motorSubtype: null,
+          selectedAdditionalBenefitIds: [],
+          coverStep: 0,
+          tpoOption: "",
+        }),
     }),
     {
       name: "motor-insurance-details",
