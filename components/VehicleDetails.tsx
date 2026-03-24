@@ -17,9 +17,10 @@ import { Card, CardContent } from "./ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
-import { Car, Loader2, Search } from "lucide-react";
+import { AlertCircle, Car, Loader2, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
+import { AxiosError } from "axios";
 
 type Props = {
   motor_type: string | undefined;
@@ -38,8 +39,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
   const motorType = useInsuranceStore((s) => s.motorType);
-  const { setPersonalDetails } = usePersonalDetailsStore();
+  const { setPersonalDetails, resetPersonalDetails } = usePersonalDetailsStore();
+  const resetVehicleStore = useVehicleStore((s) => s.reset);
   const [seatingCapacity, setSeatingCapacity] = useState("");
+  const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(null);
 
   const isCommercial = motorType?.name === "COMMERCIAL";
 
@@ -151,7 +154,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         `vehicle/search?vehicle_registration_number=${vehicleRegNumber.replace(
           / /g,
           "",
-        )}`,
+        )}&motor_type=${motor_type}`,
       );
 
       const { vehicle, owner, regNo } = res.data;
@@ -262,6 +265,27 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
       toast.success("Vehicle found");
     } catch (error) {
+      // Handle motor type mismatch from backend
+      if (error instanceof AxiosError && error.response?.data?.error) {
+        const errorMessage = error.response.data.error as string;
+
+        // Check if it's a motor type mismatch error
+        if (errorMessage.toLowerCase().includes("motor type") || errorMessage.toLowerCase().includes("please select")) {
+          setMotorTypeMismatch(errorMessage);
+          setLoadingSearch(false);
+
+          // Clear all persisted store data
+          resetVehicleStore();
+          resetPersonalDetails();
+
+          // Give the user time to read the message, then redirect
+          setTimeout(() => {
+            router.push(`/motor-type/${product_type}`);
+          }, 5000);
+          return;
+        }
+      }
+
       reset();
 
       setVehicleDetails({ ntsaRegistered: false });
@@ -330,7 +354,20 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   return (
     <div className="w-full">
-      {searchStatus === "error" && (
+      {motorTypeMismatch && (
+        <Alert className="mb-4 border-amber-300 bg-amber-50 text-amber-900 [&>svg]:text-amber-600">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>{motorTypeMismatch}</p>
+            <p className="text-xs font-medium">
+              Taking you back to select the correct motor type&hellip;
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {searchStatus === "error" && !motorTypeMismatch && (
         <Alert variant="destructive" className="mb-4">
           <AlertTitle>Vehicle Not Found</AlertTitle>
           <AlertDescription>{searchMessage}</AlertDescription>
