@@ -232,11 +232,6 @@ const OtpVerify: React.FC = () => {
                 </span>
               )}
             </p>
-            <p className="text-sm">
-              <span className="text-primary cursor-pointer hover:underline">
-                Verify using Email instead
-              </span>
-            </p>
           </div>
         </div>
       </div>
