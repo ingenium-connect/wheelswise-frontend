@@ -109,24 +109,28 @@ const SelectMotorType = ({ data }: Props) => {
 
   const handleTPO = async (category: string) => {
     const tpoCategory = category as TpoOption;
+    let motorTypeName: string;
     if (tpoCategory === "PRIVATE") {
       setMotorType({ id: "1", name: "PRIVATE", description: "", image_url: "" });
+      motorTypeName = "PRIVATE";
     } else if (tpoCategory === "MOTORBIKE") {
       setMotorType({ id: "3", name: "MOTORBIKE", description: "", image_url: "" });
+      motorTypeName = "MOTORBIKE";
     } else {
       setMotorType({ id: "2", name: "COMMERCIAL", description: "", image_url: "" });
+      motorTypeName = "COMMERCIAL";
     }
     setTpoOption(tpoCategory);
     if (initialProfile && hasAuthToken) {
       const res = await sendOtp(initialProfile.id_number);
       if (res.ok || res.reason === "recently-sent") {
         router.push(
-          `/otp-verify?product_type=${selectedCover}&motor_type=${tpoCategory}`,
+          `/otp-verify?product_type=${selectedCover}&motor_type=${motorTypeName}`,
         );
       }
     } else {
       router.push(
-        `/vehicle-value?product_type=${selectedCover}&motor_type=${tpoCategory}`,
+        `/vehicle-value?product_type=${selectedCover}&motor_type=${motorTypeName}`,
       );
     }
   };
