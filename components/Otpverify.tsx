@@ -36,6 +36,19 @@ const OtpVerify: React.FC = () => {
     ? (typeof window !== "undefined" ? sessionStorage.getItem("__login_national_id__") ?? "" : "")
     : "";
 
+  // Logged-in "new vehicle" flow: has product_type/motor_type params, not login flow,
+  // and no pending vehicle payload (guest signup sets that before OTP)
+  const flowProductType = searchParams.get("product_type");
+  const flowMotorType = searchParams.get("motor_type");
+  const hasPendingVehicle =
+    typeof window !== "undefined" &&
+    !!sessionStorage.getItem(PENDING_VEHICLE_KEY);
+  const isNewVehicleFlow =
+    !isLoginFlow &&
+    !!flowProductType &&
+    !!flowMotorType &&
+    !hasPendingVehicle;
+
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -116,6 +129,11 @@ const OtpVerify: React.FC = () => {
         if (isLoginFlow) {
           sessionStorage.removeItem("__login_national_id__");
           router.push("/login");
+        } else if (isNewVehicleFlow) {
+          // Logged-in user adding a new vehicle — continue to vehicle value
+          router.push(
+            `/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`,
+          );
         } else {
           await registerPendingVehicle();
           router.push("/dashboard/payment-summary");

@@ -15,6 +15,7 @@ import {
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
+import { useUserStore } from "@/stores/userStore";
 import { isAxiosError } from "axios";
 import Image from "next/image";
 
@@ -41,9 +42,12 @@ const methods = [
 
 const PaymentMethod = ({ token }: Props) => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
-  const phoneNumber = usePersonalDetailsStore(
+  const personalPhone = usePersonalDetailsStore(
     (s) => s.personalDetails.phoneNumber,
   );
+  const profilePhone = useUserStore((s) => s.profile?.msisdn);
+  // Logged-in users: prefer profile msisdn; guest flow: use personal details store
+  const phoneNumber = profilePhone || personalPhone || "";
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expiry: "",

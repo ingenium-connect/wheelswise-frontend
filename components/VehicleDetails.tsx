@@ -20,6 +20,8 @@ import { toast } from "sonner";
 import { AlertCircle, Car, Loader2, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
+import { useUserStore } from "@/stores/userStore";
+import { ACCESS_TOKEN } from "@/utilities/constants";
 import { AxiosError } from "axios";
 
 type Props = {
@@ -41,8 +43,22 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const motorType = useInsuranceStore((s) => s.motorType);
   const { setPersonalDetails, resetPersonalDetails } = usePersonalDetailsStore();
   const resetVehicleStore = useVehicleStore((s) => s.reset);
+  const profile = useUserStore((s) => s.profile);
   const [seatingCapacity, setSeatingCapacity] = useState("");
   const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Detect if user is logged in (has auth token cookie + profile)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    try {
+      const cookies = document.cookie.split("; ").map((c) => c.trim());
+      const tokenCookie = cookies.find((c) => c.startsWith(`${ACCESS_TOKEN}=`));
+      setIsAuthenticated(Boolean(tokenCookie && tokenCookie.split("=")[1] && profile));
+    } catch {
+      // ignore
+    }
+  }, [profile]);
 
   const isCommercial = motorType?.name === "COMMERCIAL";
 
@@ -94,10 +110,12 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       return;
     }
     setLoadingCategories(true);
+    const isMotorbike =
+      motorType?.name?.toUpperCase() === "MOTORBIKE" ||
+      motor_type?.toUpperCase() === "MOTORBIKE";
+    const purposeUrl = `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}${isMotorbike ? "&is_motorbike=true" : ""}`;
     axiosClient
-      .get(
-        `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}`,
-      )
+      .get(purposeUrl)
       .then((res) => {
         setPurposeCategories(res.data.categories ?? []);
       })
@@ -106,7 +124,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         toast.error("Could not load purpose categories. Please try again.");
       })
       .finally(() => setLoadingCategories(false));
-  }, [form.vehiclePurpose]);
+  }, [form.vehiclePurpose, motor_type, motorType]);
 
   const isThirdParty = product_type === "THIRD_PARTY";
 
@@ -312,22 +330,71 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // default behaviour: save to store and navigate
+    // Save to store
     setVehicleDetails({ ...form });
     if (seatingCapacity) {
       storeSetSeatingCapacity(seatingCapacity);
     }
 
-    setTimeout(() => {
-      toast.success("Vehicle details saved.", { duration: 2000 });
-      reset();
-      router.push(
-        `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
-      );
-    }, 200);
+    if (isAuthenticated) {
+      // Logged-in user: register vehicle and go to payment summary
+      setSubmitting(true);
+      const ntsaRegistered = useVehicleStore.getState().vehicleDetails.ntsaRegistered;
+      const payload = {
+        source: ntsaRegistered ? "NTSA" : "",
+        vehicle: {
+          chassis_number: form.chassisNumber.trim(),
+          registration_number: form.vehicleNumber.trim(),
+          make: form.make.trim(),
+          model: form.model.trim(),
+          engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
+          engine_number: form.engineNumber?.trim() || undefined,
+          body_type: form.bodyType.trim(),
+          vehicle_value: form.vehicleValue || null,
+          seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
+          tonnage: tonnage || null,
+          vehicle_type: motor_type || "PRIVATE",
+          year_of_manufacture: Number(form.year),
+          purpose: form.vehiclePurpose?.trim() || undefined,
+          purpose_type: form.vehiclePurposeCategory
+            ? Number(form.vehiclePurposeCategory)
+            : null,
+        },
+      };
+
+      try {
+        const res = await fetch("/api/vehicle/new", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.error ?? "Failed to register vehicle");
+        }
+        toast.success("Vehicle registered successfully.");
+        reset();
+        router.push("/dashboard/payment-summary");
+        router.refresh();
+      } catch (err) {
+        console.error("Vehicle registration failed:", err);
+        toast.error("Failed to register vehicle. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      // Guest user: continue to personal details
+      setTimeout(() => {
+        toast.success("Vehicle details saved.", { duration: 2000 });
+        reset();
+        router.push(
+          `/personal-details?product_type=${product_type}&motor_type=${motor_type}`,
+        );
+      }, 200);
+    }
   };
 
   const reset = () => {
@@ -658,6 +725,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       value={seatingCapacity}
                       onChange={(e) => setSeatingCapacity(e.target.value)}
                       placeholder="e.g. 5"
+                      disabled={isFieldsDisabled}
+                      readOnly={isFieldsDisabled}
                     />
                   </Field>
                   {isCommercial && tonnage > 0 && (
@@ -754,9 +823,13 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 <Button
                   type="submit"
                   className="flex-1 text-white"
-                  disabled={!validDetails()}
+                  disabled={!validDetails() || submitting}
                 >
-                  Next
+                  {submitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Next"
+                  )}
                 </Button>
               </div>
             </form>
