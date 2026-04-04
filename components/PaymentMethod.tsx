@@ -140,7 +140,7 @@ const PaymentMethod = ({ token }: Props) => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       toast.success("Payment confirmed!");
-      router.push("/vehicle-policy/payment-success");
+      router.push("/dashboard");
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data?.message ?? "Payment verification failed.");
