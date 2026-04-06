@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Vehicle } from "@/types/data";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { Car, CheckCircle2, ShieldOff } from "lucide-react";
+import { Car, CheckCircle2, Eye, ShieldOff } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   vehicle: Vehicle;
@@ -85,12 +86,26 @@ export function VehicleCard({ vehicle }: Props) {
           />
         </div>
 
-        {/* Action */}
-        {!isInsured && (
-          <Button onClick={handleCarSelection} className="w-full text-white">
-            Insure this Vehicle
-          </Button>
-        )}
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Link
+            href={`/dashboard/vehicle/${encodeURIComponent(registration_number)}`}
+            className="flex-1"
+          >
+            <Button variant="outline" className="w-full gap-1.5">
+              <Eye className="w-4 h-4" />
+              View
+            </Button>
+          </Link>
+          {!isInsured && (
+            <Button
+              onClick={handleCarSelection}
+              className="flex-1 text-white"
+            >
+              Insure this Vehicle
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
