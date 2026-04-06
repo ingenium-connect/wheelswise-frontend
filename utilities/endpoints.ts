@@ -32,6 +32,8 @@ export const SUPPORT_REQUEST_ENDPOINT = "/support/request";
 // POLICY ACTIONS
 export const POLICY_COMPLETE_PURCHASE_ENDPOINT = "/policy/complete-purchase";
 export const POLICY_DETAIL_ENDPOINT = "/policy";
+export const VEHICLE_DETAIL_ENDPOINT = "/vehicle";
+export const FILE_UPLOAD_ENDPOINT = "/file-upload";
 export const ACCOUNT_RESET_ENDPOINT = "/account/reset";
 export const ADDITIONAL_BENEFITS_ENDPOINT = "/benefit/additional";
 export const BENEFIT_EXTRAS_ENDPOINT = "/benefit/extras";
