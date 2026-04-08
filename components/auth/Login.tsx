@@ -120,8 +120,16 @@ const Login: React.FC = () => {
           }),
         );
 
+        // Notify the header (and any other listeners) that auth state changed
+        // so UI reflects the logged-in state immediately instead of waiting
+        // for a remount / visibility event.
+        window.dispatchEvent(new Event("auth:changed"));
+
         toast.success("Successfully logged in!");
         router.push("/dashboard");
+        // Invalidate server component cache so /dashboard server fetches
+        // run with the new auth cookie on first render.
+        router.refresh();
       } else {
         const errorMsg = (response?.error as string) ?? "";
         if (errorMsg.toLowerCase().includes("not verified")) {

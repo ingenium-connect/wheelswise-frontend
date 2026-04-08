@@ -16,11 +16,47 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      window.location.href = "/login";
+      forceLogout();
     }
     return Promise.reject(error);
   },
 );
+
+/**
+ * Clears cached client state and redirects to the server logout route.
+ * The server route clears httpOnly auth cookies and sets a
+ * `clear_client_state` cookie that <ClearClientState /> picks up to wipe
+ * persisted Zustand stores on the next page render.
+ */
+function forceLogout() {
+  if (typeof window === "undefined") return;
+  try {
+    // Wipe persisted Zustand stores and any ad-hoc auth-related keys.
+    const keysToClear = [
+      "motor-insurance-details",
+      "vehicle-info-store",
+      "personal-details-store",
+      "user-profile-store",
+      "payment_method_id",
+      "policy_start_date",
+      "vehicleRegistrationNumber",
+    ];
+    keysToClear.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {
+        // ignore quota / access errors
+      }
+    });
+    try {
+      sessionStorage.clear();
+    } catch {
+      // ignore
+    }
+  } finally {
+    window.location.href = "/api/logout";
+  }
+}
 
 /**
  * Pending requests waiting for a token refresh to complete
@@ -40,7 +76,6 @@ function processQueue(newToken: string) {
  */
 const axiosAuthClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -93,7 +128,7 @@ axiosAuthClient.interceptors.response.use(
       return axiosAuthClient(original);
     } catch {
       pendingQueue = [];
-      window.location.href = "/login";
+      forceLogout();
       return Promise.reject(error);
     } finally {
       isRefreshing = false;

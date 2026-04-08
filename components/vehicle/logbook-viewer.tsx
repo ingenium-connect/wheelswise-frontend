@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -27,23 +28,48 @@ import { toast } from "sonner";
 
 const ACCEPTED_TYPES = ".pdf,.jpg,.jpeg,.png";
 
-function getFileType(url: string): "pdf" | "image" {
-  const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
-  if (ext === "pdf") return "pdf";
-  return "image";
+function guessFileTypeFromUrl(url: string): "pdf" | "image" | null {
+  const path = url.split("?")[0].toLowerCase();
+  if (path.endsWith(".pdf")) return "pdf";
+  if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(path)) return "image";
+  return null;
 }
 
 export function LogbookViewer({ url }: { url: string }) {
   const [open, setOpen] = useState(false);
-  const type = getFileType(url);
+  const [type, setType] = useState<"pdf" | "image" | null>(() =>
+    guessFileTypeFromUrl(url),
+  );
+  const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
+
+  // If the URL doesn't expose a recognizable extension, probe the proxy for
+  // the real content-type so we know whether to render a PDF viewer or an image.
+  useEffect(() => {
+    if (type !== null) return;
+    let cancelled = false;
+    fetch(proxiedUrl, { method: "HEAD" })
+      .then((res) => {
+        if (cancelled) return;
+        const ct = res.headers.get("content-type") || "";
+        if (ct.includes("pdf")) setType("pdf");
+        else if (ct.startsWith("image/")) setType("image");
+        else setType("pdf"); // safest default for logbooks
+      })
+      .catch(() => {
+        if (!cancelled) setType("pdf");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [proxiedUrl, type]);
 
   return (
     <div className="flex items-center gap-3">
       <div className="flex-shrink-0 p-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-        {type === "pdf" ? (
-          <FileText className="w-5 h-5 text-emerald-600" />
-        ) : (
+        {type === "image" ? (
           <ImageIcon className="w-5 h-5 text-emerald-600" />
+        ) : (
+          <FileText className="w-5 h-5 text-emerald-600" />
         )}
       </div>
       <div className="min-w-0">
@@ -51,7 +77,7 @@ export function LogbookViewer({ url }: { url: string }) {
           Logbook Available
         </p>
         <p className="text-xs text-muted-foreground">
-          {type === "pdf" ? "PDF document" : "Image file"}
+          {type === "image" ? "Image file" : "PDF document"}
         </p>
       </div>
       <div className="flex items-center gap-2 ml-auto shrink-0">
@@ -65,21 +91,34 @@ export function LogbookViewer({ url }: { url: string }) {
           <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>Vehicle Logbook</DialogTitle>
+              <DialogDescription>
+                Preview of the uploaded vehicle logbook document.
+              </DialogDescription>
             </DialogHeader>
             <div className="mt-2 overflow-auto max-h-[75vh]">
-              {type === "pdf" ? (
-                <iframe
-                  src={url}
-                  className="w-full h-[70vh] rounded-lg border"
-                  title="Logbook PDF"
-                />
-              ) : (
+              {type === null ? (
+                <div className="flex items-center justify-center h-[70vh] rounded-lg border">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : type === "image" ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={url}
+                  src={proxiedUrl}
                   alt="Vehicle logbook"
                   className="w-full h-auto rounded-lg border"
                 />
+              ) : (
+                <object
+                  data={proxiedUrl}
+                  type="application/pdf"
+                  className="w-full h-[70vh] rounded-lg border"
+                >
+                  <iframe
+                    src={proxiedUrl}
+                    className="w-full h-[70vh] rounded-lg border"
+                    title="Logbook PDF"
+                  />
+                </object>
               )}
             </div>
           </DialogContent>
