@@ -1,7 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Phone } from "lucide-react";
 import HeaderAuth from "./HeaderAuth";
+
+const HELPLINE_DISPLAY = "+254 717 227 690";
+const HELPLINE_TEL = "+254717227690";
 
 const NAV_LINKS = [
   { label: "About Us", href: "/about" },
@@ -40,6 +44,16 @@ export default function Header() {
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
+          <a
+            href={`tel:${HELPLINE_TEL}`}
+            aria-label={`Call helpline ${HELPLINE_DISPLAY}`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <Phone className="w-4 h-4" />
+            <span className="hidden sm:inline">
+              Helpline: {HELPLINE_DISPLAY}
+            </span>
+          </a>
           <HeaderAuth />
         </div>
       </div>

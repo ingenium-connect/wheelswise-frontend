@@ -38,8 +38,14 @@ export default function HeaderAuth() {
     const onVisibility = () => {
       if (document.visibilityState === "visible") check();
     };
+    // Re-check when auth state changes in the same tab (login/logout)
+    const onAuthChanged = () => check();
     document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    window.addEventListener("auth:changed", onAuthChanged);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("auth:changed", onAuthChanged);
+    };
   }, []);
 
   // Avoid flicker — render nothing until we know
