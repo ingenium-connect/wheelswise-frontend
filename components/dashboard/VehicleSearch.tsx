@@ -7,12 +7,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
+const MOTOR_TYPES = [
+  { value: "PRIVATE", label: "Private" },
+  { value: "COMMERCIAL", label: "Commercial" },
+  { value: "PSV", label: "PSV (Public Service Vehicle)" },
+  { value: "MOTORBIKE", label: "Motorbike" },
+] as const;
 
 export default function VehicleSearch() {
   const router = useRouter();
   const [reg, setReg] = useState("");
+  const [motorType, setMotorType] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -20,33 +35,29 @@ export default function VehicleSearch() {
     setLoading(true);
     try {
       const res = await axiosClient.get(
-        `vehicle/search?vehicle_registration_number=${reg.replace(/ /g, "")}`,
+        `vehicle/search?vehicle_registration_number=${reg.replace(/ /g, "")}&motor_type=${motorType}`,
       );
       const { vehicle, owner, regNo } = res.data;
+
+      if (!vehicle) {
+        toast.error("Vehicle not found. Please check the registration number and motor type.");
+        return;
+      }
 
       sessionStorage.setItem(
         "dashboard-vehicle-search",
         JSON.stringify({
-          vehicle: vehicle ?? null,
+          vehicle,
           owner: owner ?? null,
           regNo: regNo ?? reg,
+          motorType,
         }),
       );
 
-      if (!vehicle) {
-        toast.info("Vehicle not found. You can enter details manually.");
-      } else {
-        toast.success("Vehicle found");
-      }
-
+      toast.success("Vehicle found");
       router.push("/dashboard/vehicle-details");
     } catch {
-      sessionStorage.setItem(
-        "dashboard-vehicle-search",
-        JSON.stringify({ vehicle: null, owner: null, regNo: reg }),
-      );
-      toast.info("Vehicle not found. You can enter details manually.");
-      router.push("/dashboard/vehicle-details");
+      toast.error("Vehicle not found. Please check the registration number and motor type.");
     } finally {
       setLoading(false);
     }
@@ -85,6 +96,26 @@ export default function VehicleSearch() {
               />
             </Field>
 
+            <Field>
+              <FieldLabel htmlFor="motorType">Motor Type</FieldLabel>
+              <Select
+                value={motorType}
+                onValueChange={setMotorType}
+                required
+              >
+                <SelectTrigger id="motorType">
+                  <SelectValue placeholder="Select motor type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MOTOR_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+
             <div className="flex gap-3">
               <Button
                 type="button"
@@ -97,7 +128,7 @@ export default function VehicleSearch() {
               <Button
                 type="submit"
                 className="flex-1 text-white"
-                disabled={loading || !reg.trim()}
+                disabled={loading || !reg.trim() || !motorType}
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Search Vehicle

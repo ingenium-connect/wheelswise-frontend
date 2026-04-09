@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
-import { axiosClient } from "@/utilities/axios-client";
+import { axiosClient, axiosAuthClient } from "@/utilities/axios-client";
 import { toast } from "sonner";
 import { Car, Loader2 } from "lucide-react";
 
@@ -37,6 +37,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   const [vehicleValue, setVehicleValue] = useState("");
   const [tonnage, setTonnage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [vehicleType, setVehicleType] = useState("PRIVATE");
 
   const [form, setForm] = useState({
     engineCapacity: "",
@@ -60,10 +61,15 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
     const raw = sessionStorage.getItem("dashboard-vehicle-search");
     if (!raw) return;
 
-    const { vehicle, regNo } = JSON.parse(raw) as {
+    const { vehicle, regNo, motorType: savedMotorType } = JSON.parse(raw) as {
       vehicle: Record<string, string> | null;
       regNo: string;
+      motorType?: string;
     };
+
+    if (savedMotorType) {
+      setVehicleType(savedMotorType);
+    }
 
     if (!vehicle) return;
 
@@ -148,7 +154,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       form.year &&
       form.bodyType &&
       form.vehiclePurpose &&
-      form.vehiclePurposeCategory
+      form.vehiclePurposeCategory &&
+      vehicleValue &&
+      Number(vehicleValue) > 0
     );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -172,7 +180,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         vehicle_value: vehicleValue ? Number(vehicleValue) : null,
         seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
         tonnage: tonnage ? Number(tonnage) : null,
-        vehicle_type: "PRIVATE",
+        vehicle_type: vehicleType,
         year_of_manufacture: Number(form.year),
         purpose: form.vehiclePurpose?.trim() || undefined,
         purpose_type: form.vehiclePurposeCategory ? Number(form.vehiclePurposeCategory) : null,
@@ -180,16 +188,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
     };
 
     try {
-      await fetch("/api/vehicle/new", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).then(async (res) => {
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err?.error ?? "Failed to save vehicle");
-        }
-      });
+      await axiosAuthClient.post("vehicle/new", payload);
       sessionStorage.removeItem("dashboard-vehicle-search");
       toast.success("Vehicle saved successfully.");
       router.push("/dashboard?tab=vehicle");
