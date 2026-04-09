@@ -147,6 +147,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
   const isValid = () =>
     !!(
       form.engineCapacity &&
+      form.engineNumber &&
       form.vehicleNumber &&
       form.chassisNumber &&
       form.make &&
@@ -192,6 +193,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       sessionStorage.removeItem("dashboard-vehicle-search");
       toast.success("Vehicle saved successfully.");
       router.push("/dashboard?tab=vehicle");
+      router.refresh();
     } catch {
       toast.error("Failed to save vehicle. Please try again.");
     } finally {
@@ -228,7 +230,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel htmlFor="vehicleNumber">
-                    Vehicle Number
+                    Vehicle Number <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="vehicleNumber"
@@ -243,7 +245,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="chassisNumber">
-                    Chassis Number
+                    Chassis Number <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="chassisNumber"
@@ -265,7 +267,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Field>
-                  <FieldLabel>Make</FieldLabel>
+                  <FieldLabel>Make <span className="text-red-500">*</span></FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.make}
@@ -292,7 +294,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Model</FieldLabel>
+                  <FieldLabel>Model <span className="text-red-500">*</span></FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.model}
@@ -319,7 +321,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Year of Manufacture</FieldLabel>
+                  <FieldLabel>Year of Manufacture <span className="text-red-500">*</span></FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.year}
@@ -349,7 +351,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Body Type</FieldLabel>
+                  <FieldLabel>Body Type <span className="text-red-500">*</span></FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.bodyType}
@@ -377,7 +379,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="engineCapacity">
-                    Engine Capacity
+                    Engine Capacity <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="engineCapacity"
@@ -390,7 +392,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="engineNumber">Engine Number</FieldLabel>
+                  <FieldLabel htmlFor="engineNumber">Engine Number <span className="text-red-500">*</span></FieldLabel>
                   <Input
                     id="engineNumber"
                     name="engineNumber"
@@ -412,6 +414,8 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                     value={seatingCapacity}
                     onChange={(e) => setSeatingCapacity(e.target.value)}
                     placeholder="e.g. 5"
+                    disabled={isFieldsDisabled}
+                    readOnly={isFieldsDisabled}
                   />
                 </Field>
               </div>
@@ -425,7 +429,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Field>
                   <FieldLabel htmlFor="vehicleValue">
-                    Vehicle Value (KES)
+                    Vehicle Value (KES) <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="vehicleValue"
@@ -461,7 +465,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel htmlFor="vehiclePurpose">
-                    Vehicle Purpose
+                    Vehicle Purpose <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="vehiclePurpose"
@@ -475,7 +479,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel>Purpose Category</FieldLabel>
+                  <FieldLabel>Purpose Category <span className="text-red-500">*</span></FieldLabel>
                   <Select
                     onValueChange={(v) =>
                       handleSelectChange("vehiclePurposeCategory", v)

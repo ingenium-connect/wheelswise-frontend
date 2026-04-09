@@ -121,7 +121,7 @@ export default function VehicleSearch() {
                 type="button"
                 variant="outline"
                 className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
-                onClick={() => router.push("/dashboard?tab=vehicle")}
+                onClick={() => { router.push("/dashboard?tab=vehicle"); router.refresh(); }}
               >
                 Cancel
               </Button>
