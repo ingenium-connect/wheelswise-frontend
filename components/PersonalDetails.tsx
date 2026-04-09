@@ -82,7 +82,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+                <FieldLabel htmlFor="firstName">First Name <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="firstName"
                   name="firstName"
@@ -96,7 +96,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+                <FieldLabel htmlFor="lastName">Last Name <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="lastName"
                   name="lastName"
@@ -119,7 +119,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+                <FieldLabel htmlFor="phoneNumber">Phone Number <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="phoneNumber"
                   name="phoneNumber"
@@ -131,7 +131,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="emailAddress">Email Address</FieldLabel>
+                <FieldLabel htmlFor="emailAddress">Email Address <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="emailAddress"
                   name="email"
@@ -152,7 +152,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             </p>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="idNumber">ID Number</FieldLabel>
+                <FieldLabel htmlFor="idNumber">ID Number <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="idNumber"
                   name="idNumber"
@@ -166,7 +166,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="kraPin">KRA PIN</FieldLabel>
+                <FieldLabel htmlFor="kraPin">KRA PIN <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   id="kraPin"
                   name="kraPin"
@@ -192,7 +192,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 text-white">
+            <Button type="submit" className="flex-1 text-white" disabled={!form.email.trim()}>
               Next
             </Button>
           </div>

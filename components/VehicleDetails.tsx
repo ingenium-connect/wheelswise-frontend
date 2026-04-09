@@ -510,7 +510,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehicleNumber">
-                      Vehicle Number
+                      Vehicle Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="vehicleNumber"
@@ -526,7 +526,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="chassisNumber">
-                      Chassis Number
+                      Chassis Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="chassisNumber"
@@ -549,7 +549,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="vehicleMake">Make</FieldLabel>
+                    <FieldLabel htmlFor="vehicleMake">Make <span className="text-red-500">*</span></FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.make}
@@ -576,7 +576,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="vehicleModel">Model</FieldLabel>
+                    <FieldLabel htmlFor="vehicleModel">Model <span className="text-red-500">*</span></FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.model}
@@ -604,7 +604,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="yearOfManufacture">
-                      Year of Manufacture
+                      Year of Manufacture <span className="text-red-500">*</span>
                     </FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
@@ -642,7 +642,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="bodyType">Body Type</FieldLabel>
+                    <FieldLabel htmlFor="bodyType">Body Type <span className="text-red-500">*</span></FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.bodyType}
@@ -670,7 +670,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="engineCapacity">
-                      Engine Capacity
+                      Engine Capacity <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="engineCapacity"
@@ -685,7 +685,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="engineNumber">
-                      Engine Number
+                      Engine Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="engineNumber"
@@ -755,7 +755,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehiclePurpose">
-                      Vehicle Purpose
+                      Vehicle Purpose <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="vehiclePurpose"
@@ -771,7 +771,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="vehiclePurposeCategory">
-                      Purpose Category
+                      Purpose Category <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Select
                       onValueChange={(v) =>
