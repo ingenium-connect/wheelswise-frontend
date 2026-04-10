@@ -250,9 +250,14 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const handleSelect = (product: MotorSubTypeItem) => {
     setVehicleSubType(product);
     setSelectedAdditionalBenefitIds(additionalBenefits.map((b) => b.id));
-    router.push(
-      `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`,
-    );
+
+    // If insuring an existing registered vehicle, skip vehicle-details — it's already known
+    const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
+    if (insuringExisting) {
+      router.push("/dashboard/payment-summary");
+    } else {
+      router.push(`/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`);
+    }
   };
 
   const getYomRange = (range: number) => {

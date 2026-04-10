@@ -179,9 +179,7 @@ export default async function VehicleDetailPage({
       <div className="px-4 md:px-8 pb-12 max-w-4xl mx-auto space-y-5">
         {/* Insure nudge */}
         {!isInsured && (
-          <InsureVehicleButton
-            registrationNumber={vehicle.registration_number}
-          />
+          <InsureVehicleButton vehicle={vehicle} />
         )}
 
         {/* Vehicle Identification */}

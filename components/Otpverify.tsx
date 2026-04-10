@@ -130,10 +130,13 @@ const OtpVerify: React.FC = () => {
           sessionStorage.removeItem("__login_national_id__");
           router.push("/login");
         } else if (isNewVehicleFlow) {
-          // Logged-in user adding a new vehicle — continue to vehicle value
-          router.push(
-            `/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`,
-          );
+          // Logged-in user: if insuring an existing registered vehicle, skip vehicle-value
+          const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
+          if (insuringExisting) {
+            router.push(`/motor-subtype?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+          } else {
+            router.push(`/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+          }
         } else {
           await registerPendingVehicle();
           router.push("/dashboard/payment-summary");
