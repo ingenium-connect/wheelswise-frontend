@@ -85,18 +85,15 @@ export default async function PolicyDetailPage({
   let additionalBenefits: AdditionalBenefit[] = [];
   if (policy.policy_benefits && policy.policy_benefits.length > 0) {
     try {
-      const res = await fetch(
-        `${SERVER_URL}${ADDITIONAL_BENEFITS_ENDPOINT}`,
-        {
-          method: "POST",
-          cache: "no-cache",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ ids: policy.policy_benefits }),
+      const res = await fetch(`${SERVER_URL}${ADDITIONAL_BENEFITS_ENDPOINT}`, {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ ids: policy.policy_benefits }),
+      });
       if (res.ok) {
         additionalBenefits = await res.json();
       }
@@ -125,7 +122,8 @@ export default async function PolicyDetailPage({
     expiryDate && !isNaN(expiryDate.getTime())
       ? expiryDate.getTime() - today.getTime()
       : null;
-  const daysRemaining = timeDiff != null ? Math.ceil(timeDiff / (1000 * 3600 * 24)) : null;
+  const daysRemaining =
+    timeDiff != null ? Math.ceil(timeDiff / (1000 * 3600 * 24)) : null;
   const isExpired = timeDiff != null ? timeDiff <= 0 : false;
   const isExpiringSoon =
     !isExpired && timeDiff != null && timeDiff <= 30 * 24 * 3600 * 1000;
@@ -156,18 +154,18 @@ export default async function PolicyDetailPage({
             barColor: "bg-red-500",
           }
         : isActive
-            ? {
-                label: "Active",
-                icon: CheckCircle2,
-                className: "text-emerald-700 bg-emerald-50 border-emerald-200",
-                barColor: "bg-emerald-500",
-              }
-            : {
-                label: "Pending",
-                icon: Clock,
-                className: "text-amber-700 bg-amber-50 border-amber-200",
-                barColor: "bg-amber-400",
-              };
+          ? {
+              label: "Active",
+              icon: CheckCircle2,
+              className: "text-emerald-700 bg-emerald-50 border-emerald-200",
+              barColor: "bg-emerald-500",
+            }
+          : {
+              label: "Pending",
+              icon: Clock,
+              className: "text-amber-700 bg-amber-50 border-amber-200",
+              barColor: "bg-amber-400",
+            };
 
   const StatusIcon = statusConfig.icon;
 
@@ -201,7 +199,10 @@ export default async function PolicyDetailPage({
                 )}
               </h1>
               <p className="text-white/70 text-sm mt-1">
-                {or(policy.vehicle_details.registration_number, "No Registration")}
+                {or(
+                  policy.vehicle_details.registration_number,
+                  "No Registration",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -233,10 +234,7 @@ export default async function PolicyDetailPage({
         <Section icon={FileText} title="Policy Information">
           <Grid>
             <Detail label="Policy Number" value={policy.policy_number ?? "—"} />
-            <Detail
-              label="Certificate Number"
-              value={policy.certno ?? "—"}
-            />
+            <Detail label="Certificate Number" value={policy.certno ?? "—"} />
             <Detail
               label="Coverage Type"
               value={policy.policy_type.replace("_", " ")}
@@ -245,10 +243,7 @@ export default async function PolicyDetailPage({
               label="Certificate Issued"
               value={policy.certificate_issued ? "Yes" : "No"}
             />
-            <Detail
-              label="Date Created"
-              value={fmt(policy.date_created)}
-            />
+            <Detail label="Date Created" value={fmt(policy.date_created)} />
             {policy.updated_at && (
               <Detail label="Last Updated" value={fmt(policy.updated_at)} />
             )}
@@ -258,14 +253,8 @@ export default async function PolicyDetailPage({
         {/* Coverage Dates */}
         <Section icon={Calendar} title="Coverage Period">
           <Grid>
-            <Detail
-              label="Start Date"
-              value={fmt(policy.start_date)}
-            />
-            <Detail
-              label="End Date"
-              value={fmt(policy.end_date)}
-            />
+            <Detail label="Start Date" value={fmt(policy.start_date)} />
+            <Detail label="End Date" value={fmt(policy.end_date)} />
             {policy.days != null && (
               <Detail label="Duration" value={`${policy.days} days`} />
             )}
@@ -288,10 +277,7 @@ export default async function PolicyDetailPage({
         {/* Premium & Payment */}
         <Section icon={CreditCard} title="Premium & Payment">
           <Grid>
-            <Detail
-              label="Total Premium"
-              value={fmtCurrency(policy.premium)}
-            />
+            <Detail label="Total Premium" value={fmtCurrency(policy.premium)} />
             <Detail
               label="Underwriter Premium"
               value={fmtCurrency(policy.onetime_underwriter_premium)}
@@ -369,10 +355,7 @@ export default async function PolicyDetailPage({
               />
             ) : null}
             {policy.vehicle_details.purpose?.trim() ? (
-              <Detail
-                label="Purpose"
-                value={policy.vehicle_details.purpose}
-              />
+              <Detail label="Purpose" value={policy.vehicle_details.purpose} />
             ) : null}
           </Grid>
         </Section>

@@ -33,7 +33,13 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
-import { ACCESS_TOKEN, EMAIL, NAME, REFRESH_TOKEN, USER_ID } from "@/utilities/constants";
+import {
+  ACCESS_TOKEN,
+  EMAIL,
+  NAME,
+  REFRESH_TOKEN,
+  USER_ID,
+} from "@/utilities/constants";
 import { loginFormSchema } from "@/utilities/validation-schemas";
 import { useOtp } from "@/hooks/useOtp";
 
@@ -58,12 +64,17 @@ const Login: React.FC = () => {
       (response?.error as string) ||
       (response?.message as string) ||
       (response?.detail as string) ||
-      ((response?.non_field_errors as string[])?.[0]);
+      (response?.non_field_errors as string[])?.[0];
 
     if (!raw) return "Something went wrong. Please try again.";
 
     const lower = raw.toLowerCase();
-    if (lower.includes("invalid") || lower.includes("credentials") || lower.includes("incorrect") || lower.includes("wrong password"))
+    if (
+      lower.includes("invalid") ||
+      lower.includes("credentials") ||
+      lower.includes("incorrect") ||
+      lower.includes("wrong password")
+    )
       return "Incorrect ID or password. Please try again.";
     if (lower.includes("not found") || lower.includes("no account"))
       return "No account found with that ID. Please check and try again.";
@@ -91,14 +102,19 @@ const Login: React.FC = () => {
         const isActive = response?.is_active === true;
 
         if (!otpVerified) {
-          sessionStorage.setItem("__login_national_id__", values.national_identifier);
+          sessionStorage.setItem(
+            "__login_national_id__",
+            values.national_identifier,
+          );
           await sendOtp(values.national_identifier);
           router.push("/otp-verify?from=login");
           return;
         }
 
         if (!isActive) {
-          setLoginError("Your account has been deactivated. Please contact support.");
+          setLoginError(
+            "Your account has been deactivated. Please contact support.",
+          );
           form.reset();
           return;
         }
@@ -133,7 +149,10 @@ const Login: React.FC = () => {
       } else {
         const errorMsg = (response?.error as string) ?? "";
         if (errorMsg.toLowerCase().includes("not verified")) {
-          sessionStorage.setItem("__login_national_id__", values.national_identifier);
+          sessionStorage.setItem(
+            "__login_national_id__",
+            values.national_identifier,
+          );
           await sendOtp(values.national_identifier);
           router.push("/otp-verify?from=login");
           return;
@@ -142,7 +161,9 @@ const Login: React.FC = () => {
       }
       form.reset();
     } catch {
-      setLoginError("Network error. Please check your connection and try again.");
+      setLoginError(
+        "Network error. Please check your connection and try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -187,7 +208,10 @@ const Login: React.FC = () => {
                           required
                           autoComplete="national_identifier"
                           {...field}
-                          onChange={(e) => { field.onChange(e); setLoginError(""); }}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setLoginError("");
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

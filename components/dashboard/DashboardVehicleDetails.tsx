@@ -56,12 +56,20 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
     axiosClient
       .get("vehicle/body-type")
       .then((res) => setBodyTypes(res.data))
-      .catch(() => toast.error("Could not load vehicle body types. Please refresh the page."));
+      .catch(() =>
+        toast.error(
+          "Could not load vehicle body types. Please refresh the page.",
+        ),
+      );
 
     const raw = sessionStorage.getItem("dashboard-vehicle-search");
     if (!raw) return;
 
-    const { vehicle, regNo, motorType: savedMotorType } = JSON.parse(raw) as {
+    const {
+      vehicle,
+      regNo,
+      motorType: savedMotorType,
+    } = JSON.parse(raw) as {
       vehicle: Record<string, string> | null;
       regNo: string;
       motorType?: string;
@@ -166,7 +174,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
 
     const ntsaRaw = sessionStorage.getItem("dashboard-vehicle-search");
     const ntsaData = ntsaRaw ? JSON.parse(ntsaRaw) : null;
-    const isNtsa = !!(ntsaData?.vehicle);
+    const isNtsa = !!ntsaData?.vehicle;
 
     const payload = {
       source: isNtsa ? "NTSA" : "",
@@ -175,7 +183,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         registration_number: form.vehicleNumber.trim(),
         make: form.make.trim(),
         model: form.model.trim(),
-        engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
+        engine_capacity: form.engineCapacity
+          ? Number(form.engineCapacity)
+          : null,
         engine_number: form.engineNumber?.trim() || undefined,
         body_type: form.bodyType.trim(),
         vehicle_value: vehicleValue ? Number(vehicleValue) : null,
@@ -184,7 +194,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         vehicle_type: vehicleType,
         year_of_manufacture: Number(form.year),
         purpose: form.vehiclePurpose?.trim() || undefined,
-        purpose_type: form.vehiclePurposeCategory ? Number(form.vehiclePurposeCategory) : null,
+        purpose_type: form.vehiclePurposeCategory
+          ? Number(form.vehiclePurposeCategory)
+          : null,
       },
     };
 
@@ -267,7 +279,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Field>
-                  <FieldLabel>Make <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel>
+                    Make <span className="text-red-500">*</span>
+                  </FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.make}
@@ -294,7 +308,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Model <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel>
+                    Model <span className="text-red-500">*</span>
+                  </FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.model}
@@ -321,7 +337,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Year of Manufacture <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel>
+                    Year of Manufacture <span className="text-red-500">*</span>
+                  </FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.year}
@@ -351,7 +369,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel>Body Type <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel>
+                    Body Type <span className="text-red-500">*</span>
+                  </FieldLabel>
                   {isFieldsDisabled ? (
                     <Input
                       value={form.bodyType}
@@ -392,7 +412,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="engineNumber">Engine Number <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel htmlFor="engineNumber">
+                    Engine Number <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Input
                     id="engineNumber"
                     name="engineNumber"
@@ -479,7 +501,9 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel>Purpose Category <span className="text-red-500">*</span></FieldLabel>
+                  <FieldLabel>
+                    Purpose Category <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Select
                     onValueChange={(v) =>
                       handleSelectChange("vehiclePurposeCategory", v)

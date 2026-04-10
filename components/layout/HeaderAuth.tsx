@@ -57,7 +57,10 @@ export default function HeaderAuth() {
     return (
       <>
         <button
-          onClick={() => { router.push("/dashboard"); router.refresh(); }}
+          onClick={() => {
+            router.push("/dashboard");
+            router.refresh();
+          }}
           className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
         >
           <LayoutDashboard className="w-4 h-4" />
@@ -75,7 +78,10 @@ export default function HeaderAuth() {
           <DropdownMenuContent className="w-52" align="end">
             <DropdownMenuItem asChild>
               <button
-                onClick={() => { router.push("/dashboard?tab=profile"); router.refresh(); }}
+                onClick={() => {
+                  router.push("/dashboard?tab=profile");
+                  router.refresh();
+                }}
                 className="flex items-center gap-2 w-full cursor-pointer font-medium text-[#1e3a5f]"
               >
                 <UserCircle2 className="w-4 h-4 text-primary" />

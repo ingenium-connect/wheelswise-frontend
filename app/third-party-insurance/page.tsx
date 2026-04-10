@@ -271,10 +271,11 @@ export default function ThirdPartyInsurancePage() {
                   <p className="text-sm text-[#334e68] leading-relaxed">
                     In Kenya, Section 4 of the Insurance (Motor Vehicle Third
                     Party Risks) Act (Cap 405) makes it a legal requirement to
-                    have at minimum Third Party bodily injury and property damage
-                    cover before operating a motor vehicle on public roads.
-                    Driving without valid insurance is a criminal offence that
-                    can result in fines, vehicle impoundment, or imprisonment.
+                    have at minimum Third Party bodily injury and property
+                    damage cover before operating a motor vehicle on public
+                    roads. Driving without valid insurance is a criminal offence
+                    that can result in fines, vehicle impoundment, or
+                    imprisonment.
                   </p>
                 </div>
               </div>

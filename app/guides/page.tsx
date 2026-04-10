@@ -63,8 +63,8 @@ export default function GuidesPage() {
             Motor Insurance Guides & Resources
           </h1>
           <p className="text-white/70 text-base mt-4 max-w-xl leading-relaxed">
-            Free, plain-language guides to help Kenyan motorists understand motor
-            insurance — from choosing the right cover to making a claim.
+            Free, plain-language guides to help Kenyan motorists understand
+            motor insurance — from choosing the right cover to making a claim.
           </p>
         </div>
       </div>

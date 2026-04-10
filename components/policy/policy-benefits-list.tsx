@@ -68,7 +68,10 @@ function BenefitRow({ benefit }: { benefit: ProductBenefit }) {
               </span>
             ))
           : hasDescription && (
-              <span className={`${pill} max-w-[160px] truncate`} title={benefit.description}>
+              <span
+                className={`${pill} max-w-[160px] truncate`}
+                title={benefit.description}
+              >
                 {benefit.description}
               </span>
             )}
@@ -77,7 +80,11 @@ function BenefitRow({ benefit }: { benefit: ProductBenefit }) {
   );
 }
 
-export function PolicyBenefitsList({ benefits }: { benefits: ProductBenefit[] }) {
+export function PolicyBenefitsList({
+  benefits,
+}: {
+  benefits: ProductBenefit[];
+}) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? benefits : benefits.slice(0, INITIAL_VISIBLE);
   const hiddenCount = benefits.length - INITIAL_VISIBLE;
@@ -134,7 +141,11 @@ function ExcessRow({ excess }: { excess: ApplicableExcess }) {
   );
 }
 
-export function ApplicableExcessesList({ excesses }: { excesses: ApplicableExcess[] }) {
+export function ApplicableExcessesList({
+  excesses,
+}: {
+  excesses: ApplicableExcess[];
+}) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? excesses : excesses.slice(0, INITIAL_VISIBLE);
   const hiddenCount = excesses.length - INITIAL_VISIBLE;

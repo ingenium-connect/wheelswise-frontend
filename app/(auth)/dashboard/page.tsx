@@ -1,8 +1,4 @@
-import {
-  policyResponse,
-  UserProfile,
-  Vehicle,
-} from "@/types/data";
+import { policyResponse, UserProfile, Vehicle } from "@/types/data";
 import {
   PROFILE_ENDPOINT,
   USER_POLICIES_ENDPOINT,

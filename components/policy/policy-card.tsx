@@ -204,9 +204,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
               className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
               asChild
             >
-              <Link href={`/dashboard/policy/${policy.id}`}>
-                View Details
-              </Link>
+              <Link href={`/dashboard/policy/${policy.id}`}>View Details</Link>
             </Button>
           </div>
         </div>
@@ -267,7 +265,9 @@ export const PolicyCard = ({ policy, token }: Props) => {
                       mode="single"
                       selected={startDate}
                       onSelect={handleDateSelect}
-                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      disabled={(date) =>
+                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                      }
                       initialFocus
                     />
                   </PopoverContent>

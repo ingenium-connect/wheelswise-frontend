@@ -33,7 +33,9 @@ const OtpVerify: React.FC = () => {
   const searchParams = useSearchParams();
   const isLoginFlow = searchParams.get("from") === "login";
   const loginNationalId = isLoginFlow
-    ? (typeof window !== "undefined" ? sessionStorage.getItem("__login_national_id__") ?? "" : "")
+    ? typeof window !== "undefined"
+      ? (sessionStorage.getItem("__login_national_id__") ?? "")
+      : ""
     : "";
 
   // Logged-in "new vehicle" flow: has product_type/motor_type params, not login flow,
@@ -44,10 +46,7 @@ const OtpVerify: React.FC = () => {
     typeof window !== "undefined" &&
     !!sessionStorage.getItem(PENDING_VEHICLE_KEY);
   const isNewVehicleFlow =
-    !isLoginFlow &&
-    !!flowProductType &&
-    !!flowMotorType &&
-    !hasPendingVehicle;
+    !isLoginFlow && !!flowProductType && !!flowMotorType && !hasPendingVehicle;
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +73,11 @@ const OtpVerify: React.FC = () => {
   }, [timer]);
 
   const resendOtp = () => {
-    const nationalId = isLoginFlow ? loginNationalId : personalDetails.idNumber;
+    const nationalId = isLoginFlow
+      ? loginNationalId
+      : personalDetails.secondary_user
+        ? personalDetails.secondary_user.idNumber
+        : personalDetails.user.idNumber;
     setAllowResend(false);
     (async () => {
       try {
@@ -198,11 +201,7 @@ const OtpVerify: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className={`flex justify-center ${shake ? shakeClass : ""}`}>
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={handleOtpChange}
-              >
+              <InputOTP maxLength={6} value={otp} onChange={handleOtpChange}>
                 <InputOTPGroup>
                   {[0, 1, 2].map((i) => (
                     <InputOTPSlot key={i} index={i} />

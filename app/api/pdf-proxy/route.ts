@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
   const remoteUrl = request.nextUrl.searchParams.get("url");
 
   if (!remoteUrl) {
-    return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing url parameter" },
+      { status: 400 },
+    );
   }
 
   let parsed: URL;
@@ -54,7 +57,10 @@ export async function GET(request: NextRequest) {
 
   // Only allow http(s) schemes to avoid SSRF shenanigans.
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    return NextResponse.json({ error: "Unsupported protocol" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Unsupported protocol" },
+      { status: 400 },
+    );
   }
 
   try {
