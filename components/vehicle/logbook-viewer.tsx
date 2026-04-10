@@ -153,7 +153,10 @@ export function LogbookUploadPlaceholder({
     try {
       // Step 1: Upload file
       const formData = new FormData();
-      formData.append("file_name", `${registrationNumber.toLowerCase()}logbook`);
+      formData.append(
+        "file_name",
+        `${registrationNumber.toLowerCase()}logbook`,
+      );
       formData.append("file", file);
 
       const uploadRes = await axiosAuthClient.post(
@@ -166,10 +169,9 @@ export function LogbookUploadPlaceholder({
       if (!mediaURL) throw new Error("Upload failed — no URL returned");
 
       // Step 2: Update vehicle with logbook URL
-      await axiosAuthClient.patch(
-        `${VEHICLE_DETAIL_ENDPOINT}/${vehicleId}`,
-        { logbook_url: mediaURL },
-      );
+      await axiosAuthClient.patch(`${VEHICLE_DETAIL_ENDPOINT}/${vehicleId}`, {
+        logbook_url: mediaURL,
+      });
 
       toast.success("Logbook uploaded successfully");
       router.refresh();

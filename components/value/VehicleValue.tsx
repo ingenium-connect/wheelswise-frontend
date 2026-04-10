@@ -165,7 +165,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
             className="flex-1 text-white"
             onClick={handleContinue}
             disabled={
-              (requiresSeating && (!seating_capacity || Number(seating_capacity) <= 0)) ||
+              (requiresSeating &&
+                (!seating_capacity || Number(seating_capacity) <= 0)) ||
               (isCommercial && (!tonnage || tonnage <= 0))
             }
           >

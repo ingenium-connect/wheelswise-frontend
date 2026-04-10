@@ -17,9 +17,7 @@ export default function ForgotPassword() {
   const { profile } = useUserStore();
 
   const isLoggedIn = !!profile?.id_number;
-  const [nationalId, setNationalId] = useState(
-    profile?.id_number ?? "",
-  );
+  const [nationalId, setNationalId] = useState(profile?.id_number ?? "");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

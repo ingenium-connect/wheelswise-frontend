@@ -286,10 +286,7 @@ export default async function VehicleDetailPage({
                   label="Certificate Issued"
                   value={policy.certificate_issued ? "Yes" : "No"}
                 />
-                <Detail
-                  label="Date Created"
-                  value={fmt(policy.date_created)}
-                />
+                <Detail label="Date Created" value={fmt(policy.date_created)} />
               </Grid>
             </Section>
 
@@ -352,10 +349,7 @@ export default async function VehicleDetailPage({
                   <Detail label="Full Name" value={or(policy.user.name)} />
                   <Detail label="Email" value={or(policy.user.email)} />
                   <Detail label="Phone" value={or(policy.user.msisdn)} />
-                  <Detail
-                    label="ID Number"
-                    value={or(policy.user.id_number)}
-                  />
+                  <Detail label="ID Number" value={or(policy.user.id_number)} />
                   <Detail
                     label="KRA PIN"
                     value={or(policy.user.kra_pin)}

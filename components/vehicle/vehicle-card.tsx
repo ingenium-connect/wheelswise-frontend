@@ -98,10 +98,7 @@ export function VehicleCard({ vehicle }: Props) {
             </Button>
           </Link>
           {!isInsured && (
-            <Button
-              onClick={handleCarSelection}
-              className="flex-1 text-white"
-            >
+            <Button onClick={handleCarSelection} className="flex-1 text-white">
               Insure this Vehicle
             </Button>
           )}

@@ -103,7 +103,7 @@ export function CancelCertificateButton({ policyId }: { policyId: string }) {
     setTimer(60);
     setAllowResend(false);
     sendOtp(nationalId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const handleResend = () => {
@@ -263,13 +263,19 @@ export function CancelCertificateButton({ policyId }: { policyId: string }) {
                 </InputOTP>
               </div>
               {verifying && (
-                <p className="text-center text-sm text-muted-foreground mt-2">Verifying…</p>
+                <p className="text-center text-sm text-muted-foreground mt-2">
+                  Verifying…
+                </p>
               )}
               {otpVerified && (
-                <p className="text-center text-sm text-emerald-600 font-medium mt-2">OTP verified</p>
+                <p className="text-center text-sm text-emerald-600 font-medium mt-2">
+                  OTP verified
+                </p>
               )}
               {otpError && (
-                <p className="text-center text-red-600 text-sm mt-2">{otpError}</p>
+                <p className="text-center text-red-600 text-sm mt-2">
+                  {otpError}
+                </p>
               )}
               <p className="text-center text-sm text-muted-foreground mt-2">
                 {allowResend ? (

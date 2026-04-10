@@ -151,7 +151,8 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
 
     const vehiclePayload: FinalVehiclePayload = {
       source: "",
-      intended_policy_type: cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
+      intended_policy_type:
+        cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
       vehicle: {
         chassis_number: (v.chassisNumber || "").trim(),
         registration_number: (v.vehicleNumber || "").trim(),
@@ -202,7 +203,10 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
       }
     } catch (err) {
       if (isAxiosError(err)) {
-        const msg = err.response?.data?.message || err.response?.data?.error || err.response?.data?.detail;
+        const msg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.response?.data?.detail;
         setError(msg ?? "Vehicle registration failed. Please try again.");
       } else {
         setError("Network error. Please check your connection and try again.");

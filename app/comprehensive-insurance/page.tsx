@@ -55,8 +55,7 @@ const jsonLd = {
         itemOffered: {
           "@type": "Service",
           name: "Private Comprehensive",
-          description:
-            "Comprehensive insurance for private passenger vehicles",
+          description: "Comprehensive insurance for private passenger vehicles",
         },
       },
       {

@@ -319,9 +319,9 @@ export default async function LocationPage({
                   </h3>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  Kenya&apos;s legal minimum insurance for drivers in{" "}
-                  {loc.name}. Covers third-party bodily injury and property
-                  damage at an affordable rate.
+                  Kenya&apos;s legal minimum insurance for drivers in {loc.name}
+                  . Covers third-party bodily injury and property damage at an
+                  affordable rate.
                 </p>
                 <ul className="space-y-2 mb-6">
                   {tpoBenefits.map((item) => (

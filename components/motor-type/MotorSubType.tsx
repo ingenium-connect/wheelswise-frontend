@@ -211,12 +211,11 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
     if (selectedCover === "THIRD_PARTY") {
       const params = `&tpo_category=${tpoCategory}`;
-      const specParam =
-        tpoCategory?.startsWith("COMMERCIAL")
-          ? `&tonnage=${tonnage}`
-          : seating_capacity
-            ? `&seating_capacity=${seating_capacity}`
-            : "";
+      const specParam = tpoCategory?.startsWith("COMMERCIAL")
+        ? `&tonnage=${tonnage}`
+        : seating_capacity
+          ? `&seating_capacity=${seating_capacity}`
+          : "";
       API_URL = `${BASE_URL}${params}${specParam}`;
     }
 
@@ -336,7 +335,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     {product?.premium_amount?.one_time_payment != null && (
                       <div className="text-right shrink-0">
                         <p className="text-lg font-bold text-white">
-                          KES{" "}
+                          KES {/* add loader here */}
                           {product.premium_amount.one_time_payment.toLocaleString()}
                         </p>
                         <p className="text-[10px] text-white/50 uppercase tracking-wide">

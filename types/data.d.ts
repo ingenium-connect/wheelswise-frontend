@@ -171,6 +171,7 @@ export interface FinalUserPayload {
   source: string;
   source_vehicle_reg_number: string;
   user: UserPayload;
+  secondary_user?: UserPayload;
 }
 
 export interface PaymentMethods {
@@ -355,6 +356,16 @@ export type UserProfile = {
 
 export type UIMappedPaymentMethod = PaymentMethod & {
   uiKey: string;
+};
+
+export type PersonalDetails = {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  idNumber: string;
+  kraPin: string;
+  ntsaRegistered?: boolean;
 };
 
 export type TpoOption = "PRIVATE" | "COMMERCIAL" | "MOTORBIKE";

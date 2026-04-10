@@ -32,10 +32,7 @@ export function InsureVehicleButton({
           </p>
         </div>
       </div>
-      <Button
-        onClick={handleClick}
-        className="text-white shrink-0 sm:ml-auto"
-      >
+      <Button onClick={handleClick} className="text-white shrink-0 sm:ml-auto">
         Insure this Vehicle
       </Button>
     </div>

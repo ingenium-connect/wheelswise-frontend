@@ -40,7 +40,9 @@ export default function VehicleSearch() {
       const { vehicle, owner, regNo } = res.data;
 
       if (!vehicle) {
-        toast.error("Vehicle not found. Please check the registration number and motor type.");
+        toast.error(
+          "Vehicle not found. Please check the registration number and motor type.",
+        );
         return;
       }
 
@@ -57,7 +59,9 @@ export default function VehicleSearch() {
       toast.success("Vehicle found");
       router.push("/dashboard/vehicle-details");
     } catch {
-      toast.error("Vehicle not found. Please check the registration number and motor type.");
+      toast.error(
+        "Vehicle not found. Please check the registration number and motor type.",
+      );
     } finally {
       setLoading(false);
     }
@@ -98,11 +102,7 @@ export default function VehicleSearch() {
 
             <Field>
               <FieldLabel htmlFor="motorType">Motor Type</FieldLabel>
-              <Select
-                value={motorType}
-                onValueChange={setMotorType}
-                required
-              >
+              <Select value={motorType} onValueChange={setMotorType} required>
                 <SelectTrigger id="motorType">
                   <SelectValue placeholder="Select motor type" />
                 </SelectTrigger>
@@ -121,7 +121,10 @@ export default function VehicleSearch() {
                 type="button"
                 variant="outline"
                 className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
-                onClick={() => { router.push("/dashboard?tab=vehicle"); router.refresh(); }}
+                onClick={() => {
+                  router.push("/dashboard?tab=vehicle");
+                  router.refresh();
+                }}
               >
                 Cancel
               </Button>

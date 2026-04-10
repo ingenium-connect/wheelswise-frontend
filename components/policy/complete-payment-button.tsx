@@ -32,11 +32,7 @@ export function CompletePaymentButton({ policyId, token }: Props) {
   }
 
   return (
-    <Button
-      onClick={handleComplete}
-      disabled={loading}
-      className="text-white"
-    >
+    <Button onClick={handleComplete} disabled={loading} className="text-white">
       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       Complete Payment
     </Button>
