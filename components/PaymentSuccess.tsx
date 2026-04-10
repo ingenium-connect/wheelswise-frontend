@@ -4,6 +4,11 @@ import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 const PaymentSuccess = () => {
+  // Clean up the existing-vehicle shortcut flag
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("insure_existing_vehicle");
+  }
+
   return (
     <div className="mt-5 sm:mt-[10rem] flex flex-col justify-between">
       {/* Success Message */}

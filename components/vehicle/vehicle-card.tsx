@@ -5,6 +5,8 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { Car, CheckCircle2, Eye, ShieldOff } from "lucide-react";
 import Link from "next/link";
+import { useInsuranceStore } from "@/stores/insuranceStore";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
 type Props = {
   vehicle: Vehicle;
@@ -12,6 +14,8 @@ type Props = {
 
 export function VehicleCard({ vehicle }: Props) {
   const router = useRouter();
+  const setInsuranceVehicleValue = useInsuranceStore((s) => s.setVehicleValue);
+  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } = useVehicleStore();
 
   const {
     make,
@@ -24,13 +28,35 @@ export function VehicleCard({ vehicle }: Props) {
     year_of_manufacture,
     purpose,
     active_policy,
+    chassis_number,
+    engine_capacity,
+    engine_number,
   } = vehicle;
 
   const isInsured = !!active_policy;
 
   const handleCarSelection = () => {
-    // Store the selected date in localStorage
     localStorage.setItem("vehicleRegistrationNumber", registration_number);
+    localStorage.setItem("insure_existing_vehicle", "true");
+
+    // Pre-populate stores so vehicle-value and vehicle-details pages can be skipped
+    setInsuranceVehicleValue(vehicle_value);
+    setVehicleValue(String(vehicle_value));
+    setSeatingCapacity(seating_capacity ? String(seating_capacity) : "");
+    setTonnage(tonnage ?? 0);
+    setVehicleDetails({
+      vehicleNumber: registration_number,
+      vehicleValue: vehicle_value,
+      chassisNumber: chassis_number ?? "",
+      make: make ?? "",
+      model: model ?? "",
+      year: String(year_of_manufacture),
+      bodyType: body_type ?? "",
+      vehiclePurpose: purpose ?? "",
+      engineCapacity: engine_capacity ? String(engine_capacity) : "",
+      engineNumber: engine_number ?? "",
+    });
+
     router.push("/cover-type");
   };
 
