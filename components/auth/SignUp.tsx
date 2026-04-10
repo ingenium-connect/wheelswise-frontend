@@ -23,8 +23,8 @@ import axios, { isAxiosError } from "axios";
 
 interface SignupForm {
   msisdn: string;
-  password: string;
-  confirm_password: string;
+  password: { value: string; valid: boolean };
+  confirm_password: { value: string; valid: boolean };
 }
 
 interface Props extends React.ComponentProps<typeof Card> {
@@ -47,9 +47,9 @@ const Signup: React.FC<Props> = ({
 
   const router = useRouter();
   const [formData, setFormData] = useState<SignupForm>({
-    msisdn: personalDetails.phoneNumber,
-    password: "",
-    confirm_password: "",
+    msisdn: personalDetails.user.phoneNumber,
+    password: { value: "", valid: true },
+    confirm_password: { value: "", valid: true },
   });
   const [isLoading, setIsLoading] = useState(false);
   const [signupError, setSignupError] = useState("");
@@ -59,7 +59,31 @@ const Signup: React.FC<Props> = ({
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (!Object.hasOwn(formData, name)) {
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const validateFormInput = (fieldName: string, value?: string) => {
+    const name = fieldName as keyof SignupForm;
+    if (!Object.hasOwn(formData, fieldName)) {
+      return;
+    }
+    let valid = false;
+    if (name === "password") {
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      valid = passwordRegex.test(formData.password.value);
+    }
+    if (name === "confirm_password") {
+      valid = formData.password.value === value;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: { ...(prev[name] as object), valid: valid },
+    }));
   };
 
   const requiredFields = <T extends object>(obj: T, fields: (keyof T)[]) => {
@@ -82,11 +106,22 @@ const Signup: React.FC<Props> = ({
     // Strip generic prefix added by postHandler
     const msg = raw.replace(/^Failed to fetch data:\s*/i, "").trim();
     const lower = msg.toLowerCase();
-    if (lower.includes("already exists") || lower.includes("already registered") || lower.includes("duplicate"))
+    if (
+      lower.includes("already exists") ||
+      lower.includes("already registered") ||
+      lower.includes("duplicate")
+    )
       return "An account with these details already exists. Please log in instead.";
-    if (lower.includes("phone") && (lower.includes("invalid") || lower.includes("format")))
+    if (
+      lower.includes("phone") &&
+      (lower.includes("invalid") || lower.includes("format"))
+    )
       return "The phone number format is invalid. Please use the format +254XXXXXXXXX.";
-    if (lower.includes("national_id") || lower.includes("id number") || lower.includes("identifier"))
+    if (
+      lower.includes("national_id") ||
+      lower.includes("id number") ||
+      lower.includes("identifier")
+    )
       return "The ID number provided is invalid or already in use.";
     if (lower.includes("password") && lower.includes("short"))
       return "Password must be at least 8 characters.";
@@ -107,7 +142,7 @@ const Signup: React.FC<Props> = ({
       // -------------------------------------
       // 1. Basic form validation
       // -------------------------------------
-      if (!formData.password || formData.password.length < 8) {
+      if (!formData.password.value || formData.password.value.length < 8) {
         throw new Error("Password must be at least 8 characters.");
       }
 
@@ -122,7 +157,7 @@ const Signup: React.FC<Props> = ({
       // -------------------------------------
       // 2. Validate personal details
       // -------------------------------------
-      const missingPersonalFields = requiredFields(personalDetails, [
+      const missingPersonalFields = requiredFields(personalDetails.user, [
         "firstName",
         "lastName",
         "phoneNumber",
@@ -166,17 +201,37 @@ const Signup: React.FC<Props> = ({
       // -------------------------------------
       // 4. Build user payload
       // -------------------------------------
-      const userDetailsPayload = {
-        first_name: personalDetails.firstName.trim(),
-        last_name: personalDetails.lastName.trim(),
-        msisdn: formData.msisdn.trim(),
-        id_number: personalDetails.idNumber.trim(),
-        email: personalDetails.email.trim(),
-        kra_pin: personalDetails.kraPin.trim(),
-        password: formData.password,
-        confirm_password: formData.confirm_password,
-        user_type: "CUSTOMER",
+      const userDetailsPayload: { user: any; secondary_user?: any } = {
+        user: {
+          first_name: personalDetails.user.firstName.trim(),
+          last_name: personalDetails.user.lastName.trim(),
+          msisdn: formData.msisdn.trim(),
+          id_number: personalDetails.user.idNumber.trim(),
+          email: personalDetails.user.email.trim(),
+          kra_pin: personalDetails.user.kraPin.trim(),
+          password: formData.password.value,
+          confirm_password: formData.confirm_password.value,
+          user_type: "CUSTOMER",
+        },
       };
+
+      const secondaryUserPayload = personalDetails.secondary_user
+        ? {
+            first_name: personalDetails.secondary_user.firstName.trim(),
+            last_name: personalDetails.secondary_user.lastName.trim(),
+            msisdn: personalDetails.secondary_user.phoneNumber.trim(),
+            id_number: personalDetails.secondary_user.idNumber.trim(),
+            email: personalDetails.secondary_user.email.trim(),
+            kra_pin: personalDetails.secondary_user.kraPin.trim(),
+            password: formData.password.value,
+            confirm_password: formData.confirm_password.value,
+            user_type: "CUSTOMER",
+          }
+        : undefined;
+
+      if (secondaryUserPayload) {
+        userDetailsPayload["secondary_user"] = secondaryUserPayload;
+      }
 
       // -------------------------------------
       // 5. Build vehicle payload with sanitization
@@ -208,16 +263,17 @@ const Signup: React.FC<Props> = ({
       }
 
       const finalUserPayload: FinalUserPayload = {
-        source: personalDetails.ntsaRegistered ? "NTSA" : "",
-        source_vehicle_reg_number: personalDetails.ntsaRegistered
+        source: personalDetails.user.ntsaRegistered ? "NTSA" : "",
+        source_vehicle_reg_number: personalDetails.user.ntsaRegistered
           ? vehicleDetails.vehicleNumber.trim()
           : "",
-        user: userDetailsPayload,
+        user: userDetailsPayload.user,
       };
 
       const finalVehiclePayload: FinalVehiclePayload = {
         source: vehicleDetails.ntsaRegistered ? "NTSA" : "",
-        intended_policy_type: cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
+        intended_policy_type:
+          cover === "COMPREHENSIVE" ? "COMPREHENSIVE" : "THIRD_PARTY",
         vehicle: vehiclePayload,
       };
       // -------------------------------------
@@ -264,7 +320,7 @@ const Signup: React.FC<Props> = ({
   };
   return (
     <>
-      {personalDetails.phoneNumber ? (
+      {personalDetails.user.phoneNumber ? (
         <Card
           className="border border-[#d7e8ee] shadow-sm overflow-hidden"
           {...props}
@@ -302,8 +358,9 @@ const Signup: React.FC<Props> = ({
                   <Input
                     id="password"
                     name="password"
-                    value={formData.password}
+                    value={formData.password.value}
                     onChange={handleChange}
+                    onBlur={(event) => validateFormInput(event.target.name)}
                     type={showPassword ? "text" : "password"}
                     placeholder="Min. 8 characters"
                     required
@@ -315,6 +372,12 @@ const Signup: React.FC<Props> = ({
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </span>
                 </div>
+                {!formData.password.valid && (
+                  <p className="text-sm text-red-500 italic">
+                    Password must contain a combination of letters, numbers and
+                    atleast one special character
+                  </p>
+                )}
               </Field>
 
               <Field>
@@ -325,10 +388,14 @@ const Signup: React.FC<Props> = ({
                   <Input
                     id="confirm_password"
                     name="confirm_password"
-                    value={formData.confirm_password}
+                    value={formData.confirm_password.value}
                     onChange={handleChange}
+                    onBlur={(event) => {
+                      validateFormInput(event.target.name, event.target.value);
+                    }}
                     type={showConfirm ? "text" : "password"}
                     placeholder="Re-enter password"
+                    className={`border ${formData.confirm_password.valid ? "border-gray-400" : "border-red-500"} rounded !focus:outline-none px-2 w-full h-10`}
                     required
                   />
                   <span

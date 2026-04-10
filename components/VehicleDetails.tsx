@@ -23,6 +23,8 @@ import { useVehicleStore } from "@/stores/vehicleStore";
 import { useUserStore } from "@/stores/userStore";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { AxiosError } from "axios";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Label } from "./ui/label";
 
 type Props = {
   motor_type: string | undefined;
@@ -37,15 +39,24 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const vehicleValue = useInsuranceStore((s) => s.vehicleValue);
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
+  const isCoOwned = useInsuranceStore((s) => s.isCoOwned);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
+  const setIsCoOwned = useInsuranceStore((s) => s.setisCoOwned);
 
-  const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
+  const {
+    tonnage,
+    setVehicleDetails,
+    setSeatingCapacity: storeSetSeatingCapacity,
+  } = useVehicleStore();
   const motorType = useInsuranceStore((s) => s.motorType);
-  const { setPersonalDetails, resetPersonalDetails } = usePersonalDetailsStore();
+  const { setPersonalDetails, resetPersonalDetails } =
+    usePersonalDetailsStore();
   const resetVehicleStore = useVehicleStore((s) => s.reset);
   const profile = useUserStore((s) => s.profile);
   const [seatingCapacity, setSeatingCapacity] = useState("");
-  const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(null);
+  const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
 
   // Detect if user is logged in (has auth token cookie + profile)
@@ -54,7 +65,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     try {
       const cookies = document.cookie.split("; ").map((c) => c.trim());
       const tokenCookie = cookies.find((c) => c.startsWith(`${ACCESS_TOKEN}=`));
-      setIsAuthenticated(Boolean(tokenCookie && tokenCookie.split("=")[1] && profile));
+      setIsAuthenticated(
+        Boolean(tokenCookie && tokenCookie.split("=")[1] && profile),
+      );
     } catch {
       // ignore
     }
@@ -97,7 +110,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         setBodyTypes(res.data);
       })
       .catch(() => {
-        toast.error("Could not load vehicle body types. Please refresh the page.");
+        toast.error(
+          "Could not load vehicle body types. Please refresh the page.",
+        );
       });
 
     setCoverStep(4);
@@ -140,7 +155,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       form.year &&
       form.bodyType &&
       form.vehiclePurpose &&
-      form.vehiclePurposeCategory
+      form.vehiclePurposeCategory &&
+      isCoOwned !== null
     );
   };
 
@@ -206,7 +222,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           setSearchMessage(
             `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`,
           );
-          toast.error("Vehicle too old for this cover", { description: `Maximum allowed age is ${maxAgeAllowed} years.` });
+          toast.error("Vehicle too old for this cover", {
+            description: `Maximum allowed age is ${maxAgeAllowed} years.`,
+          });
           setLoadingSearch(false);
           setTimeout(() => {
             router.back();
@@ -288,7 +306,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         const errorMessage = error.response.data.error as string;
 
         // Check if it's a motor type mismatch error
-        if (errorMessage.toLowerCase().includes("motor type") || errorMessage.toLowerCase().includes("please select")) {
+        if (
+          errorMessage.toLowerCase().includes("motor type") ||
+          errorMessage.toLowerCase().includes("please select")
+        ) {
           setMotorTypeMismatch(errorMessage);
           setLoadingSearch(false);
 
@@ -323,7 +344,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         "Vehicle not found. Please go back and enter a valid vehicle registration number.",
       );
 
-      toast.error("Vehicle not found", { description: "Please enter a valid registration number and try again." });
+      toast.error("Vehicle not found", {
+        description: "Please enter a valid registration number and try again.",
+      });
       console.error(error);
     } finally {
       setLoadingSearch(false);
@@ -342,7 +365,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     if (isAuthenticated) {
       // Logged-in user: register vehicle and go to payment summary
       setSubmitting(true);
-      const ntsaRegistered = useVehicleStore.getState().vehicleDetails.ntsaRegistered;
+      const ntsaRegistered =
+        useVehicleStore.getState().vehicleDetails.ntsaRegistered;
       const payload = {
         source: ntsaRegistered ? "NTSA" : "",
         vehicle: {
@@ -350,7 +374,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           registration_number: form.vehicleNumber.trim(),
           make: form.make.trim(),
           model: form.model.trim(),
-          engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
+          engine_capacity: form.engineCapacity
+            ? Number(form.engineCapacity)
+            : null,
           engine_number: form.engineNumber?.trim() || undefined,
           body_type: form.bodyType.trim(),
           vehicle_value: form.vehicleValue || null,
@@ -771,7 +797,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="vehiclePurposeCategory">
-                      Purpose Category <span className="text-red-500">*</span>
+                      Purpose Category<span className="text-red-500">*</span>
                     </FieldLabel>
                     <Select
                       onValueChange={(v) =>
@@ -807,6 +833,36 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       </SelectContent>
                     </Select>
                   </Field>
+                </div>
+              </div>
+
+              {/* section: ownership */}
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                  Vehicle ownership
+                </p>
+
+                <p>
+                  Is this vehicle co-owned?
+                  <span className="text-red-500">*</span>
+                </p>
+                <div>
+                  <RadioGroup
+                    className="flex gap-4"
+                    onValueChange={(val) => setIsCoOwned(val === "yes")}
+                    defaultValue={
+                      isCoOwned === null ? undefined : isCoOwned ? "yes" : "no"
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem value="yes" id="option-one" />
+                      <Label htmlFor="yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem value="no" id="option-two" />
+                      <Label htmlFor="no">No</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
               </div>
 
