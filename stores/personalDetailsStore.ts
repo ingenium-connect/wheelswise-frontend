@@ -12,20 +12,22 @@ type PersonalDetails = {
 };
 
 type PersonalDetailsState = {
-  personalDetails: PersonalDetails;
+  personalDetails: { user: PersonalDetails; secondary_user?: PersonalDetails };
   setPersonalDetails: (payload: Partial<PersonalDetails>) => void;
   updateField: (field: keyof PersonalDetails, value: string | boolean) => void;
   resetPersonalDetails: () => void;
 };
 
-const initialState: PersonalDetails = {
-  firstName: "",
-  lastName: "",
-  phoneNumber: "",
-  email: "",
-  idNumber: "",
-  kraPin: "",
-  ntsaRegistered: false,
+const initialState: { user: PersonalDetails , secondary_user?: PersonalDetails } = {
+  user: {
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    idNumber: "",
+    kraPin: "",
+    ntsaRegistered: false,
+  },
 };
 
 export const usePersonalDetailsStore = create<PersonalDetailsState>()(

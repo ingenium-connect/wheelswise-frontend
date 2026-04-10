@@ -171,6 +171,7 @@ export interface FinalUserPayload {
   source: string;
   source_vehicle_reg_number: string;
   user: UserPayload;
+  secondary_user?: UserPayload;
 }
 
 export interface PaymentMethods {

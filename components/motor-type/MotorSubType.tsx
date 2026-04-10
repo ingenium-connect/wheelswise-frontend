@@ -337,6 +337,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                       <div className="text-right shrink-0">
                         <p className="text-lg font-bold text-white">
                           KES{" "}
+                          {/* add loader here */}
                           {product.premium_amount.one_time_payment.toLocaleString()}
                         </p>
                         <p className="text-[10px] text-white/50 uppercase tracking-wide">
