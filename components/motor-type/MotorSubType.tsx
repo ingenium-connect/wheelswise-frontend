@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useInsuranceStore } from "@/stores/insuranceStore";
@@ -9,7 +9,10 @@ import {
   MotorSubTypeItem,
   ProductBenefits,
 } from "@/types/data";
-import { POLICY_ENDPOINT } from "@/utilities/endpoints";
+import {
+  POLICY_ENDPOINT,
+  PREMIUM_RECALCULATION_ENDPOINT,
+} from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { axiosClient } from "@/utilities/axios-client";
 import {
@@ -23,6 +26,7 @@ import {
   Building2,
   Clock,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
@@ -177,9 +181,22 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [openBenefits, setOpenBenefits] = useState<Record<string, boolean>>({});
-  const [additionalBenefits, setAdditionalBenefits] = useState<
-    AdditionalBenefit[]
-  >([]);
+
+  // Per-product selected add-ons: { [productId]: AdditionalBenefit[] }
+  const [selectedBenefitsPerProduct, setSelectedBenefitsPerProduct] = useState<
+    Record<string, AdditionalBenefit[]>
+  >({});
+
+  // Per-product recalculated premium: { [productId]: number }
+  const [recalculatedPremiums, setRecalculatedPremiums] = useState<
+    Record<string, number>
+  >({});
+
+  // Per-product recalculation loading state: { [productId]: boolean }
+  const [recalculatingPremium, setRecalculatingPremium] = useState<
+    Record<string, boolean>
+  >({});
+
   const {
     vehicleValue,
     motorType,
@@ -221,7 +238,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
     if (API_URL !== "") {
       axiosClient
-        .post(API_URL, { additional_benefits: additionalBenefits })
+        .post(API_URL, { additional_benefits: [] })
         .then((res) => {
           setSubtypes(res.data.underwriter_products || []);
         })
@@ -236,7 +253,6 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
   }, [
     motorType?.name,
     vehicleValue,
-    additionalBenefits,
     product_type,
     motor_type,
     seating_capacity,
@@ -246,16 +262,76 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     tpoCategory,
   ]);
 
-  const handleSelect = (product: MotorSubTypeItem) => {
-    setVehicleSubType(product);
-    setSelectedAdditionalBenefitIds(additionalBenefits.map((b) => b.id));
+  /**
+   * Calls the premium recalculation API for a specific product and updates
+   * its displayed premium in local state.
+   */
+  const recalculatePremium = useCallback(
+    async (
+      productId: string,
+      productRateId: string | undefined,
+      selectedBenefits: AdditionalBenefit[],
+    ) => {
+      setRecalculatingPremium((prev) => ({ ...prev, [productId]: true }));
+      try {
+        const response = await axiosClient.post(
+          PREMIUM_RECALCULATION_ENDPOINT,
+          {
+            underwriter_product_id: productId,
+            vehicle_value: vehicleValue,
+            product_rate_id: productRateId,
+            additional_benefits: selectedBenefits.map((b) => b.id),
+          },
+        );
+        const data = response.data;
+        // Accept either { premium_amount: { one_time_payment } } or { one_time_payment }
+        const newPremium =
+          data?.premium_amount?.one_time_payment ?? data?.one_time_payment;
+        if (newPremium != null) {
+          setRecalculatedPremiums((prev) => ({
+            ...prev,
+            [productId]: newPremium,
+          }));
+        }
+      } catch {
+        // Silently keep original premium on error
+      } finally {
+        setRecalculatingPremium((prev) => ({ ...prev, [productId]: false }));
+      }
+    },
+    [vehicleValue],
+  );
 
-    // If insuring an existing registered vehicle, skip vehicle-details — it's already known
-    const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
+  const handleSelect = (item: MotorSubTypeItem) => {
+    const product = item.underwriter_product;
+    const recalculated = recalculatedPremiums[product.id];
+
+    // Carry the recalculated premium forward if one exists
+    const itemToStore: MotorSubTypeItem =
+      recalculated != null
+        ? {
+            ...item,
+            underwriter_product: {
+              ...product,
+              premium_amount: { one_time_payment: recalculated },
+            },
+          }
+        : item;
+
+    setVehicleSubType(itemToStore);
+
+    const selectedBenefits = selectedBenefitsPerProduct[product.id] ?? [];
+    setSelectedAdditionalBenefitIds(selectedBenefits.map((b) => b.id));
+
+    const insuringExisting =
+      typeof window !== "undefined" &&
+      localStorage.getItem("insure_existing_vehicle") === "true";
     if (insuringExisting) {
       router.push("/dashboard/payment-summary");
     } else {
-      router.push(`/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`);
+      router.push(
+        `/vehicle-details?product_type=${product_type}&motor_type=${motor_type}`,
+      );
     }
   };
 
@@ -268,18 +344,23 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
     setOpenBenefits((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const addBenefit = (
+  const toggleBenefit = (
     event: React.ChangeEvent<HTMLInputElement>,
     benefit: AdditionalBenefit,
+    productId: string,
+    productRateId: string | undefined,
   ) => {
-    if (additionalBenefits.includes(benefit)) return;
-    if (event.target.checked) {
-      setAdditionalBenefits([...additionalBenefits, benefit]);
-    } else {
-      setAdditionalBenefits(
-        additionalBenefits.filter((item) => item.id !== benefit.id),
-      );
-    }
+    setSelectedBenefitsPerProduct((prev) => {
+      const current = prev[productId] ?? [];
+      const updated = event.target.checked
+        ? [...current, benefit]
+        : current.filter((b) => b.id !== benefit.id);
+
+      // Recalculate premium for this product with the updated benefit selection
+      recalculatePremium(productId, productRateId, updated);
+
+      return { ...prev, [productId]: updated };
+    });
   };
 
   return (
@@ -318,6 +399,13 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
             const hasAdditionalBenefits =
               (product?.additional_benefits?.length ?? 0) > 0;
 
+            const selectedBenefits =
+              selectedBenefitsPerProduct[product?.id] ?? [];
+            const displayPremium =
+              recalculatedPremiums[product?.id] ??
+              product?.premium_amount?.one_time_payment;
+            const isRecalculating = recalculatingPremium[product?.id] ?? false;
+
             return (
               <div
                 key={index}
@@ -337,12 +425,20 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                         </p>
                       </div>
                     </div>
-                    {product?.premium_amount?.one_time_payment != null && (
+                    {displayPremium != null && (
                       <div className="text-right shrink-0">
-                        <p className="text-lg font-bold text-white">
-                          KES {/* add loader here */}
-                          {product.premium_amount.one_time_payment.toLocaleString()}
-                        </p>
+                        {isRecalculating ? (
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Loader2 className="w-4 h-4 text-white/60 animate-spin" />
+                            <p className="text-xs text-white/60">
+                              Recalculating…
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-lg font-bold text-white">
+                            KES {displayPremium.toLocaleString()}
+                          </p>
+                        )}
                         <p className="text-[10px] text-white/50 uppercase tracking-wide">
                           one-time premium
                         </p>
@@ -396,7 +492,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                       </div>
                       <div className="space-y-2">
                         {(product?.additional_benefits ?? []).map((benefit) => {
-                          const isChecked = additionalBenefits.some(
+                          const isChecked = selectedBenefits.some(
                             (b) => b.id === benefit.id,
                           );
                           return (
@@ -413,7 +509,14 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                 name={benefit.id}
                                 type="checkbox"
                                 checked={isChecked}
-                                onChange={(e) => addBenefit(e, benefit)}
+                                onChange={(e) =>
+                                  toggleBenefit(
+                                    e,
+                                    benefit,
+                                    product.id,
+                                    item.product_rate?.id,
+                                  )
+                                }
                                 className="accent-primary cursor-pointer shrink-0"
                               />
                               <div className="flex-1 min-w-0">
@@ -465,6 +568,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     <Button
                       size="lg"
                       onClick={() => handleSelect(item)}
+                      disabled={isRecalculating}
                       className="w-full bg-[#1e3a5f] hover:bg-[#397397] text-white gap-2"
                     >
                       Select Plan <ArrowRight className="w-4 h-4" />

@@ -37,3 +37,5 @@ export const FILE_UPLOAD_ENDPOINT = "/file-upload";
 export const ACCOUNT_RESET_ENDPOINT = "/account/reset";
 export const ADDITIONAL_BENEFITS_ENDPOINT = "/benefit/additional";
 export const BENEFIT_EXTRAS_ENDPOINT = "/benefit/extras";
+export const PREMIUM_RECALCULATION_ENDPOINT =
+  "/underwriter/product-premium-recalculation";
