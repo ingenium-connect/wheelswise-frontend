@@ -279,10 +279,6 @@ export default async function PolicyDetailPage({
           <Grid>
             <Detail label="Total Premium" value={fmtCurrency(policy.premium)} />
             <Detail
-              label="Underwriter Premium"
-              value={fmtCurrency(policy.onetime_underwriter_premium)}
-            />
-            <Detail
               label="Payment Status"
               value={policy.is_paid ? "Paid" : "Unpaid"}
               valueClass={policy.is_paid ? "text-emerald-600" : "text-red-600"}

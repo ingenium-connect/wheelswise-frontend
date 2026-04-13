@@ -122,9 +122,10 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       return;
     }
     setLoadingCategories(true);
+    const isMotorbike = vehicleType.toUpperCase() === "MOTORBIKE";
     axiosClient
       .get(
-        `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}`,
+        `vehicle-purpose-category?vehicle_purpose=${encodeURIComponent(form.vehiclePurpose)}${isMotorbike ? "&is_motorbike=true" : ""}`,
       )
       .then((res) => setPurposeCategories(res.data.categories ?? []))
       .catch(() => {
@@ -132,7 +133,7 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
         toast.error("Could not load purpose categories. Please try again.");
       })
       .finally(() => setLoadingCategories(false));
-  }, [form.vehiclePurpose]);
+  }, [form.vehiclePurpose, vehicleType]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
