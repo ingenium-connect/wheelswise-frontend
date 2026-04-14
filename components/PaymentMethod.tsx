@@ -48,8 +48,9 @@ const methods = [
 
 const PaymentMethod = ({ token }: Props) => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
+  const isCoOwned = useInsuranceStore((state) => state.isCoOwned);
   const personalPhone = usePersonalDetailsStore((s) =>
-    s.personalDetails.secondary_user
+    isCoOwned
       ? s.personalDetails.secondary_user?.phoneNumber
       : s.personalDetails.user.phoneNumber,
   );

@@ -98,7 +98,7 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             <TabsList>
               <TabsTrigger value="owner">Owner</TabsTrigger>
               <TabsTrigger value="proposer" disabled={isCoOwned ? false : true}>
-                Proposer
+                Proposer (Hirer)
               </TabsTrigger>
             </TabsList>
             <TabsContent value="owner">
