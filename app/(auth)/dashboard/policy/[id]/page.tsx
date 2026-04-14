@@ -356,15 +356,28 @@ export default async function PolicyDetailPage({
           </Grid>
         </Section>
 
-        {/* Policyholder */}
+        {/* Policyholder / Proposer (Hirer) */}
         {policy.user && (
-          <Section icon={User} title="Policyholder">
+          <Section icon={User} title={policy.primary_user ? "Proposer (Hirer)" : "Policyholder"}>
             <Grid>
               <Detail label="Full Name" value={or(policy.user.name)} />
               <Detail label="Email" value={or(policy.user.email)} />
               <Detail label="Phone" value={or(policy.user.msisdn)} />
               <Detail label="ID Number" value={or(policy.user.id_number)} />
               <Detail label="KRA PIN" value={or(policy.user.kra_pin)} mono />
+            </Grid>
+          </Section>
+        )}
+
+        {/* Registered Owner (Hire Purchase only) */}
+        {policy.primary_user && (
+          <Section icon={User} title="Registered Owner">
+            <Grid>
+              <Detail label="Full Name" value={or(policy.primary_user.name)} />
+              <Detail label="Email" value={or(policy.primary_user.email)} />
+              <Detail label="Phone" value={or(policy.primary_user.msisdn)} />
+              <Detail label="ID Number" value={or(policy.primary_user.id_number)} />
+              <Detail label="KRA PIN" value={or(policy.primary_user.kra_pin)} mono />
             </Grid>
           </Section>
         )}

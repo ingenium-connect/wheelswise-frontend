@@ -287,6 +287,14 @@ export type InsurancePolicy = {
     email: string;
     kra_pin: string;
   };
+  primary_user?: {
+    id: string;
+    name: string;
+    msisdn: string;
+    id_number: string;
+    email: string;
+    kra_pin: string;
+  };
   payment_method?: {
     id: string;
     description: string;
