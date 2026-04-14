@@ -13,6 +13,7 @@ import { User } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { PersonalDetails as PersonalDetailsType } from "@/types/data";
+import { validateEmail } from "@/utilities/validation-schemas";
 
 type Props = {
   motor_type: string | undefined;
@@ -24,8 +25,6 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
   const router = useRouter();
   const setCoverStep = useInsuranceStore((state) => state.setCoverStep);
   const isCoOwned = useInsuranceStore((state) => state.isCoOwned);
-
-  const isNtsaRegistered = personalDetails.user.ntsaRegistered || false;
 
   const [form, setForm] = useState({
     firstName: personalDetails.user.firstName || "",
@@ -61,10 +60,23 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
     setSecondaryForm({ ...secondaryForm, [e.target.name]: e.target.value });
   };
 
+  /**
+   * checks for required fields
+   */
+  const checkRequiredFields = (): boolean => {
+    if (isCoOwned && personalDetails.secondary_user) {
+      return validateEmail(personalDetails.secondary_user?.email);
+    } else {
+      return validateEmail(personalDetails.user.email);
+    }
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPersonalDetails({ ...form });
     setPersonalDetails({ ...secondaryForm }, "secondary_user");
+
+    if (!checkRequiredFields())
+      return toast.error("Please fill in the required details");
     toast.success("User details saved.", { duration: 2000 });
     setTimeout(() => {
       router.push(
@@ -109,7 +121,6 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
               <PersonalDetailsForm
                 form={form}
                 handleChange={handleChange}
-                handleSubmit={handleSubmit}
                 isCoOwned={true}
                 isOwnerForm={true}
               />
@@ -132,7 +143,6 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
               <PersonalDetailsForm
                 form={secondaryForm}
                 handleChange={handleSecondaryChange}
-                handleSubmit={handleSubmit}
                 isCoOwned={true}
                 isOwnerForm={false}
               />
@@ -156,8 +166,8 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
             <PersonalDetailsForm
               form={form}
               handleChange={handleChange}
-              handleSubmit={handleSubmit}
               isCoOwned={false}
+              isOwnerForm={true}
             />
           </>
         )}
@@ -183,13 +193,11 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
 const PersonalDetailsForm = ({
   form,
   handleChange,
-  handleSubmit,
   isCoOwned,
   isOwnerForm,
 }: {
   form: PersonalDetailsType;
   handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (e: ChangeEvent<HTMLFormElement>) => void;
   isCoOwned: boolean;
   isOwnerForm?: boolean;
 }) => {
@@ -210,8 +218,8 @@ const PersonalDetailsForm = ({
               value={!isCoOwned || isOwnerForm ? form.firstName : undefined}
               onChange={handleChange}
               placeholder="First Name"
-              readOnly={isCoOwned && isOwnerForm}
-              disabled={isCoOwned && isOwnerForm}
+              readOnly={isOwnerForm}
+              disabled={isOwnerForm}
               required
             />
           </Field>
@@ -224,8 +232,8 @@ const PersonalDetailsForm = ({
               value={!isCoOwned || isOwnerForm ? form.lastName : undefined}
               onChange={handleChange}
               placeholder="Last Name"
-              readOnly={isCoOwned && isOwnerForm}
-              disabled={isCoOwned && isOwnerForm}
+              readOnly={isOwnerForm}
+              disabled={isOwnerForm}
               required
             />
           </Field>
@@ -247,13 +255,15 @@ const PersonalDetailsForm = ({
               value={!isCoOwned || isOwnerForm ? form.phoneNumber : undefined}
               onChange={handleChange}
               placeholder="254*********"
-              disabled={isOwnerForm}
-              readOnly={isOwnerForm}
+              disabled={isOwnerForm && isCoOwned}
+              readOnly={isOwnerForm && isCoOwned}
               required
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="emailAddress">Email Address</FieldLabel>
+            <FieldLabel htmlFor="emailAddress">
+              Email Address<span className="text-red-500">*</span>
+            </FieldLabel>
             <Input
               id="emailAddress"
               name="email"
@@ -261,8 +271,8 @@ const PersonalDetailsForm = ({
               value={form.email}
               onChange={handleChange}
               placeholder="email@example.com"
-              disabled={isOwnerForm}
-              readOnly={isOwnerForm}
+              disabled={isCoOwned && isOwnerForm}
+              readOnly={isCoOwned && isOwnerForm}
               required={isOwnerForm}
             />
           </Field>
@@ -284,8 +294,8 @@ const PersonalDetailsForm = ({
               value={!isCoOwned || isOwnerForm ? form.idNumber : undefined}
               onChange={handleChange}
               placeholder="ID Number"
-              readOnly={isCoOwned && isOwnerForm}
-              disabled={isCoOwned && isOwnerForm}
+              readOnly={isOwnerForm}
+              disabled={isOwnerForm}
               required
             />
           </Field>
@@ -298,8 +308,8 @@ const PersonalDetailsForm = ({
               value={!isCoOwned || isOwnerForm ? form.kraPin : undefined}
               onChange={handleChange}
               placeholder="KRA PIN"
-              readOnly={isCoOwned && isOwnerForm}
-              disabled={isCoOwned && isOwnerForm}
+              readOnly={isOwnerForm}
+              disabled={isOwnerForm}
               required
             />
           </Field>

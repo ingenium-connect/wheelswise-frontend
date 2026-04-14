@@ -5,7 +5,7 @@ import { redirect, useRouter } from "next/navigation";
 import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -54,13 +54,17 @@ const Signup: React.FC<Props> = ({
   const { tonnage, seating_capacity, vehicleDetails } = useVehicleStore();
 
   const selectedMotorType = useInsuranceStore((store) => store.motorType);
+  const isCoOwned = useInsuranceStore((state) => state.isCoOwned);
+
   const cover = useInsuranceStore((store) => store.cover);
   const { setProfile } = useUserStore();
 
   const router = useRouter();
   const [formData, setFormData] = useState<SignupForm>({
-    msisdn: personalDetails.secondary_user
-      ? personalDetails.secondary_user.phoneNumber
+    msisdn: isCoOwned
+      ? personalDetails.secondary_user
+        ? personalDetails.secondary_user.phoneNumber
+        : ""
       : personalDetails.user.phoneNumber,
     password: { value: "", valid: true },
     confirm_password: { value: "", valid: true },
@@ -184,12 +188,23 @@ const Signup: React.FC<Props> = ({
       // -------------------------------------
       // 2. Validate personal details
       // -------------------------------------
-      const missingPersonalFields = requiredFields(
-        personalDetails.secondary_user
-          ? personalDetails.secondary_user
-          : personalDetails.user,
-        ["firstName", "lastName", "phoneNumber", "email", "idNumber", "kraPin"],
-      );
+
+      const userDetails = isCoOwned
+        ? personalDetails.secondary_user
+        : personalDetails.user;
+
+      if (!userDetails) {
+        throw new Error("Personal details are required.");
+      }
+
+      const missingPersonalFields = requiredFields(userDetails, [
+        "firstName",
+        "lastName",
+        "phoneNumber",
+        "email",
+        "idNumber",
+        "kraPin",
+      ]);
 
       if (missingPersonalFields.length > 0) {
         throw new Error(
@@ -296,7 +311,7 @@ const Signup: React.FC<Props> = ({
           ? vehicleDetails.vehicleNumber.trim()
           : "",
         user: userDetailsPayload.user,
-        ...(userDetailsPayload.secondary_user && {
+        ...(isCoOwned && {
           secondary_user: userDetailsPayload.secondary_user,
         }),
       };
@@ -366,23 +381,6 @@ const Signup: React.FC<Props> = ({
                   <span>{signupError}</span>
                 </div>
               )}
-              <Field>
-                <FieldLabel htmlFor="msisdn">Phone Number</FieldLabel>
-                <Input
-                  id="msisdn"
-                  type="tel"
-                  readOnly
-                  name="msisdn"
-                  value={formData.msisdn}
-                  onChange={handleChange}
-                  placeholder="+254712***678"
-                  required
-                  className="bg-[#f0f6f9]"
-                />
-                <FieldDescription className="text-xs text-muted-foreground mt-1">
-                  This is the number linked to your account.
-                </FieldDescription>
-              </Field>
 
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>

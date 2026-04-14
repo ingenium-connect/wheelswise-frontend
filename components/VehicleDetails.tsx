@@ -862,7 +862,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div
                       onClick={() => setIsCoOwned(false)}
-                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${!isCoOwned && " bg-primary text-white"}`}
+                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned === false && " bg-primary text-white"}`}
                     >
                       <LucideUser />
                       <p>I am the sole owner</p>
