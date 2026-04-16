@@ -1,5 +1,11 @@
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import DateSelectionClient from "@/components/DateSelectionClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Select Cover Start Date",
+  robots: { index: false, follow: true },
+};
 
 export default function DateSelectionPage() {
   return (

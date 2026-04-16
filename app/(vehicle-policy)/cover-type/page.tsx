@@ -4,6 +4,14 @@ import { CoverTypesResponse } from "@/types/data";
 import { axiosServer } from "@/utilities/axios-server";
 import { COVER_TYPES_ENDPOINT } from "@/utilities/endpoints";
 import { isAxiosError } from "axios";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Choose Your Cover Type — Comprehensive or Third Party",
+  description:
+    "Select between comprehensive motor insurance and third party only (TPO) cover. Compare options and get an instant quote from IRA-licensed underwriters in Kenya.",
+  alternates: { canonical: "/cover-type" },
+};
 
 export const dynamic = "force-dynamic";
 

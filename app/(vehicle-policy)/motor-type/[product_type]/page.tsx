@@ -4,6 +4,12 @@ import { MotorType, MotorTypesResponse } from "@/types/data";
 import { axiosServer } from "@/utilities/axios-server";
 import { MOTOR_TYPES_ENDPOINT } from "@/utilities/endpoints";
 import { isAxiosError } from "axios";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Select Motor Type",
+  robots: { index: false, follow: true },
+};
 
 export const dynamic = "force-dynamic";
 

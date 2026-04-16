@@ -1,5 +1,11 @@
 import MotorSubtype from "@/components/motor-type/MotorSubType";
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Select Insurance Plan",
+  robots: { index: false, follow: true },
+};
 
 export const dynamic = "force-dynamic";
 

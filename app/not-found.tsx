@@ -20,7 +20,7 @@ export default function NotFound() {
             Return to Home
           </Link>
           <Link
-            href="/about-us"
+            href="/about"
             className="text-sm font-semibold text-gray-900"
           >
             About Us<span aria-hidden="true">&rarr;</span>

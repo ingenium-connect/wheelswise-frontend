@@ -1,6 +1,12 @@
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleDetails from "@/components/VehicleDetails";
 import { axiosServer } from "@/utilities/axios-server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Enter Vehicle Details",
+  robots: { index: false, follow: true },
+};
 
 export const dynamic = "force-dynamic";
 

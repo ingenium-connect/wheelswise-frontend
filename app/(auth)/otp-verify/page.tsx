@@ -1,6 +1,12 @@
 import { Suspense } from "react";
 import OtpVerify from "@/components/Otpverify";
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Verify Your Phone Number",
+  robots: { index: false, follow: false },
+};
 
 export default async function Page() {
   return (
