@@ -142,6 +142,7 @@ const OtpVerify: React.FC = () => {
           }
         } else {
           await registerPendingVehicle();
+          window.dispatchEvent(new Event("auth:changed"));
           router.push("/dashboard/payment-summary");
           router.refresh();
         }

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { policyResponse, UserProfile, Vehicle } from "@/types/data";
 import { PolicyCard } from "@/components/policy/policy-card";
 import { AccountCard } from "@/components/auth/profile-card";
+import { UserDocumentsCard } from "@/components/auth/user-documents-upload";
 import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import DashboardBanner from "@/components/auth/dashboard-banner";
 
@@ -202,6 +203,7 @@ export default function DashboardTabs({
       {profile && (
         <TabsContent value="profile">
           <AccountCard user={profile} />
+          <UserDocumentsCard user={profile} />
         </TabsContent>
       )}
     </Tabs>

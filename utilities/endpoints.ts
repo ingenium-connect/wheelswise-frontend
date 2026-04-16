@@ -9,6 +9,7 @@ export const REFRESH_TOKEN_ENDPOINT = "/auth/refresh";
 export const PROFILE_ENDPOINT = "/users/profile";
 export const USER_POLICIES_ENDPOINT = "/users/policies";
 export const USER_VEHICLES_ENDPOINT = "/users/vehicles";
+export const USER_DOCUMENTS_ENDPOINT = "/users/documents";
 export const RESET_PASSWORD_ENDPOINT = "/account/request";
 
 // DATA ENDPOINTS
