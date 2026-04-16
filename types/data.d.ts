@@ -360,6 +360,8 @@ export type UserProfile = {
   kra_pin: string;
   is_active: boolean;
   user_type: string;
+  kra_pin_url?: string | null;
+  national_id_url?: string | null;
 };
 
 export type UIMappedPaymentMethod = PaymentMethod & {
