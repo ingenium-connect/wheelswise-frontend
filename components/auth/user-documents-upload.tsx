@@ -25,6 +25,7 @@ import {
   Loader2,
   Upload,
 } from "lucide-react";
+import { BlobPdfViewer } from "@/components/ui/blob-pdf-viewer";
 import { toast } from "sonner";
 import { UserProfile } from "@/types/data";
 
@@ -82,17 +83,7 @@ function DocumentViewer({ url, label }: { url: string; label: string }) {
                   className="w-full h-auto rounded-lg border"
                 />
               ) : (
-                <object
-                  data={proxiedUrl}
-                  type="application/pdf"
-                  className="w-full h-[70vh] rounded-lg border"
-                >
-                  <iframe
-                    src={proxiedUrl}
-                    className="w-full h-[70vh] rounded-lg border"
-                    title={label}
-                  />
-                </object>
+                <BlobPdfViewer src={proxiedUrl} title={label} />
               )}
             </div>
           </DialogContent>

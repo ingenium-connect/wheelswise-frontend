@@ -24,6 +24,7 @@ import {
   Image as ImageIcon,
   Loader2,
 } from "lucide-react";
+import { BlobPdfViewer } from "@/components/ui/blob-pdf-viewer";
 import { toast } from "sonner";
 
 const ACCEPTED_TYPES = ".pdf,.jpg,.jpeg,.png";
@@ -108,17 +109,7 @@ export function LogbookViewer({ url }: { url: string }) {
                   className="w-full h-auto rounded-lg border"
                 />
               ) : (
-                <object
-                  data={proxiedUrl}
-                  type="application/pdf"
-                  className="w-full h-[70vh] rounded-lg border"
-                >
-                  <iframe
-                    src={proxiedUrl}
-                    className="w-full h-[70vh] rounded-lg border"
-                    title="Logbook PDF"
-                  />
-                </object>
+                <BlobPdfViewer src={proxiedUrl} title="Logbook PDF" />
               )}
             </div>
           </DialogContent>
