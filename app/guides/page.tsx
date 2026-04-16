@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Metadata } from "next";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   title: "Motor Insurance Guides & Resources — Kenya",
@@ -53,6 +54,12 @@ const guides = [
 export default function GuidesPage() {
   return (
     <div className="bg-[#f0f6f9] flex-1">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Insurance Guides", href: "/guides" },
+        ]}
+      />
       {/* Hero */}
       <div className="px-4 md:px-8 pt-6 pb-2">
         <div className="max-w-5xl mx-auto bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74] rounded-2xl px-6 md:px-12 py-12 shadow-lg">

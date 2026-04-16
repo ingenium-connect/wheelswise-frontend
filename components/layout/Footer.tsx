@@ -91,11 +91,17 @@ const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2.5 text-sm">
               {[
-                { label: "Comprehensive Cover", href: "/cover-type" },
-                { label: "Third Party Only (TPO)", href: "/cover-type" },
-                { label: "Private Motor", href: "/cover-type" },
-                { label: "Commercial Motor", href: "/cover-type" },
-                { label: "PSV Insurance", href: "/cover-type" },
+                { label: "Motor Insurance", href: "/motor-insurance" },
+                {
+                  label: "Comprehensive Cover",
+                  href: "/comprehensive-insurance",
+                },
+                {
+                  label: "Third Party Only (TPO)",
+                  href: "/third-party-insurance",
+                },
+                { label: "Insurance Guides", href: "/guides" },
+                { label: "Get a Quote", href: "/cover-type" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
