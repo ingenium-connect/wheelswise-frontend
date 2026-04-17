@@ -1,13 +1,23 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useInsuranceFlowStore } from "@/stores/insuranceFlowStore";
 
 const PaymentSuccess = () => {
-  // Clean up the existing-vehicle shortcut flag
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("insure_existing_vehicle");
-  }
+  const resetFlow = useInsuranceFlowStore((s) => s.resetFlow);
+
+  useEffect(() => {
+    // Clean up flow state after successful payment
+    resetFlow();
+
+    // Clean up the existing-vehicle shortcut flag
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("insure_existing_vehicle");
+    }
+
+    console.log("[PaymentSuccess] Flow state cleared after successful payment");
+  }, [resetFlow]);
 
   return (
     <div className="mt-5 sm:mt-[10rem] flex flex-col justify-between">
@@ -27,8 +37,8 @@ const PaymentSuccess = () => {
             us!
           </p>
           <Link
-            href="/"
-            className="w-full py-2 px-4 rounded-lg text-white font-medium bg-primary hover:bg-primary-dark active:bg-primary-dark transition"
+            href="/dashboard"
+            className="w-full py-2 px-4 rounded-lg text-white font-medium bg-primary hover:bg-primary-dark active:bg-primary-dark transition inline-block text-center"
           >
             Go to Dashboard
           </Link>

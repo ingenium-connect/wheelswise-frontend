@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({ idToken: newAccessToken });
 
-    // non-httpOnly so client JS can read it
+    // httpOnly for security (client cannot access it)
     response.cookies.set({
       name: ACCESS_TOKEN,
       value: newAccessToken,
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

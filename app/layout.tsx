@@ -7,6 +7,7 @@ import NextTopLoader from "nextjs-toploader";
 import Header from "@/components/layout/Header";
 import ClearClientState from "@/components/auth/ClearClientState";
 import GlobalJsonLd from "@/components/seo/GlobalJsonLd";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,13 +119,15 @@ export default function RootLayout({
       >
         <GlobalJsonLd />
         <NextTopLoader color="#397397" />
-        <main className="flex flex-col min-h-screen">
-          <Header />
-          <ClearClientState />
-          <div className="flex-1 flex flex-col">{children}</div>
-          <Footer />
-        </main>
-        <Toaster richColors position="top-center" />
+        <AuthProvider>
+          <main className="flex flex-col min-h-screen">
+            <Header />
+            <ClearClientState />
+            <div className="flex-1 flex flex-col">{children}</div>
+            <Footer />
+          </main>
+          <Toaster richColors position="top-center" />
+        </AuthProvider>
       </body>
     </html>
   );

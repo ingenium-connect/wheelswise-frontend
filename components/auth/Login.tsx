@@ -28,25 +28,18 @@ import { Input } from "@/components/ui/input";
 
 import { PasswordInput } from "../forms/password-input";
 import { useState } from "react";
-import { loginSubmitHandler } from "@/utilities/api";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
-import {
-  ACCESS_TOKEN,
-  EMAIL,
-  NAME,
-  REFRESH_TOKEN,
-  USER_ID,
-} from "@/utilities/constants";
 import { loginFormSchema } from "@/utilities/validation-schemas";
 import { useOtp } from "@/hooks/useOtp";
+import { useAuth } from "@/hooks/useAuth";
 
 const formSchema = loginFormSchema;
 
 const Login: React.FC = () => {
   const router = useRouter();
+  const { login } = useAuth();
 
   const { sendOtp } = useOtp();
   const [isLoading, setIsLoading] = useState(false);
@@ -95,11 +88,20 @@ const Login: React.FC = () => {
         password: values.password,
         user_type: "CUSTOMER",
       };
-      const response = await loginSubmitHandler({ ...payload });
-      if (response?.id) {
+
+      // Call our API route which sets httpOnly cookies
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data?.id) {
         // absent field (Go omitempty) === false
-        const otpVerified = response?.otp_verified === true;
-        const isActive = response?.is_active === true;
+        const otpVerified = data?.otp_verified === true;
+        const isActive = data?.is_active === true;
 
         if (!otpVerified) {
           sessionStorage.setItem(
@@ -119,27 +121,9 @@ const Login: React.FC = () => {
           return;
         }
 
-        const userData = {
-          [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
-          [REFRESH_TOKEN]: response?.auth_credentials?.refreshToken,
-          [USER_ID]: response?.id,
-          [EMAIL]: response?.email,
-          [NAME]: response?.name,
-        };
-
-        Object.entries(userData).forEach(([key, value]) =>
-          setCookie(null, key, value ?? "", {
-            maxAge: key === REFRESH_TOKEN ? 30 * 24 * 60 * 60 : 60 * 60,
-            path: "/",
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-          }),
-        );
-
-        // Notify the header (and any other listeners) that auth state changed
-        // so UI reflects the logged-in state immediately instead of waiting
-        // for a remount / visibility event.
-        window.dispatchEvent(new Event("auth:changed"));
+        // Cookies are now set by the API route (httpOnly)
+        // Update auth context with user data
+        login(data);
 
         toast.success("Successfully logged in!");
         router.push("/dashboard");
@@ -147,7 +131,7 @@ const Login: React.FC = () => {
         // run with the new auth cookie on first render.
         router.refresh();
       } else {
-        const errorMsg = (response?.error as string) ?? "";
+        const errorMsg = (data?.error as string) ?? "";
         if (errorMsg.toLowerCase().includes("not verified")) {
           sessionStorage.setItem(
             "__login_national_id__",
@@ -157,7 +141,7 @@ const Login: React.FC = () => {
           router.push("/otp-verify?from=login");
           return;
         }
-        setLoginError(extractApiError(response));
+        setLoginError(extractApiError(data));
       }
       form.reset();
     } catch {

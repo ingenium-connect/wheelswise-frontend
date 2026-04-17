@@ -20,6 +20,10 @@ export default function middleware(request: NextRequest) {
   response = NextResponse.next();
 
   const authToken = request.cookies.get(ACCESS_TOKEN)?.value || "";
+  const isAuthenticated = Boolean(authToken);
+
+  // Add auth status header (can be read by client)
+  response.headers.set("X-Auth-Status", isAuthenticated ? "authenticated" : "unauthenticated");
 
   // If user is authenticated and trying to access login or register, redirect to /dashboard
   if (
@@ -31,10 +35,10 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/dashboard`, request.url));
   }
 
-  // If user is unauthenticated and trying to access a protected route redirect to /
+  // If user is unauthenticated and trying to access a protected route redirect to /login
   const isAuthPage = pathname.startsWith("/dashboard");
   if (!authToken && isAuthPage) {
-    const res = NextResponse.redirect(new URL(`/`, request.url));
+    const res = NextResponse.redirect(new URL(`/login`, request.url));
     // Signal the client to clear client-side state (localStorage + stores)
     res.cookies.set({
       name: "clear_client_state",

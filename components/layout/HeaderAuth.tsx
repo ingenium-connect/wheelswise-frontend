@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ACCESS_TOKEN } from "@/utilities/constants";
 import LogoutButton from "@/components/auth/LogoutButton";
 import {
   HeadphonesIcon,
@@ -18,42 +16,16 @@ import {
   LayoutDashboard,
   ChevronDown,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function HeaderAuth() {
   const router = useRouter();
-  const [hasToken, setHasToken] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const check = () => {
-      try {
-        const cookies = document.cookie.split("; ").map((c) => c.trim());
-        const found = cookies.find((c) => c.startsWith(`${ACCESS_TOKEN}=`));
-        setHasToken(Boolean(found && found.split("=")[1]));
-      } catch {
-        setHasToken(false);
-      }
-    };
-
-    check();
-
-    // Re-check when the page becomes visible (e.g. after login redirect)
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") check();
-    };
-    // Re-check when auth state changes in the same tab (login/logout)
-    const onAuthChanged = () => check();
-    document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("auth:changed", onAuthChanged);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("auth:changed", onAuthChanged);
-    };
-  }, []);
+  const { isAuthenticated, isLoading } = useAuth();
 
   // Avoid flicker — render nothing until we know
-  if (hasToken === null) return null;
+  if (isLoading) return null;
 
-  if (hasToken) {
+  if (isAuthenticated) {
     return (
       <>
         <button

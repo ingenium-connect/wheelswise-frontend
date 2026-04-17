@@ -30,9 +30,9 @@ export async function refreshAccessToken(): Promise<string | null> {
 
     if (!newAccessToken || !newRefreshToken) return null;
 
-    // ACCESS_TOKEN: non-httpOnly so client JS can read it for Authorization headers
+    // ACCESS_TOKEN: httpOnly for security
     cookieStore.set(ACCESS_TOKEN, newAccessToken, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

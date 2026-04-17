@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { axiosClient } from "@/utilities/axios-client";
+import { proxyGet, proxyPost } from "@/utilities/api-proxy";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import {
   AdditionalBenefit,
@@ -51,96 +51,89 @@ function addDays(iso: string, days: number) {
 
 /* ── Component ── */
 
+const MappedPaymentMethods: Record<
+  string,
+  { name: string; description: string; key: string }
+> = {
+  ONE_TIME: {
+    name: "One Time",
+    description: "Pay the full amount in one go for hassle-free coverage.",
+    key: "onetime",
+  },
+  INSTALLMENT: {
+    name: "Installment",
+    description: "Pay the full amount in 2 installments.",
+    key: "installment",
+  },
+};
+
 const PaymentSummary = () => {
   const router = useRouter();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<string>("");
 
-  const [paymentMethods, setPaymentMethods] = useState<UIMappedPaymentMethod[]>(
-    [],
-  );
+  // ── All hooks declared unconditionally at the top ──
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [paymentMethods, setPaymentMethods] = useState<UIMappedPaymentMethod[]>([]);
   const [oneTimePayment, setOneTimePayment] = useState<number>(0);
   const [date, setDate] = useState("");
   const dateInputRef = useRef<HTMLInputElement>(null);
-
-  const [doubleInsuranceStatus, setDoubleInsuranceStatus] =
-    useState<DoubleInsuranceStatus>("idle");
-  const [conflictPolicies, setConflictPolicies] = useState<ConflictPolicy[]>(
-    [],
-  );
-
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
-  const today = new Date();
+  const [doubleInsuranceStatus, setDoubleInsuranceStatus] = useState<DoubleInsuranceStatus>("idle");
+  const [conflictPolicies, setConflictPolicies] = useState<ConflictPolicy[]>([]);
+  const [additionalBenefits, setAdditionalBenefits] = useState<AdditionalBenefit[]>([]);
 
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
   const cover = useInsuranceStore((s) => s.cover);
-  const selectedAdditionalBenefitIds = useInsuranceStore(
-    (s) => s.selectedAdditionalBenefitIds,
-  );
+  const selectedAdditionalBenefitIds = useInsuranceStore((s) => s.selectedAdditionalBenefitIds);
   const { vehicleDetails } = useVehicleStore();
-  const [additionalBenefits, setAdditionalBenefits] = useState<
-    AdditionalBenefit[]
-  >([]);
 
-  const MappedPaymentMethods: Record<
-    string,
-    { name: string; description: string; key: string }
-  > = {
-    ONE_TIME: {
-      name: "One Time",
-      description: "Pay the full amount in one go for hassle-free coverage.",
-      key: "onetime",
-    },
-    INSTALLMENT: {
-      name: "Installment",
-      description: "Pay the full amount in 2 installments.",
-      key: "installment",
-    },
-  };
+  const formatDate = (d: Date) => d.toISOString().split("T")[0];
+  const today = new Date();
 
+  // Derived booleans — used to gate effects below without breaking hook order
+  const hasRequiredData = Boolean(motorSubType && cover && vehicleDetails.vehicleNumber);
+
+  // Redirect if data is missing
   useEffect(() => {
-    if (motorSubType?.underwriter_product.premium_amount?.one_time_payment) {
+    if (!hasRequiredData) {
+      toast.error("Missing insurance details. Please start from the beginning.");
+      router.push("/cover-type");
+    }
+  }, [hasRequiredData, router]);
+
+  // Set default payment method from product data
+  useEffect(() => {
+    if (!motorSubType) return;
+    if (motorSubType.underwriter_product.premium_amount?.one_time_payment) {
       setSelectedPaymentMethod("onetime");
-      setOneTimePayment(
-        motorSubType.underwriter_product.premium_amount.one_time_payment,
-      );
+      setOneTimePayment(motorSubType.underwriter_product.premium_amount.one_time_payment);
     } else {
       setSelectedPaymentMethod("installment");
     }
   }, [motorSubType]);
 
-  const methodMapper = useCallback(
-    (payment_methods: PaymentMethods[]) => {
-      const enrichedPaymentMethods: UIMappedPaymentMethod[] = payment_methods
-        .map((method: UIMappedPaymentMethod) => {
-          const mapped = MappedPaymentMethods[method.name];
-          if (!mapped) return null;
-          return {
-            ...method,
-            name: mapped.name,
-            description: mapped.description,
-            uiKey: mapped.key,
-          };
-        })
-        .filter(Boolean) as UIMappedPaymentMethod[];
-      return enrichedPaymentMethods;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  const methodMapper = useCallback((payment_methods: PaymentMethods[]) => {
+    return payment_methods
+      .map((method: UIMappedPaymentMethod) => {
+        const mapped = MappedPaymentMethods[method.name];
+        if (!mapped) return null;
+        return { ...method, name: mapped.name, description: mapped.description, uiKey: mapped.key };
+      })
+      .filter(Boolean) as UIMappedPaymentMethod[];
+  }, []);
 
+  // Fetch payment methods via proxy (authenticated)
   useEffect(() => {
     const underwriterId = motorSubType?.underwriter_product.underwriter_id;
     if (!underwriterId) return;
-    axiosClient
-      .get(`payment-method?underwriter_id=${underwriterId}`)
-      .then((res) => {
-        const mappedMethods = methodMapper(res.data?.payment_method);
 
-        setPaymentMethods(mappedMethods ?? []);
+    proxyGet<{ payment_method: PaymentMethods[] }>(
+      `payment-method`,
+      { underwriter_id: underwriterId },
+    )
+      .then((data) => {
+        const mappedMethods = methodMapper(data?.payment_method ?? []);
+        setPaymentMethods(mappedMethods);
         if (mappedMethods.length > 0) {
           localStorage.setItem("payment_method_id", mappedMethods[0].id);
-
           setSelectedPaymentMethod(mappedMethods[0].uiKey);
         }
       })
@@ -149,23 +142,22 @@ const PaymentSummary = () => {
       });
   }, [motorSubType, methodMapper]);
 
+  // Fetch additional benefits via proxy (authenticated)
   useEffect(() => {
     if (selectedAdditionalBenefitIds.length === 0) return;
-    axiosClient
-      .post("benefit/additional", { ids: selectedAdditionalBenefitIds })
-      .then((res) => setAdditionalBenefits(res.data ?? []))
+
+    proxyPost<AdditionalBenefit[]>("benefit/additional", { ids: selectedAdditionalBenefitIds })
+      .then((data) => setAdditionalBenefits(data ?? []))
       .catch(() => {
         toast.error("Could not load selected add-ons.");
       });
   }, [selectedAdditionalBenefitIds]);
 
-  /* Double-insurance check */
+  // Double-insurance check
   useEffect(() => {
     if (!date) return;
-
     const period = motorSubType?.underwriter_product?.period;
     const regNum = vehicleDetails.vehicleNumber;
-
     if (period == null || !regNum) return;
 
     fetch("/api/double-insurance", {
@@ -179,8 +171,7 @@ const PaymentSummary = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const conflicts: ConflictPolicy[] =
-          data.callback_obj?.double_insurance ?? [];
+        const conflicts: ConflictPolicy[] = data.callback_obj?.double_insurance ?? [];
         if (data.success && conflicts.length > 0) {
           setDoubleInsuranceStatus("conflict");
           setConflictPolicies(conflicts);
@@ -189,19 +180,17 @@ const PaymentSummary = () => {
         }
       })
       .catch(() => {
-        // On error let the user proceed — don't hard-block
         setDoubleInsuranceStatus("clear");
       });
   }, [date, motorSubType, vehicleDetails.vehicleNumber]);
 
-  const productName =
-    motorSubType?.underwriter_product.name ?? "Insurance Plan";
+  // ── Derived display values ──
+  const productName = motorSubType?.underwriter_product.name ?? "Insurance Plan";
   const underwriterName =
     motorSubType?.underwriter_product.underwriter_name ||
     motorSubType?.underwriter_product.underwriter?.name ||
     "—";
-  const coverLabel =
-    cover === "COMPREHENSIVE" ? "Comprehensive" : "Third Party";
+  const coverLabel = cover === "COMPREHENSIVE" ? "Comprehensive" : "Third Party";
 
   const coverStartDate = (selectedDate: string) => {
     setDate(selectedDate);
@@ -219,6 +208,20 @@ const PaymentSummary = () => {
     paymentMethods.length > 0 &&
     doubleInsuranceStatus !== "checking" &&
     doubleInsuranceStatus !== "conflict";
+
+  // ── Loading / missing-data guard rendered AFTER all hooks ──
+  if (!hasRequiredData) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white border border-[#d7e8ee] rounded-2xl shadow-sm p-6 md:p-8 flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Loading your details…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -262,8 +265,7 @@ const PaymentSummary = () => {
                   Premium
                 </p>
                 <p className="font-semibold text-[#1e3a5f]">
-                  KES{" "}
-                  {oneTimePayment > 0 ? oneTimePayment.toLocaleString() : "—"}
+                  KES {oneTimePayment > 0 ? oneTimePayment.toLocaleString() : "—"}
                 </p>
               </div>
             </div>
@@ -394,8 +396,7 @@ const PaymentSummary = () => {
                   Checking for existing coverage
                 </p>
                 <p className="text-xs text-blue-600 mt-0.5">
-                  Verifying this vehicle has no active policy for the selected
-                  period...
+                  Verifying this vehicle has no active policy for the selected period…
                 </p>
               </div>
             </div>
@@ -483,7 +484,7 @@ const PaymentSummary = () => {
             disabled={!canProceed}
           >
             {doubleInsuranceStatus === "checking"
-              ? "Checking coverage..."
+              ? "Checking coverage…"
               : "Proceed to Payment"}
           </Button>
         </div>

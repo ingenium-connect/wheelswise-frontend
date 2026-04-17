@@ -1,23 +1,13 @@
 "use client";
 
-import { destroyCookie } from "nookies";
-import {
-  ACCESS_TOKEN,
-  EMAIL,
-  NAME,
-  REFRESH_TOKEN,
-  USER_ID,
-} from "@/utilities/constants";
 import { LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LogoutButton() {
-  const handleLogout = () => {
-    // Clear all client-readable cookies
-    [ACCESS_TOKEN, REFRESH_TOKEN, USER_ID, NAME, EMAIL].forEach((key) =>
-      destroyCookie(null, key, { path: "/" }),
-    );
+  const { logout } = useAuth();
 
-    // Wipe all persisted state — stores, session data, everything
+  const handleLogout = async () => {
+    // Clear all persisted state — stores, session data, everything
     try {
       localStorage.clear();
     } catch (_) {}
@@ -25,8 +15,14 @@ export default function LogoutButton() {
       sessionStorage.clear();
     } catch (_) {}
 
-    // Navigate to logout route — clears httpOnly cookies and redirects to /login
-    window.location.href = "/api/logout";
+    // Signal logout to other tabs
+    try {
+      localStorage.setItem("auth_event", "logout");
+      setTimeout(() => localStorage.removeItem("auth_event"), 100);
+    } catch (_) {}
+
+    // Call logout from auth context (clears httpOnly cookies via API)
+    await logout();
   };
 
   return (

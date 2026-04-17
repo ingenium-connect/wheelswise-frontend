@@ -10,13 +10,12 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
-import { axiosClient } from "@/utilities/axios-client";
-import { OTP_VERIFY_ENDPOINT } from "@/utilities/endpoints";
 import axios from "axios";
 import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 import { useUserStore } from "@/stores/userStore";
+import { useAuth } from "@/hooks/useAuth";
 
 const PENDING_VEHICLE_KEY = "__pending_vehicle_payload__";
 
@@ -28,6 +27,7 @@ const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
   const { profile } = useUserStore();
   const { sendOtp, timeUntilResend } = useOtp();
+  const { login } = useAuth();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -123,9 +123,23 @@ const OtpVerify: React.FC = () => {
         ? { national_id: loginNationalId, otp: otpValue, user_type: "CUSTOMER" }
         : { user_id: profile?.id ?? "", otp: otpValue, user_type: "CUSTOMER" };
 
-      const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
+      // Route through our Next.js API so cookies can be set server-side.
+      // /api/otp-verify forwards to the backend and sets auth + identity
+      // cookies when the response includes auth_credentials (signup flow).
+      const res = await fetch("/api/otp-verify", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
-      const data = res?.data;
+      if (!res.ok) {
+        retryOtp();
+        setError("Invalid OTP. Please try again.");
+        return;
+      }
+
+      const data = await res.json();
 
       if (data) {
         toast.success("OTP successfully verified");
@@ -133,7 +147,7 @@ const OtpVerify: React.FC = () => {
           sessionStorage.removeItem("__login_national_id__");
           router.push("/login");
         } else if (isNewVehicleFlow) {
-          // Logged-in user: if insuring an existing registered vehicle, skip vehicle-value
+          // Logged-in user adding a new vehicle
           const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
           if (insuringExisting) {
             router.push(`/motor-subtype?product_type=${flowProductType}&motor_type=${flowMotorType}`);
@@ -141,8 +155,21 @@ const OtpVerify: React.FC = () => {
             router.push(`/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`);
           }
         } else {
+          // Guest signup flow: cookies are now set by /api/otp-verify.
+          // Call login() with the data from the response so AuthContext
+          // immediately reflects the authenticated state — nav updates at once.
+          login({
+            id: data.id ?? profile?.id ?? "",
+            name: data.name ?? profile?.name ?? "",
+            email: data.email ?? profile?.email ?? "",
+            msisdn: data.msisdn ?? profile?.msisdn ?? "",
+            id_number: data.id_number ?? profile?.id_number ?? "",
+            kra_pin: data.kra_pin ?? profile?.kra_pin ?? "",
+            is_active: true,
+            user_type: "CUSTOMER",
+          });
+
           await registerPendingVehicle();
-          window.dispatchEvent(new Event("auth:changed"));
           router.push("/dashboard/payment-summary");
           router.refresh();
         }
@@ -151,7 +178,6 @@ const OtpVerify: React.FC = () => {
       }
     } catch (_err) {
       retryOtp();
-
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
