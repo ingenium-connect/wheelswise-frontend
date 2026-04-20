@@ -1,31 +1,34 @@
+import { PersonalDetails } from "@/types/data";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type PersonalDetails = {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  email: string;
-  idNumber: string;
-  kraPin: string;
-  ntsaRegistered: boolean;
-};
-
 type PersonalDetailsState = {
-  personalDetails: PersonalDetails;
-  setPersonalDetails: (payload: Partial<PersonalDetails>) => void;
-  updateField: (field: keyof PersonalDetails, value: string | boolean) => void;
+  personalDetails: { user: PersonalDetails; secondary_user?: PersonalDetails };
+  setPersonalDetails: (
+    payload: Partial<PersonalDetails>,
+    userType?: "user" | "secondary_user",
+  ) => void;
+  updateField: (
+    field: keyof PersonalDetails,
+    value: string | boolean,
+    userType?: "user" | "secondary_user",
+  ) => void;
   resetPersonalDetails: () => void;
 };
 
-const initialState: PersonalDetails = {
-  firstName: "",
-  lastName: "",
-  phoneNumber: "",
-  email: "",
-  idNumber: "",
-  kraPin: "",
-  ntsaRegistered: false,
+const initialState: {
+  user: PersonalDetails;
+  secondary_user?: PersonalDetails;
+} = {
+  user: {
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    idNumber: "",
+    kraPin: "",
+    ntsaRegistered: false,
+  },
 };
 
 export const usePersonalDetailsStore = create<PersonalDetailsState>()(
@@ -33,14 +36,23 @@ export const usePersonalDetailsStore = create<PersonalDetailsState>()(
     (set) => ({
       personalDetails: initialState,
 
-      setPersonalDetails: (payload) =>
+      setPersonalDetails: (payload, userType = "user") =>
         set((state) => ({
-          personalDetails: { ...state.personalDetails, ...payload },
+          personalDetails: {
+            ...state.personalDetails,
+            [userType]: { ...state.personalDetails[userType], ...payload },
+          },
         })),
 
-      updateField: (field, value) =>
+      updateField: (field, value, userType = "user") =>
         set((state) => ({
-          personalDetails: { ...state.personalDetails, [field]: value as any },
+          personalDetails: {
+            ...state.personalDetails,
+            [userType]: {
+              ...state.personalDetails[userType],
+              [field]: value as any,
+            },
+          },
         })),
 
       resetPersonalDetails: () => set({ personalDetails: initialState }),

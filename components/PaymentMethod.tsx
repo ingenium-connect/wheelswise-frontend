@@ -3,7 +3,13 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Check, CreditCard, Smartphone, Loader2, AlertCircle } from "lucide-react";
+import {
+  Check,
+  CreditCard,
+  Smartphone,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -42,8 +48,11 @@ const methods = [
 
 const PaymentMethod = ({ token }: Props) => {
   const [selectedMethod, setSelectedMethod] = useState("mpesa");
-  const personalPhone = usePersonalDetailsStore(
-    (s) => s.personalDetails.phoneNumber,
+  const isCoOwned = useInsuranceStore((state) => state.isCoOwned);
+  const personalPhone = usePersonalDetailsStore((s) =>
+    isCoOwned
+      ? s.personalDetails.secondary_user?.phoneNumber
+      : s.personalDetails.user.phoneNumber,
   );
   const profilePhone = useUserStore((s) => s.profile?.msisdn);
   // Logged-in users: prefer profile msisdn; guest flow: use personal details store
@@ -162,7 +171,9 @@ const PaymentMethod = ({ token }: Props) => {
         {error && (
           <Alert variant="destructive" className="border-red-200 bg-red-50">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-red-700">{error}</AlertDescription>
+            <AlertDescription className="text-red-700">
+              {error}
+            </AlertDescription>
           </Alert>
         )}
         <div>

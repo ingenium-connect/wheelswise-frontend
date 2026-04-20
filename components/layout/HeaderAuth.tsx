@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 export default function HeaderAuth() {
+  const router = useRouter();
   const [hasToken, setHasToken] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -38,8 +40,14 @@ export default function HeaderAuth() {
     const onVisibility = () => {
       if (document.visibilityState === "visible") check();
     };
+    // Re-check when auth state changes in the same tab (login/logout)
+    const onAuthChanged = () => check();
     document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    window.addEventListener("auth:changed", onAuthChanged);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("auth:changed", onAuthChanged);
+    };
   }, []);
 
   // Avoid flicker — render nothing until we know
@@ -48,13 +56,16 @@ export default function HeaderAuth() {
   if (hasToken) {
     return (
       <>
-        <Link
-          href="/dashboard"
+        <button
+          onClick={() => {
+            router.push("/dashboard");
+            router.refresh();
+          }}
           className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
         >
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
-        </Link>
+        </button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -66,13 +77,16 @@ export default function HeaderAuth() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-52" align="end">
             <DropdownMenuItem asChild>
-              <Link
-                href="/dashboard?tab=profile"
+              <button
+                onClick={() => {
+                  router.push("/dashboard?tab=profile");
+                  router.refresh();
+                }}
                 className="flex items-center gap-2 w-full cursor-pointer font-medium text-[#1e3a5f]"
               >
                 <UserCircle2 className="w-4 h-4 text-primary" />
                 My Account
-              </Link>
+              </button>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

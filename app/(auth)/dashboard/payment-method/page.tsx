@@ -1,6 +1,12 @@
 import PaymentMethod from "@/components/PaymentMethod";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Payment Method",
+  robots: { index: false, follow: false },
+};
 
 export default async function Page() {
   const cookiesData = await cookies();

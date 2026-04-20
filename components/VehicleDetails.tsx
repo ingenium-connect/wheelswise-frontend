@@ -17,7 +17,14 @@ import { Card, CardContent } from "./ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
-import { AlertCircle, Car, Loader2, Search } from "lucide-react";
+import {
+  AlertCircle,
+  Car,
+  Loader2,
+  LucideUser,
+  LucideUsers,
+  Search,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useUserStore } from "@/stores/userStore";
@@ -37,15 +44,24 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const vehicleValue = useInsuranceStore((s) => s.vehicleValue);
   const motorSubType = useInsuranceStore((s) => s.motorSubtype);
+  const isCoOwned = useInsuranceStore((s) => s.isCoOwned);
   const setCoverStep = useInsuranceStore((s) => s.setCoverStep);
+  const setIsCoOwned = useInsuranceStore((s) => s.setisCoOwned);
 
-  const { tonnage, setVehicleDetails, setSeatingCapacity: storeSetSeatingCapacity } = useVehicleStore();
+  const {
+    tonnage,
+    setVehicleDetails,
+    setSeatingCapacity: storeSetSeatingCapacity,
+  } = useVehicleStore();
   const motorType = useInsuranceStore((s) => s.motorType);
-  const { setPersonalDetails, resetPersonalDetails } = usePersonalDetailsStore();
+  const { setPersonalDetails, resetPersonalDetails } =
+    usePersonalDetailsStore();
   const resetVehicleStore = useVehicleStore((s) => s.reset);
   const profile = useUserStore((s) => s.profile);
   const [seatingCapacity, setSeatingCapacity] = useState("");
-  const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(null);
+  const [motorTypeMismatch, setMotorTypeMismatch] = useState<string | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
 
   // Detect if user is logged in (has auth token cookie + profile)
@@ -54,7 +70,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     try {
       const cookies = document.cookie.split("; ").map((c) => c.trim());
       const tokenCookie = cookies.find((c) => c.startsWith(`${ACCESS_TOKEN}=`));
-      setIsAuthenticated(Boolean(tokenCookie && tokenCookie.split("=")[1] && profile));
+      setIsAuthenticated(
+        Boolean(tokenCookie && tokenCookie.split("=")[1] && profile),
+      );
     } catch {
       // ignore
     }
@@ -97,7 +115,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         setBodyTypes(res.data);
       })
       .catch(() => {
-        toast.error("Could not load vehicle body types. Please refresh the page.");
+        toast.error(
+          "Could not load vehicle body types. Please refresh the page.",
+        );
       });
 
     setCoverStep(4);
@@ -140,7 +160,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       form.year &&
       form.bodyType &&
       form.vehiclePurpose &&
-      form.vehiclePurposeCategory
+      form.vehiclePurposeCategory &&
+      isCoOwned !== null
     );
   };
 
@@ -206,7 +227,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           setSearchMessage(
             `Vehicle is too old (${vehicleAge} years). The maximum allowed age for this cover is ${maxAgeAllowed} years. Kindly select a different product`,
           );
-          toast.error("Vehicle too old for this cover", { description: `Maximum allowed age is ${maxAgeAllowed} years.` });
+          toast.error("Vehicle too old for this cover", {
+            description: `Maximum allowed age is ${maxAgeAllowed} years.`,
+          });
           setLoadingSearch(false);
           setTimeout(() => {
             router.back();
@@ -288,7 +311,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         const errorMessage = error.response.data.error as string;
 
         // Check if it's a motor type mismatch error
-        if (errorMessage.toLowerCase().includes("motor type") || errorMessage.toLowerCase().includes("please select")) {
+        if (
+          errorMessage.toLowerCase().includes("motor type") ||
+          errorMessage.toLowerCase().includes("please select")
+        ) {
           setMotorTypeMismatch(errorMessage);
           setLoadingSearch(false);
 
@@ -323,7 +349,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
         "Vehicle not found. Please go back and enter a valid vehicle registration number.",
       );
 
-      toast.error("Vehicle not found", { description: "Please enter a valid registration number and try again." });
+      toast.error("Vehicle not found", {
+        description: "Please enter a valid registration number and try again.",
+      });
       console.error(error);
     } finally {
       setLoadingSearch(false);
@@ -342,7 +370,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     if (isAuthenticated) {
       // Logged-in user: register vehicle and go to payment summary
       setSubmitting(true);
-      const ntsaRegistered = useVehicleStore.getState().vehicleDetails.ntsaRegistered;
+      const ntsaRegistered =
+        useVehicleStore.getState().vehicleDetails.ntsaRegistered;
       const payload = {
         source: ntsaRegistered ? "NTSA" : "",
         vehicle: {
@@ -350,7 +379,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           registration_number: form.vehicleNumber.trim(),
           make: form.make.trim(),
           model: form.model.trim(),
-          engine_capacity: form.engineCapacity ? Number(form.engineCapacity) : null,
+          engine_capacity: form.engineCapacity
+            ? Number(form.engineCapacity)
+            : null,
           engine_number: form.engineNumber?.trim() || undefined,
           body_type: form.bodyType.trim(),
           vehicle_value: form.vehicleValue || null,
@@ -510,7 +541,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehicleNumber">
-                      Vehicle Number
+                      Vehicle Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="vehicleNumber"
@@ -526,7 +557,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="chassisNumber">
-                      Chassis Number
+                      Chassis Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="chassisNumber"
@@ -549,7 +580,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="vehicleMake">Make</FieldLabel>
+                    <FieldLabel htmlFor="vehicleMake">
+                      Make <span className="text-red-500">*</span>
+                    </FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.make}
@@ -576,7 +609,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="vehicleModel">Model</FieldLabel>
+                    <FieldLabel htmlFor="vehicleModel">
+                      Model <span className="text-red-500">*</span>
+                    </FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.model}
@@ -604,7 +639,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="yearOfManufacture">
-                      Year of Manufacture
+                      Year of Manufacture{" "}
+                      <span className="text-red-500">*</span>
                     </FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
@@ -642,7 +678,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="bodyType">Body Type</FieldLabel>
+                    <FieldLabel htmlFor="bodyType">
+                      Body Type <span className="text-red-500">*</span>
+                    </FieldLabel>
                     {isFieldsDisabled ? (
                       <Input
                         value={form.bodyType}
@@ -670,7 +708,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="engineCapacity">
-                      Engine Capacity
+                      Engine Capacity <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="engineCapacity"
@@ -685,7 +723,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="engineNumber">
-                      Engine Number
+                      Engine Number <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="engineNumber"
@@ -755,7 +793,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="vehiclePurpose">
-                      Vehicle Purpose
+                      Vehicle Purpose <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Input
                       id="vehiclePurpose"
@@ -771,7 +809,7 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="vehiclePurposeCategory">
-                      Purpose Category
+                      Purpose Category<span className="text-red-500">*</span>
                     </FieldLabel>
                     <Select
                       onValueChange={(v) =>
@@ -807,6 +845,38 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                       </SelectContent>
                     </Select>
                   </Field>
+                </div>
+              </div>
+
+              {/* section: ownership */}
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                  Vehicle ownership
+                </p>
+
+                <p>
+                  Who is the registered owner of this vehicle?
+                  <span className="text-red-500">*</span>
+                </p>
+                <div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div
+                      onClick={() => setIsCoOwned(false)}
+                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned === false && " bg-primary text-white"}`}
+                    >
+                      <LucideUser />
+                      <p>I am the sole owner</p>
+                    </div>
+                    <div
+                      onClick={() => setIsCoOwned(true)}
+                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned && " bg-primary text-white"}`}
+                    >
+                      <LucideUsers />
+                      <p>
+                        It is co-owned or under finance (e.g. Hire Purchase)
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Metadata } from "next";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://motor.medgeninsurance.com";
@@ -87,6 +88,13 @@ export default function ThirdPartyInsurancePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Motor Insurance", href: "/motor-insurance" },
+          { name: "Third Party Insurance", href: "/third-party-insurance" },
+        ]}
       />
 
       {/* Hero */}
@@ -271,10 +279,11 @@ export default function ThirdPartyInsurancePage() {
                   <p className="text-sm text-[#334e68] leading-relaxed">
                     In Kenya, Section 4 of the Insurance (Motor Vehicle Third
                     Party Risks) Act (Cap 405) makes it a legal requirement to
-                    have at minimum Third Party bodily injury and property damage
-                    cover before operating a motor vehicle on public roads.
-                    Driving without valid insurance is a criminal offence that
-                    can result in fines, vehicle impoundment, or imprisonment.
+                    have at minimum Third Party bodily injury and property
+                    damage cover before operating a motor vehicle on public
+                    roads. Driving without valid insurance is a criminal offence
+                    that can result in fines, vehicle impoundment, or
+                    imprisonment.
                   </p>
                 </div>
               </div>

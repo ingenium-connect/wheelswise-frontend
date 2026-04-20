@@ -10,16 +10,10 @@ import { toast } from "sonner";
 import { axiosClient } from "@/utilities/axios-client";
 import { RESET_PASSWORD_ENDPOINT } from "@/utilities/endpoints";
 import { Loader2, KeyRound } from "lucide-react";
-import { useUserStore } from "@/stores/userStore";
 
 export default function ForgotPassword() {
   const router = useRouter();
-  const { profile } = useUserStore();
-
-  const isLoggedIn = !!profile?.id_number;
-  const [nationalId, setNationalId] = useState(
-    profile?.id_number ?? "",
-  );
+  const [nationalId, setNationalId] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -99,20 +93,14 @@ export default function ForgotPassword() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 National ID Number
               </label>
-              {isLoggedIn ? (
-                <div className="w-full px-4 py-2.5 border border-[#d7e8ee] rounded-lg bg-gray-50 text-gray-600 text-sm">
-                  {nationalId}
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  required
-                  value={nationalId}
-                  onChange={(e) => setNationalId(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-[#d7e8ee] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm"
-                  placeholder="e.g. 12345678"
-                />
-              )}
+              <input
+                type="text"
+                required
+                value={nationalId}
+                onChange={(e) => setNationalId(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#d7e8ee] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm"
+                placeholder="e.g. 12345678"
+              />
             </div>
 
             <Button
@@ -127,10 +115,10 @@ export default function ForgotPassword() {
 
           <p className="text-sm text-center text-muted-foreground mt-6">
             <Link
-              href={isLoggedIn ? "/dashboard" : "/login"}
+              href="/login"
               className="font-medium text-primary hover:underline"
             >
-              {isLoggedIn ? "Back to Dashboard" : "Back to Login"}
+              Back to Login
             </Link>
           </p>
         </div>

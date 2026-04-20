@@ -171,6 +171,7 @@ export interface FinalUserPayload {
   source: string;
   source_vehicle_reg_number: string;
   user: UserPayload;
+  secondary_user?: UserPayload;
 }
 
 export interface PaymentMethods {
@@ -286,6 +287,14 @@ export type InsurancePolicy = {
     email: string;
     kra_pin: string;
   };
+  primary_user?: {
+    id: string;
+    name: string;
+    msisdn: string;
+    id_number: string;
+    email: string;
+    kra_pin: string;
+  };
   payment_method?: {
     id: string;
     description: string;
@@ -351,10 +360,22 @@ export type UserProfile = {
   kra_pin: string;
   is_active: boolean;
   user_type: string;
+  kra_pin_url?: string | null;
+  national_id_url?: string | null;
 };
 
 export type UIMappedPaymentMethod = PaymentMethod & {
   uiKey: string;
+};
+
+export type PersonalDetails = {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  idNumber: string;
+  kraPin: string;
+  ntsaRegistered?: boolean;
 };
 
 export type TpoOption = "PRIVATE" | "COMMERCIAL" | "MOTORBIKE";

@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://motor.medgeninsurance.com"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://motor.medgeninsurance.com",
   ),
   title: {
     template: "%s | Wheelswise",

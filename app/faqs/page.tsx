@@ -1,5 +1,6 @@
 import FaqsContent from "@/components/faqs/FaqsContent";
 import type { Metadata } from "next";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   title: "FAQs — Motor Insurance Questions Answered",
@@ -123,6 +124,12 @@ export default function FaqsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "FAQs", href: "/faqs" },
+        ]}
       />
       <div className="bg-[#f0f6f9] flex-1">
         <div className="px-4 md:px-8 pt-6 pb-2">

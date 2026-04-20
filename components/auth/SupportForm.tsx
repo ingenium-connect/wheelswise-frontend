@@ -9,6 +9,13 @@ import { useRouter } from "next/navigation";
 import { HeadphonesIcon, Loader2 } from "lucide-react";
 import { axiosClient } from "@/utilities/axios-client";
 import { SUPPORT_REQUEST_ENDPOINT } from "@/utilities/endpoints";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const CATEGORIES: { label: string; value: string }[] = [
   { label: "Policy Inquiry", value: "POLICY_INQUIRY" },
@@ -38,6 +45,10 @@ export default function SupportForm() {
     >,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setForm({ ...form, category: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,20 +149,18 @@ export default function SupportForm() {
                   <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">
                     Category
                   </label>
-                  <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    required
-                    className={inputClass}
-                  >
-                    <option value="">Select a category</option>
-                    {CATEGORIES.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Select onValueChange={handleCategoryChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#1e3a5f] mb-1.5">

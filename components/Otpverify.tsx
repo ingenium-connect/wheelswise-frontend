@@ -33,7 +33,9 @@ const OtpVerify: React.FC = () => {
   const searchParams = useSearchParams();
   const isLoginFlow = searchParams.get("from") === "login";
   const loginNationalId = isLoginFlow
-    ? (typeof window !== "undefined" ? sessionStorage.getItem("__login_national_id__") ?? "" : "")
+    ? typeof window !== "undefined"
+      ? (sessionStorage.getItem("__login_national_id__") ?? "")
+      : ""
     : "";
 
   // Logged-in "new vehicle" flow: has product_type/motor_type params, not login flow,
@@ -44,10 +46,7 @@ const OtpVerify: React.FC = () => {
     typeof window !== "undefined" &&
     !!sessionStorage.getItem(PENDING_VEHICLE_KEY);
   const isNewVehicleFlow =
-    !isLoginFlow &&
-    !!flowProductType &&
-    !!flowMotorType &&
-    !hasPendingVehicle;
+    !isLoginFlow && !!flowProductType && !!flowMotorType && !hasPendingVehicle;
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +73,11 @@ const OtpVerify: React.FC = () => {
   }, [timer]);
 
   const resendOtp = () => {
-    const nationalId = isLoginFlow ? loginNationalId : personalDetails.idNumber;
+    const nationalId = isLoginFlow
+      ? loginNationalId
+      : personalDetails.secondary_user
+        ? personalDetails.secondary_user.idNumber
+        : personalDetails.user.idNumber;
     setAllowResend(false);
     (async () => {
       try {
@@ -130,12 +133,16 @@ const OtpVerify: React.FC = () => {
           sessionStorage.removeItem("__login_national_id__");
           router.push("/login");
         } else if (isNewVehicleFlow) {
-          // Logged-in user adding a new vehicle — continue to vehicle value
-          router.push(
-            `/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`,
-          );
+          // Logged-in user: if insuring an existing registered vehicle, skip vehicle-value
+          const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
+          if (insuringExisting) {
+            router.push(`/motor-subtype?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+          } else {
+            router.push(`/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+          }
         } else {
           await registerPendingVehicle();
+          window.dispatchEvent(new Event("auth:changed"));
           router.push("/dashboard/payment-summary");
           router.refresh();
         }
@@ -195,11 +202,7 @@ const OtpVerify: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className={`flex justify-center ${shake ? shakeClass : ""}`}>
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={handleOtpChange}
-              >
+              <InputOTP maxLength={6} value={otp} onChange={handleOtpChange}>
                 <InputOTPGroup>
                   {[0, 1, 2].map((i) => (
                     <InputOTPSlot key={i} index={i} />

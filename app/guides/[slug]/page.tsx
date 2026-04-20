@@ -21,8 +21,7 @@ type Guide = {
 const GUIDES: Guide[] = [
   {
     slug: "comprehensive-vs-third-party",
-    title:
-      "Comprehensive vs Third Party Insurance — Which Should You Choose?",
+    title: "Comprehensive vs Third Party Insurance — Which Should You Choose?",
     metaTitle:
       "Comprehensive vs Third Party Insurance Kenya — Which is Right for You?",
     metaDescription:
@@ -205,8 +204,7 @@ const GUIDES: Guide[] = [
     ],
     sections: [
       {
-        heading:
-          "Is Motor Insurance Mandatory for New Drivers in Kenya?",
+        heading: "Is Motor Insurance Mandatory for New Drivers in Kenya?",
         body: "Yes. Every motor vehicle operated on a public road in Kenya must have at minimum Third Party Only (TPO) insurance, regardless of whether the driver is new or experienced. Driving without valid insurance is a criminal offence under the Insurance Act and Traffic Act of Kenya.",
       },
       {

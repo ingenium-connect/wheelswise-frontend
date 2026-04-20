@@ -73,7 +73,9 @@ const SelectMotorType = ({ data }: Props) => {
           setCommercialOptions(res.data);
         })
         .catch(() => {
-          toast.error("Could not load commercial categories. Please refresh the page.");
+          toast.error(
+            "Could not load commercial categories. Please refresh the page.",
+          );
         });
     };
     setCoverStep(1);
@@ -111,13 +113,28 @@ const SelectMotorType = ({ data }: Props) => {
     const tpoCategory = category as TpoOption;
     let motorTypeName: string;
     if (tpoCategory === "PRIVATE") {
-      setMotorType({ id: "1", name: "PRIVATE", description: "", image_url: "" });
+      setMotorType({
+        id: "1",
+        name: "PRIVATE",
+        description: "",
+        image_url: "",
+      });
       motorTypeName = "PRIVATE";
     } else if (tpoCategory === "MOTORBIKE") {
-      setMotorType({ id: "3", name: "MOTORBIKE", description: "", image_url: "" });
+      setMotorType({
+        id: "3",
+        name: "MOTORBIKE",
+        description: "",
+        image_url: "",
+      });
       motorTypeName = "MOTORBIKE";
     } else {
-      setMotorType({ id: "2", name: "COMMERCIAL", description: "", image_url: "" });
+      setMotorType({
+        id: "2",
+        name: "COMMERCIAL",
+        description: "",
+        image_url: "",
+      });
       motorTypeName = "COMMERCIAL";
     }
     setTpoOption(tpoCategory);

@@ -9,6 +9,7 @@ export const REFRESH_TOKEN_ENDPOINT = "/auth/refresh";
 export const PROFILE_ENDPOINT = "/users/profile";
 export const USER_POLICIES_ENDPOINT = "/users/policies";
 export const USER_VEHICLES_ENDPOINT = "/users/vehicles";
+export const USER_DOCUMENTS_ENDPOINT = "/users/documents";
 export const RESET_PASSWORD_ENDPOINT = "/account/request";
 
 // DATA ENDPOINTS
@@ -37,3 +38,5 @@ export const FILE_UPLOAD_ENDPOINT = "/file-upload";
 export const ACCOUNT_RESET_ENDPOINT = "/account/reset";
 export const ADDITIONAL_BENEFITS_ENDPOINT = "/benefit/additional";
 export const BENEFIT_EXTRAS_ENDPOINT = "/benefit/extras";
+export const PREMIUM_RECALCULATION_ENDPOINT =
+  "/underwriter/product-premium-recalculation";

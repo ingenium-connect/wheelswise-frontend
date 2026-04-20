@@ -6,13 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Car, FileText, Home, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  policyResponse,
-  UserProfile,
-  Vehicle,
-} from "@/types/data";
+import { policyResponse, UserProfile, Vehicle } from "@/types/data";
 import { PolicyCard } from "@/components/policy/policy-card";
 import { AccountCard } from "@/components/auth/profile-card";
+import { UserDocumentsCard } from "@/components/auth/user-documents-upload";
 import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import DashboardBanner from "@/components/auth/dashboard-banner";
 
@@ -113,8 +110,15 @@ export default function DashboardTabs({
             (policyPayload?.policies ?? []).filter((p) => {
               const now = new Date();
               const endDate = new Date(p.end_date);
-              const daysLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-              return p.is_paid && p.is_active && !p.is_cancelled && daysLeft > 0 && daysLeft <= 14;
+              const daysLeft =
+                (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+              return (
+                p.is_paid &&
+                p.is_active &&
+                !p.is_cancelled &&
+                daysLeft > 0 &&
+                daysLeft <= 14
+              );
             }).length
           }
         />
@@ -199,6 +203,7 @@ export default function DashboardTabs({
       {profile && (
         <TabsContent value="profile">
           <AccountCard user={profile} />
+          <UserDocumentsCard user={profile} />
         </TabsContent>
       )}
     </Tabs>

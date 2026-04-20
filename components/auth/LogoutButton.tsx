@@ -1,7 +1,13 @@
 "use client";
 
 import { destroyCookie } from "nookies";
-import { ACCESS_TOKEN, EMAIL, NAME, REFRESH_TOKEN, USER_ID } from "@/utilities/constants";
+import {
+  ACCESS_TOKEN,
+  EMAIL,
+  NAME,
+  REFRESH_TOKEN,
+  USER_ID,
+} from "@/utilities/constants";
 import { LogOut } from "lucide-react";
 
 export default function LogoutButton() {
@@ -12,8 +18,12 @@ export default function LogoutButton() {
     );
 
     // Wipe all persisted state — stores, session data, everything
-    try { localStorage.clear(); } catch (_) {}
-    try { sessionStorage.clear(); } catch (_) {}
+    try {
+      localStorage.clear();
+    } catch (_) {}
+    try {
+      sessionStorage.clear();
+    } catch (_) {}
 
     // Navigate to logout route — clears httpOnly cookies and redirects to /login
     window.location.href = "/api/logout";

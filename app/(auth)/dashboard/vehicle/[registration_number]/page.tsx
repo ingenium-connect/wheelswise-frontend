@@ -179,9 +179,7 @@ export default async function VehicleDetailPage({
       <div className="px-4 md:px-8 pb-12 max-w-4xl mx-auto space-y-5">
         {/* Insure nudge */}
         {!isInsured && (
-          <InsureVehicleButton
-            registrationNumber={vehicle.registration_number}
-          />
+          <InsureVehicleButton vehicle={vehicle} />
         )}
 
         {/* Vehicle Identification */}
@@ -286,10 +284,7 @@ export default async function VehicleDetailPage({
                   label="Certificate Issued"
                   value={policy.certificate_issued ? "Yes" : "No"}
                 />
-                <Detail
-                  label="Date Created"
-                  value={fmt(policy.date_created)}
-                />
+                <Detail label="Date Created" value={fmt(policy.date_created)} />
               </Grid>
             </Section>
 
@@ -345,22 +340,28 @@ export default async function VehicleDetailPage({
               </Grid>
             </Section>
 
-            {/* Policyholder */}
+            {/* Policyholder / Proposer (Hirer) */}
             {policy.user && (
-              <Section icon={User} title="Policyholder">
+              <Section icon={User} title={policy.primary_user ? "Proposer (Hirer)" : "Policyholder"}>
                 <Grid>
                   <Detail label="Full Name" value={or(policy.user.name)} />
                   <Detail label="Email" value={or(policy.user.email)} />
                   <Detail label="Phone" value={or(policy.user.msisdn)} />
-                  <Detail
-                    label="ID Number"
-                    value={or(policy.user.id_number)}
-                  />
-                  <Detail
-                    label="KRA PIN"
-                    value={or(policy.user.kra_pin)}
-                    mono
-                  />
+                  <Detail label="ID Number" value={or(policy.user.id_number)} />
+                  <Detail label="KRA PIN" value={or(policy.user.kra_pin)} mono />
+                </Grid>
+              </Section>
+            )}
+
+            {/* Registered Owner (Hire Purchase only) */}
+            {policy.primary_user && (
+              <Section icon={User} title="Registered Owner">
+                <Grid>
+                  <Detail label="Full Name" value={or(policy.primary_user.name)} />
+                  <Detail label="Email" value={or(policy.primary_user.email)} />
+                  <Detail label="Phone" value={or(policy.primary_user.msisdn)} />
+                  <Detail label="ID Number" value={or(policy.primary_user.id_number)} />
+                  <Detail label="KRA PIN" value={or(policy.primary_user.kra_pin)} mono />
                 </Grid>
               </Section>
             )}

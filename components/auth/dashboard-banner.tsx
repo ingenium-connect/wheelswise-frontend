@@ -11,7 +11,12 @@ type Props = {
   expiringSoonCount: number;
 };
 
-const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }: Props) => {
+const DashboardBanner = ({
+  name,
+  vehicleCount,
+  policyCount,
+  expiringSoonCount,
+}: Props) => {
   const stats = [
     {
       icon: <Car className="w-5 h-5 text-primary" />,
@@ -61,7 +66,9 @@ const DashboardBanner = ({ name, vehicleCount, policyCount, expiringSoonCount }:
             <Link key={i} href={stat.href}>
               <Card className="border border-[#d7e8ee] shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
                 <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                  <div className={`p-3 rounded-full ${stat.bg}`}>{stat.icon}</div>
+                  <div className={`p-3 rounded-full ${stat.bg}`}>
+                    {stat.icon}
+                  </div>
                   <p className="text-3xl font-bold text-[#1e3a5f]">
                     {stat.value ?? 0}
                   </p>

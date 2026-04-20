@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Metadata } from "next";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://motor.medgeninsurance.com";
@@ -122,6 +123,12 @@ export default function MotorInsurancePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Motor Insurance", href: "/motor-insurance" },
+        ]}
       />
 
       {/* Hero */}

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,55 +15,34 @@ import {
 import { axiosAuthClient } from "@/utilities/axios-client";
 import {
   FILE_UPLOAD_ENDPOINT,
-  VEHICLE_DETAIL_ENDPOINT,
+  USER_DOCUMENTS_ENDPOINT,
 } from "@/utilities/endpoints";
 import {
   Eye,
-  FileText,
-  Upload,
   ExternalLink,
+  FileText,
   Image as ImageIcon,
   Loader2,
+  Upload,
 } from "lucide-react";
 import { BlobPdfViewer } from "@/components/ui/blob-pdf-viewer";
 import { toast } from "sonner";
+import { UserProfile } from "@/types/data";
 
 const ACCEPTED_TYPES = ".pdf,.jpg,.jpeg,.png";
 
-function guessFileTypeFromUrl(url: string): "pdf" | "image" | null {
+type DocumentField = "kra_pin_url" | "national_id_url";
+
+function guessFileTypeFromUrl(url: string): "pdf" | "image" {
   const path = url.split("?")[0].toLowerCase();
-  if (path.endsWith(".pdf")) return "pdf";
   if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(path)) return "image";
-  return null;
+  return "pdf";
 }
 
-export function LogbookViewer({ url }: { url: string }) {
+function DocumentViewer({ url, label }: { url: string; label: string }) {
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<"pdf" | "image" | null>(() =>
-    guessFileTypeFromUrl(url),
-  );
+  const type = guessFileTypeFromUrl(url);
   const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
-
-  // If the URL doesn't expose a recognizable extension, probe the proxy for
-  // the real content-type so we know whether to render a PDF viewer or an image.
-  useEffect(() => {
-    if (type !== null) return;
-    let cancelled = false;
-    fetch(proxiedUrl, { method: "HEAD" })
-      .then((res) => {
-        if (cancelled) return;
-        const ct = res.headers.get("content-type") || "";
-        if (ct.includes("pdf")) setType("pdf");
-        else if (ct.startsWith("image/")) setType("image");
-        else setType("pdf"); // safest default for logbooks
-      })
-      .catch(() => {
-        if (!cancelled) setType("pdf");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [proxiedUrl, type]);
 
   return (
     <div className="flex items-center gap-3">
@@ -74,9 +54,7 @@ export function LogbookViewer({ url }: { url: string }) {
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-[#1e3a5f]">
-          Logbook Available
-        </p>
+        <p className="text-sm font-semibold text-[#1e3a5f]">{label} Uploaded</p>
         <p className="text-xs text-muted-foreground">
           {type === "image" ? "Image file" : "PDF document"}
         </p>
@@ -91,25 +69,21 @@ export function LogbookViewer({ url }: { url: string }) {
           </DialogTrigger>
           <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh]">
             <DialogHeader>
-              <DialogTitle>Vehicle Logbook</DialogTitle>
+              <DialogTitle>{label}</DialogTitle>
               <DialogDescription>
-                Preview of the uploaded vehicle logbook document.
+                Preview of your uploaded {label.toLowerCase()} document.
               </DialogDescription>
             </DialogHeader>
             <div className="mt-2 overflow-auto max-h-[75vh]">
-              {type === null ? (
-                <div className="flex items-center justify-center h-[70vh] rounded-lg border">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : type === "image" ? (
+              {type === "image" ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={proxiedUrl}
-                  alt="Vehicle logbook"
+                  alt={label}
                   className="w-full h-auto rounded-lg border"
                 />
               ) : (
-                <BlobPdfViewer src={proxiedUrl} title="Logbook PDF" />
+                <BlobPdfViewer src={proxiedUrl} title={label} />
               )}
             </div>
           </DialogContent>
@@ -124,12 +98,16 @@ export function LogbookViewer({ url }: { url: string }) {
   );
 }
 
-export function LogbookUploadPlaceholder({
-  vehicleId,
-  registrationNumber,
+function DocumentUploadRow({
+  label,
+  field,
+  existingUrl,
+  idNumber,
 }: {
-  vehicleId: string;
-  registrationNumber: string;
+  label: string;
+  field: DocumentField;
+  existingUrl?: string | null;
+  idNumber: string;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -140,14 +118,10 @@ export function LogbookUploadPlaceholder({
     if (!file) return;
 
     setUploading(true);
-
     try {
-      // Step 1: Upload file
+      const slugField = field === "kra_pin_url" ? "kra_pin" : "national_id";
       const formData = new FormData();
-      formData.append(
-        "file_name",
-        `${registrationNumber.toLowerCase()}logbook`,
-      );
+      formData.append("file_name", `${idNumber.toLowerCase()}_${slugField}`);
       formData.append("file", file);
 
       const uploadRes = await axiosAuthClient.post(
@@ -159,23 +133,25 @@ export function LogbookUploadPlaceholder({
       const mediaURL = uploadRes.data?.[0]?.mediaURL;
       if (!mediaURL) throw new Error("Upload failed — no URL returned");
 
-      // Step 2: Update vehicle with logbook URL
-      await axiosAuthClient.patch(`${VEHICLE_DETAIL_ENDPOINT}/${vehicleId}`, {
-        logbook_url: mediaURL,
+      await axiosAuthClient.patch(USER_DOCUMENTS_ENDPOINT, {
+        [field]: mediaURL,
       });
 
-      toast.success("Logbook uploaded successfully");
+      toast.success(`${label} uploaded successfully`);
       router.refresh();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to upload logbook";
+        err instanceof Error ? err.message : `Failed to upload ${label}`;
       toast.error(message);
     } finally {
       setUploading(false);
-      // Reset input so re-selecting the same file triggers onChange
       if (inputRef.current) inputRef.current.value = "";
     }
   };
+
+  if (existingUrl) {
+    return <DocumentViewer url={existingUrl} label={label} />;
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -184,10 +160,10 @@ export function LogbookUploadPlaceholder({
       </div>
       <div className="min-w-0">
         <p className="text-sm font-semibold text-[#1e3a5f]">
-          No logbook uploaded
+          No {label} uploaded
         </p>
         <p className="text-xs text-muted-foreground">
-          Upload your vehicle logbook for verification
+          Upload your {label.toLowerCase()} for verification
         </p>
       </div>
       <input
@@ -212,5 +188,35 @@ export function LogbookUploadPlaceholder({
         {uploading ? "Uploading..." : "Upload"}
       </Button>
     </div>
+  );
+}
+
+export function UserDocumentsCard({ user }: { user: UserProfile }) {
+  return (
+    <Card className="border border-[#d7e8ee] shadow-sm mt-5">
+      <CardContent className="p-6">
+        <h3 className="text-sm font-semibold text-[#1e3a5f] mb-5 uppercase tracking-wide">
+          Identity Documents
+        </h3>
+        <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
+            <DocumentUploadRow
+              label="National ID"
+              field="national_id_url"
+              existingUrl={user.national_id_url}
+              idNumber={user.id_number}
+            />
+          </div>
+          <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
+            <DocumentUploadRow
+              label="KRA PIN Certificate"
+              field="kra_pin_url"
+              existingUrl={user.kra_pin_url}
+              idNumber={user.id_number}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

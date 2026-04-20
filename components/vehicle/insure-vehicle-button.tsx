@@ -3,16 +3,37 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
+import { Vehicle } from "@/types/data";
+import { useInsuranceStore } from "@/stores/insuranceStore";
+import { useVehicleStore } from "@/stores/vehicleStore";
 
-export function InsureVehicleButton({
-  registrationNumber,
-}: {
-  registrationNumber: string;
-}) {
+export function InsureVehicleButton({ vehicle }: { vehicle: Vehicle }) {
   const router = useRouter();
+  const setInsuranceVehicleValue = useInsuranceStore((s) => s.setVehicleValue);
+  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } = useVehicleStore();
 
   const handleClick = () => {
-    localStorage.setItem("vehicleRegistrationNumber", registrationNumber);
+    localStorage.setItem("vehicleRegistrationNumber", vehicle.registration_number);
+    localStorage.setItem("insure_existing_vehicle", "true");
+
+    // Pre-populate stores so vehicle-value and vehicle-details pages can be skipped
+    setInsuranceVehicleValue(vehicle.vehicle_value);
+    setVehicleValue(String(vehicle.vehicle_value));
+    setSeatingCapacity(vehicle.seating_capacity ? String(vehicle.seating_capacity) : "");
+    setTonnage(vehicle.tonnage ?? 0);
+    setVehicleDetails({
+      vehicleNumber: vehicle.registration_number,
+      vehicleValue: vehicle.vehicle_value,
+      chassisNumber: vehicle.chassis_number ?? "",
+      make: vehicle.make ?? "",
+      model: vehicle.model ?? "",
+      year: String(vehicle.year_of_manufacture),
+      bodyType: vehicle.body_type ?? "",
+      vehiclePurpose: vehicle.purpose ?? "",
+      engineCapacity: vehicle.engine_capacity ? String(vehicle.engine_capacity) : "",
+      engineNumber: vehicle.engine_number ?? "",
+    });
+
     router.push("/cover-type");
   };
 
@@ -32,10 +53,7 @@ export function InsureVehicleButton({
           </p>
         </div>
       </div>
-      <Button
-        onClick={handleClick}
-        className="text-white shrink-0 sm:ml-auto"
-      >
+      <Button onClick={handleClick} className="text-white shrink-0 sm:ml-auto">
         Insure this Vehicle
       </Button>
     </div>

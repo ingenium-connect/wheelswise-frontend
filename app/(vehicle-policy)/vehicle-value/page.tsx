@@ -1,5 +1,11 @@
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleValue from "@/components/value/VehicleValue";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Enter Vehicle Value",
+  robots: { index: false, follow: true },
+};
 
 export default async function Page({
   searchParams,

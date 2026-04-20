@@ -1,5 +1,11 @@
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleSearch from "@/components/dashboard/VehicleSearch";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Add a Vehicle",
+  robots: { index: false, follow: false },
+};
 
 export default function AddVehiclePage() {
   return (

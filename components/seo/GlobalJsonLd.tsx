@@ -8,7 +8,7 @@ const organizationSchema = {
   legalName: "MedGen Insurance Agency",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.png`,
-  image: `${BASE_URL}/og-image.png`,
+  image: `${BASE_URL}/logo.png`,
   description:
     "Kenya's digital motor insurance platform connecting motorists with IRA-licensed underwriters for comprehensive and third-party motor insurance.",
   telephone: "+254717227690",
@@ -78,6 +78,14 @@ const websiteSchema = {
     "@type": "Organization",
     name: "MedGen Insurance Agency",
     url: BASE_URL,
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `https://www.google.com/search?q=site:motor.medgeninsurance.com+{search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
   },
 };
 

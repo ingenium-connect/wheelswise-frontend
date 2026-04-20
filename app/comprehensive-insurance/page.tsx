@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Metadata } from "next";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://motor.medgeninsurance.com";
@@ -55,8 +56,7 @@ const jsonLd = {
         itemOffered: {
           "@type": "Service",
           name: "Private Comprehensive",
-          description:
-            "Comprehensive insurance for private passenger vehicles",
+          description: "Comprehensive insurance for private passenger vehicles",
         },
       },
       {
@@ -165,6 +165,13 @@ export default function ComprehensiveInsurancePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Motor Insurance", href: "/motor-insurance" },
+          { name: "Comprehensive Insurance", href: "/comprehensive-insurance" },
+        ]}
       />
 
       {/* Hero */}
