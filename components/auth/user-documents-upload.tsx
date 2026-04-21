@@ -132,27 +132,32 @@ function DocumentUploadRow({
     const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(existingUrl)}`;
 
     return (
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 p-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-          {type === "image" ? (
-            <ImageIcon className="w-5 h-5 text-emerald-600" />
-          ) : (
-            <FileText className="w-5 h-5 text-emerald-600" />
-          )}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        {/* Icon + label row */}
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex-shrink-0 p-2 bg-emerald-50 border border-emerald-200 rounded-xl">
+            {type === "image" ? (
+              <ImageIcon className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <FileText className="w-5 h-5 text-emerald-600" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#1e3a5f] truncate">
+              {label} Uploaded
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {type === "image" ? "Image file" : "PDF document"}
+            </p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#1e3a5f]">
-            {label} Uploaded
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {type === "image" ? "Image file" : "PDF document"}
-          </p>
-        </div>
-        <div className="flex items-center gap-1 ml-auto shrink-0">
+
+        {/* Action buttons row */}
+        <div className="flex items-center gap-2 shrink-0">
           {/* View */}
           <Dialog open={viewOpen} onOpenChange={setViewOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
+              <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none">
                 <Eye className="w-3.5 h-3.5" />
                 View
               </Button>
@@ -181,7 +186,7 @@ function DocumentUploadRow({
 
           {/* Open in new tab */}
           <a href={existingUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="ghost" size="sm">
+            <Button variant="outline" size="sm">
               <ExternalLink className="w-3.5 h-3.5" />
             </Button>
           </a>
@@ -189,7 +194,7 @@ function DocumentUploadRow({
           {/* Re-upload */}
           {fileInput}
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             disabled={uploading}
             onClick={() => inputRef.current?.click()}
@@ -207,23 +212,26 @@ function DocumentUploadRow({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex-shrink-0 p-2 bg-gray-100 border border-gray-200 rounded-xl">
-        <FileText className="w-5 h-5 text-gray-400" />
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-[#1e3a5f]">
-          No {label} uploaded
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Upload your {label.toLowerCase()} for verification
-        </p>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {/* Icon + label row */}
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex-shrink-0 p-2 bg-gray-100 border border-gray-200 rounded-xl">
+          <FileText className="w-5 h-5 text-gray-400" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#1e3a5f] truncate">
+            No {label} uploaded
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            Upload your {label.toLowerCase()} for verification
+          </p>
+        </div>
       </div>
       {fileInput}
       <Button
         variant="outline"
         size="sm"
-        className="gap-1.5 ml-auto shrink-0"
+        className="gap-1.5 w-full sm:w-auto shrink-0"
         disabled={uploading}
         onClick={() => inputRef.current?.click()}
       >
@@ -270,7 +278,7 @@ export function UserDocumentsCard({ user }: { user: UserProfile }) {
   return (
     <Card className="border border-[#d7e8ee] shadow-sm mt-5">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between gap-3 mb-5">
           <h3 className="text-sm font-semibold text-[#1e3a5f] uppercase tracking-wide">
             Identity Documents
           </h3>
