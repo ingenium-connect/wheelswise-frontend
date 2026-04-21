@@ -38,18 +38,18 @@ export function AccountCard({ user }: Props) {
   ];
 
   return (
-    <div className="max-w-2xl">
+    <div className="w-full max-w-2xl">
       {/* Profile header */}
       <Card className="border border-[#d7e8ee] shadow-sm mb-5 overflow-hidden">
         <div className="h-20 bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
         <CardContent className="px-6 pb-6">
-          <div className="-mt-8 mb-4 flex items-end gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white border-4 border-white shadow-md flex items-center justify-center">
+          <div className="-mt-8 mb-4 flex items-end gap-4 min-w-0">
+            <div className="w-16 h-16 shrink-0 rounded-2xl bg-white border-4 border-white shadow-md flex items-center justify-center">
               <User className="w-7 h-7 text-primary" />
             </div>
-            <div className="pb-1">
-              <h2 className="text-lg font-bold text-[#1e3a5f]">{user.name}</h2>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+            <div className="pb-1 min-w-0">
+              <h2 className="text-lg font-bold text-[#1e3a5f] truncate">{user.name}</h2>
+              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
             </div>
           </div>
           <div
@@ -88,11 +88,11 @@ export function AccountCard({ user }: Props) {
                   <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
                     {field.icon}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
                       {field.label}
                     </p>
-                    <p className="font-medium text-[#1e3a5f] text-sm">
+                    <p className="font-medium text-[#1e3a5f] text-sm break-all">
                       {field.value || "—"}
                     </p>
                   </div>
