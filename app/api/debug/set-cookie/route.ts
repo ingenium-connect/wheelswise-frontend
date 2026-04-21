@@ -17,5 +17,3 @@ export async function GET() {
 
   return res;
 }
-
-export const runtime = "edge";

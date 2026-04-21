@@ -493,7 +493,8 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
               </div>
               <Field>
                 <FieldLabel htmlFor="vehicleReg">
-                  Vehicle Registration Number
+                  Vehicle Registration Number{" "}
+                  <span className="text-red-500">*</span>
                 </FieldLabel>
                 <Input
                   id="vehicleReg"

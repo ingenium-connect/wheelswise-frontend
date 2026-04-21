@@ -36,6 +36,7 @@ import { LoginPayload } from "@/types/data";
 import {
   ACCESS_TOKEN,
   EMAIL,
+  KYC_STATUS,
   NAME,
   REFRESH_TOKEN,
   USER_ID,
@@ -125,6 +126,7 @@ const Login: React.FC = () => {
           [USER_ID]: response?.id,
           [EMAIL]: response?.email,
           [NAME]: response?.name,
+          [KYC_STATUS]: response?.kyc_documents_verification_status ?? "",
         };
 
         Object.entries(userData).forEach(([key, value]) =>
@@ -199,7 +201,7 @@ const Login: React.FC = () => {
                   name="national_identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>National Identifier</FormLabel>
+                      <FormLabel>National Identifier <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           id="national_identifier"
@@ -224,7 +226,7 @@ const Login: React.FC = () => {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex justify-between items-center">
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
                         <Link
                           href="/forgot-password"
                           className="text-xs text-primary hover:underline"

@@ -49,7 +49,7 @@ function LastUpdated({ date }: { date: string }) {
 function PrivacyPolicy() {
   return (
     <div>
-      <LastUpdated date="2026-03-08" />
+      <LastUpdated date="2026-04-18" />
 
       <Prose>
         This Privacy Policy explains how MedGen Insurance Agency trading as
@@ -140,7 +140,23 @@ function PrivacyPolicy() {
         safeguards.
       </Prose>
 
-      <SectionHeading number="10" title="Contact" />
+      <SectionHeading number="10" title="KYC Document Submission" />
+      <Prose>
+        In compliance with applicable Anti-Money Laundering (AML) and Know Your
+        Customer (KYC) regulations, users are required to submit accurate and
+        valid identity verification documents - including a government-issued
+        National ID or Passport and a KRA PIN Certificate - within{" "}
+        <strong>48 hours</strong> of account registration or upon request by the
+        Company. Failure to provide accurate KYC documents within the stipulated
+        timeframe may result in suspension of account access, cancellation of
+        pending policy applications, or termination of active policies. The
+        Company reserves the right to reject documents that are illegible,
+        expired, or inconsistent with information provided during registration.
+        Users are solely liable for any loss or prejudice arising from the
+        submission of inaccurate, fraudulent, or incomplete KYC documentation.
+      </Prose>
+
+      <SectionHeading number="11" title="Contact" />
       <div className="mt-2 p-4 bg-primary/5 rounded-xl border border-[#d7e8ee]">
         <p className="text-sm text-[#1e3a5f]">
           <span className="font-medium">Email: </span>
@@ -222,7 +238,7 @@ function CookiesPolicy() {
 
   return (
     <div>
-      <LastUpdated date="2026-03-08" />
+      <LastUpdated date="2026-04-18" />
 
       <Prose>
         This Cookies Policy explains how MedGen (&ldquo;Company&rdquo;) uses
