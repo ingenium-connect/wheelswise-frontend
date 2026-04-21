@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,79 +23,26 @@ import {
   FileText,
   Image as ImageIcon,
   Loader2,
+  Pencil,
+  ShieldAlert,
+  ShieldCheck,
   Upload,
+  XCircle,
 } from "lucide-react";
 import { BlobPdfViewer } from "@/components/ui/blob-pdf-viewer";
 import { toast } from "sonner";
-import { UserProfile } from "@/types/data";
+import { KycVerificationStatus, UserProfile } from "@/types/data";
 
 const ACCEPTED_TYPES = ".pdf,.jpg,.jpeg,.png";
 
 type DocumentField = "kra_pin_url" | "national_id_url";
 
-function guessFileTypeFromUrl(url: string): "pdf" | "image" {
+function guessFileTypeFromUrl(url: string): "pdf" | "image" | null {
   const path = url.split("?")[0].toLowerCase();
   if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(path)) return "image";
-  return "pdf";
-}
-
-function DocumentViewer({ url, label }: { url: string; label: string }) {
-  const [open, setOpen] = useState(false);
-  const type = guessFileTypeFromUrl(url);
-  const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex-shrink-0 p-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-        {type === "image" ? (
-          <ImageIcon className="w-5 h-5 text-emerald-600" />
-        ) : (
-          <FileText className="w-5 h-5 text-emerald-600" />
-        )}
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-[#1e3a5f]">{label} Uploaded</p>
-        <p className="text-xs text-muted-foreground">
-          {type === "image" ? "Image file" : "PDF document"}
-        </p>
-      </div>
-      <div className="flex items-center gap-2 ml-auto shrink-0">
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Eye className="w-3.5 h-3.5" />
-              View
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle>{label}</DialogTitle>
-              <DialogDescription>
-                Preview of your uploaded {label.toLowerCase()} document.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-2 overflow-auto max-h-[75vh]">
-              {type === "image" ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={proxiedUrl}
-                  alt={label}
-                  className="w-full h-auto rounded-lg border"
-                />
-              ) : (
-                <BlobPdfViewer src={proxiedUrl} title={label} />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          <Button variant="ghost" size="sm" className="gap-1.5">
-            <ExternalLink className="w-3.5 h-3.5" />
-          </Button>
-        </a>
-      </div>
-    </div>
-  );
+  if (/\.pdf$/.test(path)) return "pdf";
+  // No recognisable extension — caller must probe the Content-Type header
+  return null;
 }
 
 function DocumentUploadRow({
@@ -112,6 +59,26 @@ function DocumentUploadRow({
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+
+  // Resolve the file type. Start with a URL-based guess; if the URL has no
+  // recognisable extension (common with S3 signed URLs) probe the proxy HEAD
+  // so we get the real Content-Type instead of always falling back to "pdf".
+  const urlGuess = existingUrl ? guessFileTypeFromUrl(existingUrl) : null;
+  const [resolvedType, setResolvedType] = useState<"pdf" | "image" | null>(
+    urlGuess,
+  );
+
+  useEffect(() => {
+    if (!existingUrl || urlGuess !== null) return; // already known from URL
+    const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(existingUrl)}`;
+    fetch(proxiedUrl, { method: "HEAD" })
+      .then((res) => {
+        const ct = res.headers.get("content-type") ?? "";
+        setResolvedType(ct.startsWith("image/") ? "image" : "pdf");
+      })
+      .catch(() => setResolvedType("pdf")); // safe fallback
+  }, [existingUrl, urlGuess]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -149,8 +116,94 @@ function DocumentUploadRow({
     }
   };
 
+  // Hidden file input — always rendered so re-upload works in both states
+  const fileInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept={ACCEPTED_TYPES}
+      className="hidden"
+      onChange={handleUpload}
+    />
+  );
+
   if (existingUrl) {
-    return <DocumentViewer url={existingUrl} label={label} />;
+    const type = resolvedType ?? "pdf"; // default to pdf until probe resolves
+    const proxiedUrl = `/api/pdf-proxy?url=${encodeURIComponent(existingUrl)}`;
+
+    return (
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 p-2 bg-emerald-50 border border-emerald-200 rounded-xl">
+          {type === "image" ? (
+            <ImageIcon className="w-5 h-5 text-emerald-600" />
+          ) : (
+            <FileText className="w-5 h-5 text-emerald-600" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#1e3a5f]">
+            {label} Uploaded
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {type === "image" ? "Image file" : "PDF document"}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 ml-auto shrink-0">
+          {/* View */}
+          <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                View
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh]">
+              <DialogHeader>
+                <DialogTitle>{label}</DialogTitle>
+                <DialogDescription>
+                  Preview of your uploaded {label.toLowerCase()} document.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-2 overflow-auto max-h-[75vh]">
+                {type === "image" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={proxiedUrl}
+                    alt={label}
+                    className="w-full h-auto rounded-lg border"
+                  />
+                ) : (
+                  <BlobPdfViewer src={proxiedUrl} title={label} />
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Open in new tab */}
+          <a href={existingUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="ghost" size="sm">
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Button>
+          </a>
+
+          {/* Re-upload */}
+          {fileInput}
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+            title={`Replace ${label}`}
+          >
+            {uploading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Pencil className="w-3.5 h-3.5" />
+            )}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -166,13 +219,7 @@ function DocumentUploadRow({
           Upload your {label.toLowerCase()} for verification
         </p>
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={ACCEPTED_TYPES}
-        className="hidden"
-        onChange={handleUpload}
-      />
+      {fileInput}
       <Button
         variant="outline"
         size="sm"
@@ -191,13 +238,50 @@ function DocumentUploadRow({
   );
 }
 
+function KycStatusBadge({ status }: { status: KycVerificationStatus }) {
+  if (status === "VERIFIED") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+        Verified
+      </span>
+    );
+  }
+  if (status === "REJECTED") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
+        <XCircle className="w-3.5 h-3.5 shrink-0" />
+        Action required
+      </span>
+    );
+  }
+  // UNVERIFIED
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+      Pending review
+    </span>
+  );
+}
+
 export function UserDocumentsCard({ user }: { user: UserProfile }) {
+  const kycStatus = user.kyc_documents_verification_status;
+
   return (
     <Card className="border border-[#d7e8ee] shadow-sm mt-5">
       <CardContent className="p-6">
-        <h3 className="text-sm font-semibold text-[#1e3a5f] mb-5 uppercase tracking-wide">
-          Identity Documents
-        </h3>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-sm font-semibold text-[#1e3a5f] uppercase tracking-wide">
+            Identity Documents
+          </h3>
+          {kycStatus && <KycStatusBadge status={kycStatus} />}
+        </div>
+        {kycStatus === "REJECTED" && (
+          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+            Your documents were not accepted. Please re-upload clear, valid
+            copies of your National ID and KRA PIN Certificate.
+          </p>
+        )}
         <div className="space-y-4">
           <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
             <DocumentUploadRow

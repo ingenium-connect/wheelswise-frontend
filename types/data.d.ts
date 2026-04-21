@@ -351,6 +351,8 @@ export type policyResponse = {
   total_count: number;
 };
 
+export type KycVerificationStatus = "VERIFIED" | "UNVERIFIED" | "REJECTED";
+
 export type UserProfile = {
   id: string;
   name: string;
@@ -362,6 +364,7 @@ export type UserProfile = {
   user_type: string;
   kra_pin_url?: string | null;
   national_id_url?: string | null;
+  kyc_documents_verification_status?: KycVerificationStatus | null;
 };
 
 export type UIMappedPaymentMethod = PaymentMethod & {

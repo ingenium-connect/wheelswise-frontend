@@ -52,8 +52,16 @@ export function AccountCard({ user }: Props) {
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+          <div
+            className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
+              user.is_active
+                ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
+                : "text-red-700 bg-red-50 border border-red-200"
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${user.is_active ? "bg-emerald-500" : "bg-red-500"}`}
+            />
             {user.is_active ? "Active Account" : "Inactive Account"}
           </div>
         </CardContent>

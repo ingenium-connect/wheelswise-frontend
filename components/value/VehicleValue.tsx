@@ -101,7 +101,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="vehicleValue">
-                  Vehicle Value (KES)
+                  Vehicle Value (KES) <span className="text-red-500">*</span>
                 </FieldLabel>
                 <Input
                   id="vehicleValue"
@@ -113,10 +113,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
               </Field>
               <Field>
                 <FieldLabel htmlFor="seatingCapacity">
-                  Seating Capacity
-                  {requiresSeating && (
-                    <span className="text-red-500 ml-1">*</span>
-                  )}
+                  Seating Capacity <span className="text-red-500">*</span>
                 </FieldLabel>
                 <Input
                   id="seatingCapacity"

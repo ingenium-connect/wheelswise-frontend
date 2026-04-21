@@ -12,6 +12,8 @@ import StoreUserClient from "@/components/auth/StoreUserClient";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { Suspense } from "react";
 import StorePersonalDetailsClient from "@/components/auth/StorePersonalDetailsClient";
+import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import type { Metadata } from "next";
 
@@ -41,7 +43,16 @@ export default async function Page() {
 
     const [profileRes, policiesRes, vehiclesRes] = results;
 
-    profile = profileRes.status === "fulfilled" ? profileRes.value : undefined;
+    const rawProfile =
+      profileRes.status === "fulfilled" ? profileRes.value : undefined;
+
+    // If the profile fetch returned no valid user (expired/invalid session),
+    // force a full logout rather than showing an empty dashboard.
+    if (!rawProfile?.id) {
+      redirect("/api/logout");
+    }
+
+    profile = rawProfile as UserProfile;
     policies =
       policiesRes.status === "fulfilled" ? policiesRes.value : undefined;
 
@@ -49,8 +60,12 @@ export default async function Page() {
       const data = vehiclesRes.value.data;
       vehicles = Array.isArray(data) ? data : undefined;
     }
-  } catch (_err: unknown) {
-    // silently handle fetch errors; pages gracefully show empty states
+  } catch (err: unknown) {
+    // Next.js redirect() throws internally — let it propagate.
+    if (isRedirectError(err)) throw err;
+    // Any other unexpected error: force logout so the user never sees
+    // a broken logged-in state with empty data.
+    redirect("/api/logout");
   }
 
   const firstName = profile?.name?.split(" ")[0] ?? "there";

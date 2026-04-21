@@ -65,9 +65,9 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
    */
   const checkRequiredFields = (): boolean => {
     if (isCoOwned && personalDetails.secondary_user) {
-      return validateEmail(personalDetails.secondary_user?.email);
+      return validateEmail(secondaryForm.email);
     } else {
-      return validateEmail(personalDetails.user.email);
+      return validateEmail(form.email);
     }
   };
   const handleSubmit = (e: React.FormEvent) => {

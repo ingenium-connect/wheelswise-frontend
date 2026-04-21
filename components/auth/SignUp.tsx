@@ -383,7 +383,7 @@ const Signup: React.FC<Props> = ({
               )}
 
               <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">Password <span className="text-red-500">*</span></FieldLabel>
                 <div className="relative">
                   <Input
                     id="password"
@@ -412,7 +412,7 @@ const Signup: React.FC<Props> = ({
 
               <Field>
                 <FieldLabel htmlFor="confirm_password">
-                  Confirm Password
+                  Confirm Password <span className="text-red-500">*</span>
                 </FieldLabel>
                 <div className="relative">
                   <Input
