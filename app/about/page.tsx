@@ -22,7 +22,7 @@ import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 export const metadata: Metadata = {
   title: "About Us — Kenya's Digital Motor Insurance Platform",
   description:
-    "Wheelswise is a product of MedGen Insurance Agency, an IRA-licensed digital insurance intermediary in Kenya. We connect motorists with reputable underwriters for fast, transparent motor insurance.",
+    "Wheelswise is a product of Med-Gen Insurance Agency, an IRA-licensed digital insurance intermediary in Kenya. We connect motorists with reputable underwriters for fast, transparent motor insurance.",
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About Wheelswise — IRA-Licensed Motor Insurance in Kenya",
@@ -170,7 +170,7 @@ export default function AboutPage() {
                     A Licensed Insurance Intermediary Built for the Digital Age
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                    MedGen Insurance Agency is a licensed intermediary regulated
+                    Med-Gen Insurance Agency is a licensed intermediary regulated
                     by the Insurance Regulatory Authority (IRA) of Kenya. We act
                     as a bridge between motorists and reputable underwriters,
                     giving you access to competitive motor insurance products

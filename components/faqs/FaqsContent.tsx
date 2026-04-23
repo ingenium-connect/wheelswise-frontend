@@ -24,7 +24,7 @@ const CATEGORIES: Category[] = [
     faqs: [
       {
         q: "What is Wheelswise?",
-        a: "Wheelswise is a product of MedGen Insurance, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
+        a: "Wheelswise is a product of Med-Gen Insurance, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
       },
       {
         q: "How do I get a motor insurance quote?",
@@ -54,7 +54,7 @@ const CATEGORIES: Category[] = [
       },
       {
         q: "Is Wheelswise licensed and regulated?",
-        a: "Yes. Wheelswise is a product of MedGen Insurance Agency, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
+        a: "Yes. Wheelswise is a product of Med-Gen Insurance Agency, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
       },
     ],
   },
@@ -175,7 +175,7 @@ const CATEGORIES: Category[] = [
               </li>
             </ol>
             <p className="mt-2 text-sm text-muted-foreground">
-              Claims are handled directly by the underwriter. MedGen can assist
+              Claims are handled directly by the underwriter. Med-Gen can assist
               you in liaising with them.
             </p>
           </>
@@ -186,7 +186,7 @@ const CATEGORIES: Category[] = [
         a: "Policy cancellation terms vary by underwriter. Generally, you may request cancellation before the policy start date for a full refund. Post-commencement cancellations may be subject to the underwriter's short-rate table and administrative fees. Please contact our support team to initiate a cancellation request.",
       },
       {
-        q: "Can I renew my policy through MedGen?",
+        q: "Can I renew my policy through Med-Gen?",
         a: "Yes. When your policy is approaching expiry, you will receive a renewal reminder. You can renew directly from your dashboard — your vehicle details will be pre-filled and you can compare the latest plans available.",
       },
     ],
@@ -210,7 +210,7 @@ const CATEGORIES: Category[] = [
       },
       {
         q: "Is my payment information stored securely?",
-        a: "MedGen does not store your M-Pesa PIN or card details. Payments are processed via secure, PCI-compliant gateways. We only retain transaction metadata (amount, reference, date) for policy and audit purposes.",
+        a: "Med-Gen does not store your M-Pesa PIN or card details. Payments are processed via secure, PCI-compliant gateways. We only retain transaction metadata (amount, reference, date) for policy and audit purposes.",
       },
       {
         q: "What happens if my M-Pesa payment times out?",

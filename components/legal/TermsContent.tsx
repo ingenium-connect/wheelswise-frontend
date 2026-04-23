@@ -54,7 +54,7 @@ function PrivacyPolicy() {
       <LastUpdated date="2026-04-21" />
 
       <Prose>
-        At MedGen Insurance Agency (&ldquo;MedGen&rdquo;, &ldquo;we&rdquo;,
+        At Med-Gen Insurance Agency (&ldquo;Med-Gen&rdquo;, &ldquo;we&rdquo;,
         &ldquo;us&rdquo;), your privacy is important to us. This Privacy Policy
         sets out how we collect, use, share, and protect your personal data in
         accordance with the Data Protection Act, 2019 (DPA) and the regulations
@@ -65,7 +65,7 @@ function PrivacyPolicy() {
 
       <SectionHeading number="1" title="Who We Are" />
       <Prose>
-        MedGen Insurance Agency is a licensed insurance intermediary registered
+        Med-Gen Insurance Agency is a licensed insurance intermediary registered
         in Kenya and operating under the Insurance Act (Cap. 487). We act as
         both a data controller in respect of information you provide directly to
         us, and as a data processor when handling personal data on behalf of our
@@ -121,7 +121,7 @@ function PrivacyPolicy() {
             "Your explicit consent, where required",
             "Performance of a contract to which you are a party",
             "Compliance with a legal or regulatory obligation",
-            "Legitimate interests pursued by MedGen or our underwriting partners, where not overridden by your rights",
+            "Legitimate interests pursued by Med-Gen or our underwriting partners, where not overridden by your rights",
           ]}
         />
       </div>
@@ -192,9 +192,9 @@ function PrivacyPolicy() {
         valid identity verification documents — including a government-issued
         National ID or Passport and a KRA PIN Certificate — within{" "}
         <strong>48 hours</strong> of account registration or upon request by
-        MedGen. Failure to comply within the stipulated timeframe may result in
+        Med-Gen. Failure to comply within the stipulated timeframe may result in
         suspension of account access, cancellation of pending policy
-        applications, or termination of active policies. MedGen reserves the
+        applications, or termination of active policies. Med-Gen reserves the
         right to reject documents that are illegible, expired, or inconsistent
         with registration details. Users bear sole responsibility for any loss
         or prejudice arising from the submission of inaccurate, fraudulent, or
@@ -235,7 +235,7 @@ function GeneralDisclaimer() {
       <LastUpdated date="2026-04-21" />
 
       <Prose>
-        MedGen Insurance Agency, trading as MedGen, is a licensed insurance
+        Med-Gen Insurance Agency, trading as Med-Gen, is a licensed insurance
         intermediary duly registered and operating in compliance with the
         Insurance Act (Cap. 487) and the regulations of the Insurance Regulatory
         Authority (IRA) of Kenya. We are committed to delivering professional,
@@ -245,7 +245,7 @@ function GeneralDisclaimer() {
 
       <SectionHeading number="1" title="Professional Insurance Advisory Role" />
       <Prose>
-        MedGen Insurance Agency is a licensed insurance intermediary operating on
+        Med-Gen Insurance Agency is a licensed insurance intermediary operating on
         behalf of, and in partnership with, regulated underwriters. The guidance,
         recommendations, and product information provided through this platform
         constitute professional insurance advisory services rendered in that
@@ -269,7 +269,7 @@ function GeneralDisclaimer() {
         The reliability of your policy depends on the accuracy of the information
         you provide. In line with the Insurance Act and the principle of utmost
         good faith (<em>uberrimae fidei</em>), users are required to disclose all
-        material facts truthfully and completely. MedGen shall not be liable for
+        material facts truthfully and completely. Med-Gen shall not be liable for
         any prejudice arising from inaccurate, incomplete, or misleading
         information submitted by a user.
       </Prose>
@@ -278,7 +278,7 @@ function GeneralDisclaimer() {
       <Prose>
         Our platform integrates with third-party systems including payment
         processors and insurer portals to deliver a seamless experience. While we
-        carefully select our partners, MedGen cannot be held responsible for the
+        carefully select our partners, Med-Gen cannot be held responsible for the
         independent acts, omissions, or service interruptions of third parties
         operating under their own regulatory frameworks.
       </Prose>
@@ -287,7 +287,7 @@ function GeneralDisclaimer() {
       <Prose>
         All insurance products facilitated through this platform are subject to
         the terms and conditions of the issuing insurer and the regulatory
-        oversight of the Insurance Regulatory Authority of Kenya. MedGen operates
+        oversight of the Insurance Regulatory Authority of Kenya. Med-Gen operates
         strictly within the bounds of its intermediary licence and applicable
         Kenyan law, including but not limited to the Insurance Act, the Data
         Protection Act, 2019, and any relevant IRA guidelines in force.
@@ -295,7 +295,7 @@ function GeneralDisclaimer() {
 
       <SectionHeading number="6" title="Limitation of Liability" />
       <Prose>
-        To the extent permitted by law, MedGen&apos;s liability in connection
+        To the extent permitted by law, Med-Gen&apos;s liability in connection
         with the use of this platform is limited to direct losses arising solely
         from our own negligence or wilful default in the performance of our
         intermediary obligations. We remain fully committed to resolving any
@@ -330,7 +330,7 @@ function CookiesPolicy() {
       <LastUpdated date="2026-04-18" />
 
       <Prose>
-        This Cookies Policy explains how MedGen (&ldquo;Company&rdquo;) uses
+        This Cookies Policy explains how Med-Gen (&ldquo;Company&rdquo;) uses
         cookies and similar technologies on our platform.
       </Prose>
 

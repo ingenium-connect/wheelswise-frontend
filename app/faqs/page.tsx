@@ -24,7 +24,7 @@ const faqSchema = {
       name: "What is Wheelswise?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Wheelswise is a product of MedGen Insurance, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
+        text: "Wheelswise is a product of Med-Gen Insurance, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We connect motorists with reputable underwriters, making it easy to compare, purchase, and manage motor insurance policies entirely online — no agents, no paperwork.",
       },
     },
     {
@@ -48,7 +48,7 @@ const faqSchema = {
       name: "Is Wheelswise licensed and regulated?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Wheelswise is a product of MedGen Insurance Agency, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
+        text: "Yes. Wheelswise is a product of Med-Gen Insurance Agency, a licensed digital insurance intermediary regulated by the Insurance Regulatory Authority (IRA) of Kenya. We operate strictly as an insurance intermediary — we facilitate transactions between you and licensed underwriters but do not underwrite policies ourselves.",
       },
     },
     {
@@ -141,7 +141,7 @@ export default function FaqsPage() {
               Frequently Asked Questions
             </h1>
             <p className="text-white/60 text-sm mt-1">
-              Everything you need to know about motor insurance on MedGen.
+              Everything you need to know about motor insurance on Med-Gen.
             </p>
           </div>
         </div>
