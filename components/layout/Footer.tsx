@@ -156,7 +156,7 @@ const Footer: React.FC = () => {
       <div className="border-t border-white/10 px-6 md:px-16 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
           <span>
-            &copy; {new Date().getFullYear()} Wheelswise, A Product of MedGen
+            &copy; {new Date().getFullYear()} Wheelswise, A Product of Med-Gen
             Insurance Agency. All rights reserved.
           </span>
           <span>

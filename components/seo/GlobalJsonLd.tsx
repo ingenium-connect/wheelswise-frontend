@@ -5,7 +5,7 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": ["Organization", "InsuranceAgency"],
   name: "Wheelswise",
-  legalName: "MedGen Insurance Agency",
+  legalName: "Med-Gen Insurance Agency",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.png`,
   image: `${BASE_URL}/logo.png`,
@@ -69,14 +69,14 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Wheelswise",
-  alternateName: "MedGen Insurance",
+  alternateName: "Med-Gen Insurance",
   url: BASE_URL,
   description:
     "Buy motor insurance online in Kenya — compare quotes from top underwriters, pay via M-Pesa, get your certificate instantly.",
   inLanguage: "en-KE",
   publisher: {
     "@type": "Organization",
-    name: "MedGen Insurance Agency",
+    name: "Med-Gen Insurance Agency",
     url: BASE_URL,
   },
   potentialAction: {

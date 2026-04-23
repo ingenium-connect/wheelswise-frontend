@@ -28,7 +28,7 @@ const jsonLd = {
   serviceType: "Third Party Motor Vehicle Insurance",
   provider: {
     "@type": "InsuranceAgency",
-    name: "MedGen Insurance Agency",
+    name: "Med-Gen Insurance Agency",
     url: BASE_URL,
   },
   areaServed: { "@type": "Country", name: "Kenya" },

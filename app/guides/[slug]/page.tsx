@@ -312,7 +312,7 @@ export default async function GuidePage({
     description: guide.metaDescription,
     author: {
       "@type": "Organization",
-      name: "MedGen Insurance Agency",
+      name: "Med-Gen Insurance Agency",
     },
     publisher: {
       "@type": "Organization",
