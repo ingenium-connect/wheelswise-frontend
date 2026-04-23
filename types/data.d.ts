@@ -300,6 +300,7 @@ export type InsurancePolicy = {
     description: string;
   };
   policy_benefits?: string[];
+  referral_code?: string | null;
 };
 
 export type AdditionalBenefit = {

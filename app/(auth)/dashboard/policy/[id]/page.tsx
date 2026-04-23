@@ -247,6 +247,9 @@ export default async function PolicyDetailPage({
             {policy.updated_at && (
               <Detail label="Last Updated" value={fmt(policy.updated_at)} />
             )}
+            {policy.referral_code?.trim() && (
+              <Detail label="Referral Code" value={policy.referral_code} mono />
+            )}
           </Grid>
         </Section>
 
