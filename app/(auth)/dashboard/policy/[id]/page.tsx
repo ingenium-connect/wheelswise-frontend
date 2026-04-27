@@ -16,6 +16,7 @@ import { cookies } from "next/headers";
 import { ACCESS_TOKEN } from "@/utilities/constants";
 import { CompletePaymentButton } from "@/components/policy/complete-payment-button";
 import { CancelCertificateButton } from "@/components/policy/cancel-certificate-button";
+import { ValuationSection } from "@/components/policy/ValuationSection";
 import {
   ApplicableExcessesList,
   PolicyBenefitsList,
@@ -35,6 +36,7 @@ import {
   ShieldCheck,
   ListChecks,
   BadgePercent,
+  ClipboardCheck,
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -167,6 +169,26 @@ export default async function PolicyDetailPage({
               barColor: "bg-amber-400",
             };
 
+  const valuationStatusConfig = (() => {
+    const s = policy.valuation_status;
+    if (!s) return null;
+    const label = s
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    const className =
+      s === "COMPLETED"
+        ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+        : s === "UNDER_REVIEW"
+          ? "text-blue-700 bg-blue-50 border-blue-200"
+          : s === "LODGED"
+            ? "text-violet-700 bg-violet-50 border-violet-200"
+            : s === "NOT_REQUIRED"
+              ? "text-gray-600 bg-gray-100 border-gray-200"
+              : "text-amber-700 bg-amber-50 border-amber-200";
+    return { label, className };
+  })();
+
   const StatusIcon = statusConfig.icon;
 
   return (
@@ -216,6 +238,14 @@ export default async function PolicyDetailPage({
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium border px-3 py-1.5 rounded-full text-amber-700 bg-amber-50 border-amber-200">
                   <AlertTriangle className="w-4 h-4" />
                   Expiring Soon
+                </span>
+              )}
+              {valuationStatusConfig && (
+                <span
+                  className={`inline-flex items-center gap-1.5 text-sm font-medium border px-3 py-1.5 rounded-full ${valuationStatusConfig.className}`}
+                >
+                  <ClipboardCheck className="w-4 h-4" />
+                  {valuationStatusConfig.label}
                 </span>
               )}
               {isPendingPayment && (
@@ -383,6 +413,15 @@ export default async function PolicyDetailPage({
               <Detail label="KRA PIN" value={or(policy.primary_user.kra_pin)} mono />
             </Grid>
           </Section>
+        )}
+
+        {/* Vehicle Valuation */}
+        {policy.valuation_status && (
+          <ValuationSection
+            valuationStatus={policy.valuation_status}
+            underwriterId={policy.underwriter_id}
+            policyId={policy.id}
+          />
         )}
 
         {/* Policy Benefits */}

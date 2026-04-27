@@ -20,6 +20,7 @@ import {
   Hourglass,
   Pencil,
   Loader2,
+  ClipboardCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { axiosClient } from "@/utilities/axios-client";
@@ -27,8 +28,6 @@ import {
   POLICY_COMPLETE_PURCHASE_ENDPOINT,
   POLICY_UPDATE_ENDPOINT,
 } from "@/utilities/endpoints";
-import { Badge } from "../ui/badge";
-import { ValuersList } from "./ValuersList";
 
 type Props = {
   policy: InsurancePolicy;
@@ -40,7 +39,6 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [completingPayment, setCompletingPayment] = useState(false);
-  const [showValuersDialog, setShowValuersDialog] = useState(false);
 
   const today = new Date();
   const expiryDate = new Date(policy.end_date);
@@ -55,8 +53,6 @@ export const PolicyCard = ({ policy, token }: Props) => {
 
   const todayMidnight = new Date(new Date().setHours(0, 0, 0, 0));
   const startDateIsValid = startDate >= todayMidnight;
-
-  console.log("THE POLICY IS", policy);
 
   const primaryBadge = isCancelled ? (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-full">
@@ -85,6 +81,33 @@ export const PolicyCard = ({ policy, token }: Props) => {
     </span>
   );
 
+  const valuationBadge = (() => {
+    const s = policy.valuation_status;
+    if (!s) return null;
+    const label = s
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    const styles =
+      s === "COMPLETED"
+        ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+        : s === "UNDER_REVIEW"
+          ? "text-blue-700 bg-blue-50 border-blue-200"
+          : s === "LODGED"
+            ? "text-violet-700 bg-violet-50 border-violet-200"
+            : s === "NOT_REQUIRED"
+              ? "text-gray-600 bg-gray-100 border-gray-200"
+              : "text-amber-700 bg-amber-50 border-amber-200"; // AWAITING_VALUATION
+    return (
+      <span
+        className={`inline-flex items-center gap-1 text-xs font-medium border px-2.5 py-1 rounded-full ${styles}`}
+      >
+        <ClipboardCheck className="w-3.5 h-3.5 shrink-0" />
+        {label}
+      </span>
+    );
+  })();
+
   const statusBadge = (
     <div className="flex flex-wrap items-center gap-1.5">
       {primaryBadge}
@@ -94,6 +117,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
           Expiring Soon
         </span>
       )}
+      {valuationBadge}
     </div>
   );
 
@@ -295,21 +319,6 @@ export const PolicyCard = ({ policy, token }: Props) => {
               }
             />
           )}
-        </div>
-        {/* valuation action */}
-        <div>
-          <p className="font-semibold text-[#1e3a5f]">Vehicle valuation</p>
-          <div className="">
-            <Badge className="mr-4 p-2 rounded-full">
-              {policy.valuation_status.toLowerCase().replace("_", " ")}
-            </Badge>
-            {policy.valuation_status === "AWAITING_VALUATION" && (
-              <ValuersList
-                underwriterId={policy.underwriter_id}
-                policyId={policy.id}
-              />
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>

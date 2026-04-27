@@ -305,7 +305,8 @@ export type InsurancePolicy = {
     | "AWAITING_VALUATION"
     | "LODGED"
     | "UNDER_REVIEW"
-    | "COMPLETED";
+    | "COMPLETED"
+    | "NOT_REQUIRED";
 };
 
 export type AdditionalBenefit = {
