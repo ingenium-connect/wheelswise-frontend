@@ -301,6 +301,11 @@ export type InsurancePolicy = {
   };
   policy_benefits?: string[];
   referral_code?: string | null;
+  valuation_status:
+    | "AWAITING_VALUATION"
+    | "LODGED"
+    | "UNDER_REVIEW"
+    | "COMPLETED";
 };
 
 export type AdditionalBenefit = {
@@ -383,3 +388,12 @@ export type PersonalDetails = {
 };
 
 export type TpoOption = "PRIVATE" | "COMMERCIAL" | "MOTORBIKE";
+
+export type UnderwriterValuer = {
+  id: string;
+  underwriter_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+};
