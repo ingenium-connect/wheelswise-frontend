@@ -4,7 +4,7 @@ import React from "react";
 import { Phone } from "lucide-react";
 import HeaderAuth from "./HeaderAuth";
 
-const HELPLINE_DISPLAY = "+254 717 227 690";
+const HELPLINE_DISPLAY = "+254 017 227 690";
 const HELPLINE_TEL = "+254717227690";
 
 const NAV_LINKS = [

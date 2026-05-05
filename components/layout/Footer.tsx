@@ -127,7 +127,7 @@ const Footer: React.FC = () => {
                   className="flex items-start gap-2.5 text-white/70 hover:text-white transition-colors"
                 >
                   <Phone className="w-4 h-4 shrink-0 mt-0.5 text-[#8bbfd8]" />
-                  +254 717 227 690
+                  +254 017 227 690
                 </a>
               </li>
               <li>
