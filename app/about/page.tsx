@@ -306,7 +306,7 @@ export default function AboutPage() {
                       href="tel:+254717227690"
                       className="text-sm font-medium text-[#1e3a5f] hover:text-primary"
                     >
-                      +254 717 227 690
+                      +254 017 227 690
                     </a>
                   </div>
                 </div>
