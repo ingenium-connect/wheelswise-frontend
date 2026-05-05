@@ -310,7 +310,12 @@ export default async function PolicyDetailPage({
         {/* Premium & Payment */}
         <Section icon={CreditCard} title="Premium & Payment">
           <Grid>
-            <Detail label="Total Premium" value={fmtCurrency(policy.premium)} />
+            <div>
+              <Detail label="Total Premium" value={fmtCurrency(policy.premium)} />
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                (Inclusive of Levies & Stamp Duty)
+              </p>
+            </div>
             <Detail
               label="Payment Status"
               value={policy.is_paid ? "Paid" : "Unpaid"}
