@@ -10,16 +10,22 @@ import { useVehicleStore } from "@/stores/vehicleStore";
 export function InsureVehicleButton({ vehicle }: { vehicle: Vehicle }) {
   const router = useRouter();
   const setInsuranceVehicleValue = useInsuranceStore((s) => s.setVehicleValue);
-  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } = useVehicleStore();
+  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } =
+    useVehicleStore();
 
   const handleClick = () => {
-    localStorage.setItem("vehicleRegistrationNumber", vehicle.registration_number);
+    localStorage.setItem(
+      "vehicleRegistrationNumber",
+      vehicle.registration_number,
+    );
     localStorage.setItem("insure_existing_vehicle", "true");
 
     // Pre-populate stores so vehicle-value and vehicle-details pages can be skipped
     setInsuranceVehicleValue(vehicle.vehicle_value);
     setVehicleValue(String(vehicle.vehicle_value));
-    setSeatingCapacity(vehicle.seating_capacity ? String(vehicle.seating_capacity) : "");
+    setSeatingCapacity(
+      vehicle.seating_capacity ? String(vehicle.seating_capacity) : "",
+    );
     setTonnage(vehicle.tonnage ?? 0);
     setVehicleDetails({
       vehicleNumber: vehicle.registration_number,
@@ -30,7 +36,9 @@ export function InsureVehicleButton({ vehicle }: { vehicle: Vehicle }) {
       year: String(vehicle.year_of_manufacture),
       bodyType: vehicle.body_type ?? "",
       vehiclePurpose: vehicle.purpose ?? "",
-      engineCapacity: vehicle.engine_capacity ? String(vehicle.engine_capacity) : "",
+      engineCapacity: vehicle.engine_capacity
+        ? String(vehicle.engine_capacity)
+        : "",
       engineNumber: vehicle.engine_number ?? "",
     });
 

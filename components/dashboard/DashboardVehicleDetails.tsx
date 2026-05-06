@@ -11,11 +11,15 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
 import { axiosClient, axiosAuthClient } from "@/utilities/axios-client";
 import { toast } from "sonner";
 import { Car, Loader2 } from "lucide-react";
+import {
+  getVehicleValueLimitError,
+  MAX_VEHICLE_VALUE,
+} from "@/utilities/validation-schemas";
 
 type Props = {
   modelMakeMap: { make: string; models: string[] }[];
@@ -166,11 +170,20 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
       form.vehiclePurpose &&
       form.vehiclePurposeCategory &&
       vehicleValue &&
-      Number(vehicleValue) > 0
+      Number(vehicleValue) > 0 &&
+      !vehicleValueError
     );
+
+  const vehicleValueError = getVehicleValueLimitError(vehicleValue);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (vehicleValueError) {
+      toast.error(vehicleValueError);
+      return;
+    }
+
     setSubmitting(true);
 
     const ntsaRaw = sessionStorage.getItem("dashboard-vehicle-search");
@@ -458,10 +471,13 @@ export default function DashboardVehicleDetails({ modelMakeMap }: Props) {
                     id="vehicleValue"
                     type="number"
                     min={0}
+                    max={MAX_VEHICLE_VALUE}
                     value={vehicleValue}
+                    aria-invalid={Boolean(vehicleValueError)}
                     onChange={(e) => setVehicleValue(e.target.value)}
-                    placeholder="e.g. 1500000"
+                    placeholder="e.g. 800000"
                   />
+                  <FieldError>{vehicleValueError}</FieldError>
                 </Field>
                 {form.vehiclePurpose.toUpperCase() === "COMMERCIAL" && (
                   <Field>

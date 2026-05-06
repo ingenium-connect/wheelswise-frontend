@@ -15,7 +15,8 @@ type Props = {
 export function VehicleCard({ vehicle }: Props) {
   const router = useRouter();
   const setInsuranceVehicleValue = useInsuranceStore((s) => s.setVehicleValue);
-  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } = useVehicleStore();
+  const { setVehicleValue, setSeatingCapacity, setTonnage, setVehicleDetails } =
+    useVehicleStore();
 
   const {
     make,

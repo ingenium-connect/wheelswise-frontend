@@ -157,7 +157,11 @@ function DocumentUploadRow({
           {/* View */}
           <Dialog open={viewOpen} onOpenChange={setViewOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 flex-1 sm:flex-none"
+              >
                 <Eye className="w-3.5 h-3.5" />
                 View
               </Button>

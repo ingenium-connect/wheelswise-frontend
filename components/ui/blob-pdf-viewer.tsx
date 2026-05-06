@@ -50,7 +50,9 @@ export function BlobPdfViewer({
 
   if (error) {
     return (
-      <div className={`flex flex-col items-center justify-center gap-2 bg-muted/30 ${className}`}>
+      <div
+        className={`flex flex-col items-center justify-center gap-2 bg-muted/30 ${className}`}
+      >
         <p className="text-sm text-muted-foreground">
           Unable to preview this document.
         </p>
@@ -68,17 +70,13 @@ export function BlobPdfViewer({
 
   if (!blobUrl) {
     return (
-      <div className={`flex items-center justify-center bg-muted/30 ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-muted/30 ${className}`}
+      >
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  return (
-    <iframe
-      src={blobUrl}
-      className={className}
-      title={title}
-    />
-  );
+  return <iframe src={blobUrl} className={className} title={title} />;
 }
