@@ -4,11 +4,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { useVehicleStore } from "@/stores/vehicleStore";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Car } from "lucide-react";
+import {
+  getVehicleValueLimitError,
+  MAX_VEHICLE_VALUE,
+} from "@/utilities/validation-schemas";
 
 type Props = {
   motor_type: string | undefined;
@@ -31,6 +41,7 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const isPSV = motorTypeName === "PSV";
   const isMotorbike = motorTypeName === "MOTORBIKE";
   const requiresSeating = isCommercial || isPSV || isMotorbike;
+  const vehicleValueError = getVehicleValueLimitError(vehicleValue);
 
   // Track if tonnage was pre-filled from MotorType page (TPO COMMERCIAL)
   const tonnagePreFilled = useRef(tonnage > 0);
@@ -57,6 +68,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
     ) {
       isValid = false;
       setError("Please enter a valid numeric value for your vehicle.");
+    } else if (vehicleValueError) {
+      isValid = false;
     } else if (
       requiresSeating &&
       (!seating_capacity || Number(seating_capacity) <= 0)
@@ -106,10 +119,13 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
                 <Input
                   id="vehicleValue"
                   type="number"
+                  max={MAX_VEHICLE_VALUE}
                   placeholder="e.g. 800000"
                   value={vehicleValue || ""}
+                  aria-invalid={Boolean(vehicleValueError)}
                   onChange={(e) => setVehicleValue(Number(e.target.value))}
                 />
+                <FieldError>{vehicleValueError}</FieldError>
               </Field>
               <Field>
                 <FieldLabel htmlFor="seatingCapacity">
@@ -164,7 +180,8 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
             disabled={
               (requiresSeating &&
                 (!seating_capacity || Number(seating_capacity) <= 0)) ||
-              (isCommercial && (!tonnage || tonnage <= 0))
+              (isCommercial && (!tonnage || tonnage <= 0)) ||
+              Boolean(vehicleValueError)
             }
           >
             Continue

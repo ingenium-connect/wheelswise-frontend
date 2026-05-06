@@ -12,7 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
 import { axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
@@ -29,6 +29,7 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { useUserStore } from "@/stores/userStore";
 import { ACCESS_TOKEN } from "@/utilities/constants";
+import { getVehicleValueLimitError } from "@/utilities/validation-schemas";
 import { AxiosError } from "axios";
 
 type Props = {
@@ -38,6 +39,7 @@ type Props = {
 };
 
 type SearchStatus = "idle" | "success" | "error";
+const MOTOR_TYPE_REDIRECT_DELAY_SECONDS = 5;
 
 const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const router = useRouter();
@@ -63,6 +65,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     null,
   );
   const [submitting, setSubmitting] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(
+    null,
+  );
 
   // Detect if user is logged in (has auth token cookie + profile)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -123,6 +128,34 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     setCoverStep(4);
   }, [setCoverStep]);
 
+  useEffect(() => {
+    if (!motorTypeMismatch) {
+      setRedirectCountdown(null);
+      return;
+    }
+
+    setRedirectCountdown(MOTOR_TYPE_REDIRECT_DELAY_SECONDS);
+
+    const countdownInterval = window.setInterval(() => {
+      setRedirectCountdown((current) => {
+        if (current === null || current <= 1) {
+          return 0;
+        }
+
+        return current - 1;
+      });
+    }, 1000);
+
+    const redirectTimeout = window.setTimeout(() => {
+      router.push(`/motor-type/${product_type}`);
+    }, MOTOR_TYPE_REDIRECT_DELAY_SECONDS * 1000);
+
+    return () => {
+      window.clearInterval(countdownInterval);
+      window.clearTimeout(redirectTimeout);
+    };
+  }, [motorTypeMismatch, product_type, router]);
+
   // Fetch purpose categories whenever vehiclePurpose changes
   useEffect(() => {
     if (!form.vehiclePurpose) {
@@ -147,10 +180,14 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   }, [form.vehiclePurpose, motor_type, motorType]);
 
   const isThirdParty = product_type === "THIRD_PARTY";
+  const vehicleValueError = isThirdParty
+    ? ""
+    : getVehicleValueLimitError(form.vehicleValue);
 
   const validDetails = () => {
     return (
       (isThirdParty || form.vehicleValue > 0) &&
+      !vehicleValueError &&
       form.engineCapacity &&
       form.engineNumber &&
       form.vehicleNumber &&
@@ -321,11 +358,6 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           // Clear all persisted store data
           resetVehicleStore();
           resetPersonalDetails();
-
-          // Give the user time to read the message, then redirect
-          setTimeout(() => {
-            router.push(`/motor-type/${product_type}`);
-          }, 5000);
           return;
         }
       }
@@ -360,6 +392,11 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (vehicleValueError) {
+      toast.error(vehicleValueError);
+      return;
+    }
 
     // Save to store
     setVehicleDetails({ ...form });
@@ -458,8 +495,17 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription className="space-y-2">
             <p>{motorTypeMismatch}</p>
+            <p className="text-sm">
+              We&apos;ll return you to motor type selection so you can choose
+              the correct option for this vehicle.
+            </p>
             <p className="text-xs font-medium">
-              Taking you back to select the correct motor type&hellip;
+              Redirecting in{" "}
+              {redirectCountdown ?? MOTOR_TYPE_REDIRECT_DELAY_SECONDS} second
+              {(redirectCountdown ?? MOTOR_TYPE_REDIRECT_DELAY_SECONDS) === 1
+                ? ""
+                : "s"}
+              &hellip;
             </p>
           </AlertDescription>
         </Alert>
@@ -749,8 +795,10 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
                         value={form.vehicleValue}
                         disabled
                         readOnly
+                        aria-invalid={Boolean(vehicleValueError)}
                         className="bg-[#f0f6f9]"
                       />
+                      <FieldError>{vehicleValueError}</FieldError>
                     </Field>
                   )}
                   <Field>

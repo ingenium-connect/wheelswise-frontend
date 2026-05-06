@@ -68,8 +68,7 @@ const STATUS_META: Record<
   },
   NOT_REQUIRED: {
     label: "Not Required",
-    description:
-      "Vehicle valuation is not required for this policy.",
+    description: "Vehicle valuation is not required for this policy.",
     icon: MinusCircle,
     cardClass: "bg-gray-50 border-gray-200",
     iconClass: "bg-gray-100 border-gray-200 text-gray-500",

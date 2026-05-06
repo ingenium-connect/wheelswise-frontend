@@ -157,9 +157,7 @@ function PrivacyPolicy() {
       </Prose>
 
       <SectionHeading number="7" title="Your Rights" />
-      <Prose>
-        Under the Data Protection Act, 2019, you have the right to:
-      </Prose>
+      <Prose>Under the Data Protection Act, 2019, you have the right to:</Prose>
       <div className="mt-2">
         <BulletList
           items={[
@@ -182,7 +180,8 @@ function PrivacyPolicy() {
         your personal data against unauthorised access, loss, alteration, or
         disclosure. These include encrypted data transmission, access controls,
         and regular security assessments. While we take every reasonable
-        precaution, we encourage you to keep your account credentials confidential.
+        precaution, we encourage you to keep your account credentials
+        confidential.
       </Prose>
 
       <SectionHeading number="9" title="KYC Document Submission" />
@@ -245,13 +244,13 @@ function GeneralDisclaimer() {
 
       <SectionHeading number="1" title="Professional Insurance Advisory Role" />
       <Prose>
-        Med-Gen Insurance Agency is a licensed insurance intermediary operating on
-        behalf of, and in partnership with, regulated underwriters. The guidance,
-        recommendations, and product information provided through this platform
-        constitute professional insurance advisory services rendered in that
-        capacity. Our team is committed to helping you find the right cover for
-        your needs, backed by the expertise and authority of our underwriting
-        partners.
+        Med-Gen Insurance Agency is a licensed insurance intermediary operating
+        on behalf of, and in partnership with, regulated underwriters. The
+        guidance, recommendations, and product information provided through this
+        platform constitute professional insurance advisory services rendered in
+        that capacity. Our team is committed to helping you find the right cover
+        for your needs, backed by the expertise and authority of our
+        underwriting partners.
       </Prose>
 
       <SectionHeading number="2" title="Coverage and Claims" />
@@ -259,38 +258,38 @@ function GeneralDisclaimer() {
         While we work diligently to match you with the most suitable insurance
         products, the ultimate terms of coverage, claim determinations, and
         settlement decisions rest with the underwriting insurer in accordance
-        with the policy contract and applicable Kenyan insurance law. We advocate
-        on your behalf throughout the process and are here to support you at
-        every step.
+        with the policy contract and applicable Kenyan insurance law. We
+        advocate on your behalf throughout the process and are here to support
+        you at every step.
       </Prose>
 
       <SectionHeading number="3" title="Accuracy of Information" />
       <Prose>
-        The reliability of your policy depends on the accuracy of the information
-        you provide. In line with the Insurance Act and the principle of utmost
-        good faith (<em>uberrimae fidei</em>), users are required to disclose all
-        material facts truthfully and completely. Med-Gen shall not be liable for
-        any prejudice arising from inaccurate, incomplete, or misleading
-        information submitted by a user.
+        The reliability of your policy depends on the accuracy of the
+        information you provide. In line with the Insurance Act and the
+        principle of utmost good faith (<em>uberrimae fidei</em>), users are
+        required to disclose all material facts truthfully and completely.
+        Med-Gen shall not be liable for any prejudice arising from inaccurate,
+        incomplete, or misleading information submitted by a user.
       </Prose>
 
       <SectionHeading number="4" title="Third-Party Services" />
       <Prose>
         Our platform integrates with third-party systems including payment
-        processors and insurer portals to deliver a seamless experience. While we
-        carefully select our partners, Med-Gen cannot be held responsible for the
-        independent acts, omissions, or service interruptions of third parties
-        operating under their own regulatory frameworks.
+        processors and insurer portals to deliver a seamless experience. While
+        we carefully select our partners, Med-Gen cannot be held responsible for
+        the independent acts, omissions, or service interruptions of third
+        parties operating under their own regulatory frameworks.
       </Prose>
 
       <SectionHeading number="5" title="Regulatory Compliance" />
       <Prose>
         All insurance products facilitated through this platform are subject to
         the terms and conditions of the issuing insurer and the regulatory
-        oversight of the Insurance Regulatory Authority of Kenya. Med-Gen operates
-        strictly within the bounds of its intermediary licence and applicable
-        Kenyan law, including but not limited to the Insurance Act, the Data
-        Protection Act, 2019, and any relevant IRA guidelines in force.
+        oversight of the Insurance Regulatory Authority of Kenya. Med-Gen
+        operates strictly within the bounds of its intermediary licence and
+        applicable Kenyan law, including but not limited to the Insurance Act,
+        the Data Protection Act, 2019, and any relevant IRA guidelines in force.
       </Prose>
 
       <SectionHeading number="6" title="Limitation of Liability" />

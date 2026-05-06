@@ -170,11 +170,12 @@ export default function AboutPage() {
                     A Licensed Insurance Intermediary Built for the Digital Age
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                    Med-Gen Insurance Agency is a licensed intermediary regulated
-                    by the Insurance Regulatory Authority (IRA) of Kenya. We act
-                    as a bridge between motorists and reputable underwriters,
-                    giving you access to competitive motor insurance products
-                    through a single, intuitive digital platform.
+                    Med-Gen Insurance Agency is a licensed intermediary
+                    regulated by the Insurance Regulatory Authority (IRA) of
+                    Kenya. We act as a bridge between motorists and reputable
+                    underwriters, giving you access to competitive motor
+                    insurance products through a single, intuitive digital
+                    platform.
                   </p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     We do not underwrite policies ourselves. Instead, we partner

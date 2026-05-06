@@ -201,7 +201,10 @@ const Login: React.FC = () => {
                   name="national_identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>National Identifier <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        National Identifier{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           id="national_identifier"
@@ -226,7 +229,9 @@ const Login: React.FC = () => {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex justify-between items-center">
-                        <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
+                        <FormLabel>
+                          Password <span className="text-red-500">*</span>
+                        </FormLabel>
                         <Link
                           href="/forgot-password"
                           className="text-xs text-primary hover:underline"

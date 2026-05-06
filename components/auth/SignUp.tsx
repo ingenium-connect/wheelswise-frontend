@@ -383,7 +383,9 @@ const Signup: React.FC<Props> = ({
               )}
 
               <Field>
-                <FieldLabel htmlFor="password">Password <span className="text-red-500">*</span></FieldLabel>
+                <FieldLabel htmlFor="password">
+                  Password <span className="text-red-500">*</span>
+                </FieldLabel>
                 <div className="relative">
                   <Input
                     id="password"

@@ -13,6 +13,7 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldLegend,
@@ -30,6 +31,10 @@ import { FinalVehiclePayload, MotorType } from "@/types/data";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import { Card, CardContent } from "./ui/card";
+import {
+  getVehicleValueLimitError,
+  MAX_VEHICLE_VALUE,
+} from "@/utilities/validation-schemas";
 
 type Props = {
   token?: string | undefined;
@@ -95,6 +100,12 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
     }
   };
 
+  const handleVehicleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, vehicleValue: Number(e.target.value) }));
+  };
+
+  const vehicleValueError = getVehicleValueLimitError(form.vehicleValue);
+
   const handleSelectChange = (name: string, value: string) => {
     const syntheticEvent = {
       target: { name, value },
@@ -105,6 +116,7 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
   const validDetails = () => {
     return (
       form.vehicleValue > 0 &&
+      !vehicleValueError &&
       form.engineCapacity &&
       form.vehicleNumber &&
       form.chassisNumber &&
@@ -122,6 +134,10 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
     const v = Object.fromEntries(formData) as Record<string, string>;
     if (!v) {
       setError("Please fill vehicle details before registering.");
+      return;
+    }
+
+    if (vehicleValueError) {
       return;
     }
 
@@ -295,11 +311,14 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
                           id="vehicleValue"
                           name="vehicleValue"
                           value={form.vehicleValue}
-                          onChange={handleChange}
+                          onChange={handleVehicleValueChange}
                           type="number"
+                          max={MAX_VEHICLE_VALUE}
+                          aria-invalid={Boolean(vehicleValueError)}
                           placeholder="Enter vehicle value e.g. 500000"
                           required
                         />
+                        <FieldError>{vehicleValueError}</FieldError>
                       </Field>
                       <Field>
                         <FieldLabel htmlFor="engineCapacity">

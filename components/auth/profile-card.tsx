@@ -48,8 +48,12 @@ export function AccountCard({ user }: Props) {
               <User className="w-7 h-7 text-primary" />
             </div>
             <div className="pb-1 min-w-0">
-              <h2 className="text-lg font-bold text-[#1e3a5f] truncate">{user.name}</h2>
-              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+              <h2 className="text-lg font-bold text-[#1e3a5f] truncate">
+                {user.name}
+              </h2>
+              <p className="text-sm text-muted-foreground truncate">
+                {user.email}
+              </p>
             </div>
           </div>
           <div

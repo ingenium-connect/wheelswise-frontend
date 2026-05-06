@@ -78,6 +78,7 @@ const OtpVerify: React.FC = () => {
       : personalDetails.secondary_user
         ? personalDetails.secondary_user.idNumber
         : personalDetails.user.idNumber;
+    console.log("Resending OTP to national ID:", nationalId);
     setAllowResend(false);
     (async () => {
       try {
@@ -134,11 +135,17 @@ const OtpVerify: React.FC = () => {
           router.push("/login");
         } else if (isNewVehicleFlow) {
           // Logged-in user: if insuring an existing registered vehicle, skip vehicle-value
-          const insuringExisting = typeof window !== "undefined" && localStorage.getItem("insure_existing_vehicle") === "true";
+          const insuringExisting =
+            typeof window !== "undefined" &&
+            localStorage.getItem("insure_existing_vehicle") === "true";
           if (insuringExisting) {
-            router.push(`/motor-subtype?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+            router.push(
+              `/motor-subtype?product_type=${flowProductType}&motor_type=${flowMotorType}`,
+            );
           } else {
-            router.push(`/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`);
+            router.push(
+              `/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`,
+            );
           }
         } else {
           await registerPendingVehicle();
