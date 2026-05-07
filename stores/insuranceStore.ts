@@ -12,6 +12,7 @@ type InsuranceStoreState = {
   coverStep: number;
   tpoOption: string;
   isCoOwned: boolean | null;
+  referralCode: string | null;
   // Actions
   selectCover: (coverType: string) => void;
   setMotorType: (type: MotorType) => void;
@@ -23,6 +24,7 @@ type InsuranceStoreState = {
   setCoverStep: (step: number) => void;
   setTpoOption: (option: TpoOption) => void;
   setisCoOwned: (isCoOwned: boolean) => void;
+  setReferralCode: (code: string | null) => void;
 };
 
 /**
@@ -40,6 +42,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       coverStep: 0,
       tpoOption: "",
       isCoOwned: null,
+      referralCode: null,
       // Actions
       selectCover: (coverType) => set({ cover: coverType }),
       setMotorType: (type) => set({ motorType: type }),
@@ -53,6 +56,7 @@ const useInsuranceStore = create<InsuranceStoreState>()(
       setCoverStep: (step) => set({ coverStep: step }),
       setTpoOption: (option) => set({ tpoOption: option }),
       setisCoOwned: (isCoOwned) => set({ isCoOwned }),
+      setReferralCode: (code) => set({ referralCode: code }),
     }),
     {
       name: "motor-insurance-details",

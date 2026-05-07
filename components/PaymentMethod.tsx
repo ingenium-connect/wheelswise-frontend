@@ -69,6 +69,7 @@ const PaymentMethod = ({ token }: Props) => {
   const selectedAdditionalBenefitIds = useInsuranceStore(
     (s) => s.selectedAdditionalBenefitIds,
   );
+  const referralCode = useInsuranceStore((s) => s.referralCode);
   const router = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -111,6 +112,7 @@ const PaymentMethod = ({ token }: Props) => {
         cover_type: cover,
         payment_method_id: paymentMethodId,
         additional_benefits: selectedAdditionalBenefitIds,
+        referral_code: referralCode ?? undefined,
       };
 
       if (isComprehensive) {
