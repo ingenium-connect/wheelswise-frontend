@@ -349,7 +349,7 @@ const VehicleDetails = ({
         const ownerObj = owner[0];
         setPersonalDetails({
           firstName: ownerObj.FIRSTNAME || "",
-          lastName: ownerObj.LASTNAME || ownerObj.FIRSTNAME || "",
+          lastName: ownerObj.LASTNAME || "",
           phoneNumber: ownerObj.TELNO || "",
           idNumber: ownerObj.ID_NUMBER || "",
           kraPin: ownerObj.PIN || "",
