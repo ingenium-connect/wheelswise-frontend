@@ -254,7 +254,7 @@ const PersonalDetailsForm = ({
               type="text"
               value={!isCoOwned || isOwnerForm ? form.phoneNumber : undefined}
               onChange={handleChange}
-              placeholder="254*********"
+              placeholder="eg. 0712345678"
               disabled={isOwnerForm && isCoOwned}
               readOnly={isOwnerForm && isCoOwned}
               required
