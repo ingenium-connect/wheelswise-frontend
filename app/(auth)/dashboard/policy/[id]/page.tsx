@@ -311,7 +311,10 @@ export default async function PolicyDetailPage({
         <Section icon={CreditCard} title="Premium & Payment">
           <Grid>
             <div>
-              <Detail label="Total Premium" value={fmtCurrency(policy.premium)} />
+              <Detail
+                label="Total Premium"
+                value={fmtCurrency(policy.premium)}
+              />
               <p className="text-[10px] text-muted-foreground mt-0.5">
                 (Inclusive of Levies & Stamp Duty)
               </p>

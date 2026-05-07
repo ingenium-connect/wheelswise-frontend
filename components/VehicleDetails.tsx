@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
-import { axiosClient } from "@/utilities/axios-client";
+import { axiosAuthClient, axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
 import {
@@ -34,14 +34,18 @@ import { AxiosError } from "axios";
 
 type Props = {
   motor_type: string | undefined;
-  product_type: string | undefined;
-  modelMakeMap: { make: string; models: string[] }[];
+  product_type?: string | undefined;
+  isAddVehicleOnly?: boolean;
 };
 
 type SearchStatus = "idle" | "success" | "error";
 const MOTOR_TYPE_REDIRECT_DELAY_SECONDS = 5;
 
-const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
+const VehicleDetails = ({
+  motor_type,
+  product_type,
+  isAddVehicleOnly = false,
+}: Props) => {
   const router = useRouter();
 
   const vehicleValue = useInsuranceStore((s) => s.vehicleValue);
@@ -68,6 +72,9 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(
     null,
   );
+  const [modelMakeMap, setModelMakeMap] = useState<
+    { make: string; models: string[] }[]
+  >([]);
 
   // Detect if user is logged in (has auth token cookie + profile)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,6 +89,12 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       // ignore
     }
   }, [profile]);
+
+  useEffect(() => {
+    axiosClient.get("/vehicle/make-model-map").then((res) => {
+      setModelMakeMap(res.data);
+    });
+  }, []);
 
   const isCommercial = motorType?.name === "COMMERCIAL";
 
@@ -147,14 +160,19 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
     }, 1000);
 
     const redirectTimeout = window.setTimeout(() => {
-      router.push(`/motor-type/${product_type}`);
+      if (isAddVehicleOnly) {
+        // for add vehicle only redirect to the dashboard
+        router.push("/dashboard?tab=vehicle");
+      } else {
+        router.push(`/motor-type/${product_type}`);
+      }
     }, MOTOR_TYPE_REDIRECT_DELAY_SECONDS * 1000);
 
     return () => {
       window.clearInterval(countdownInterval);
       window.clearTimeout(redirectTimeout);
     };
-  }, [motorTypeMismatch, product_type, router]);
+  }, [motorTypeMismatch, product_type, router, isAddVehicleOnly]);
 
   // Fetch purpose categories whenever vehiclePurpose changes
   useEffect(() => {
@@ -404,34 +422,46 @@ const VehicleDetails = ({ modelMakeMap, motor_type, product_type }: Props) => {
       storeSetSeatingCapacity(seatingCapacity);
     }
 
-    if (isAuthenticated) {
+    const payload = {
+      source: "NTSA",
+      vehicle: {
+        chassis_number: form.chassisNumber.trim(),
+        registration_number: form.vehicleNumber.trim(),
+        make: form.make.trim(),
+        model: form.model.trim(),
+        engine_capacity: form.engineCapacity
+          ? Number(form.engineCapacity)
+          : null,
+        engine_number: form.engineNumber?.trim() || undefined,
+        body_type: form.bodyType.trim(),
+        vehicle_value: form.vehicleValue || null,
+        seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
+        tonnage: tonnage || null,
+        vehicle_type: motor_type || "PRIVATE",
+        year_of_manufacture: Number(form.year),
+        purpose: form.vehiclePurpose?.trim() || undefined,
+        purpose_type: form.vehiclePurposeCategory
+          ? Number(form.vehiclePurposeCategory)
+          : null,
+      },
+    };
+
+    if (isAddVehicleOnly) {
+      // for adding a vehicle only, just redirect to the dashboard
+      try {
+        await axiosAuthClient.post("vehicle/new", payload);
+        sessionStorage.removeItem("dashboard-vehicle-search");
+        toast.success("Vehicle saved successfully.");
+        router.push("/dashboard?tab=vehicle");
+        router.refresh();
+      } catch {
+        toast.error("Failed to save vehicle. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
+    } else if (isAuthenticated) {
       // Logged-in user: register vehicle and go to payment summary
       setSubmitting(true);
-      const ntsaRegistered =
-        useVehicleStore.getState().vehicleDetails.ntsaRegistered;
-      const payload = {
-        source: ntsaRegistered ? "NTSA" : "",
-        vehicle: {
-          chassis_number: form.chassisNumber.trim(),
-          registration_number: form.vehicleNumber.trim(),
-          make: form.make.trim(),
-          model: form.model.trim(),
-          engine_capacity: form.engineCapacity
-            ? Number(form.engineCapacity)
-            : null,
-          engine_number: form.engineNumber?.trim() || undefined,
-          body_type: form.bodyType.trim(),
-          vehicle_value: form.vehicleValue || null,
-          seating_capacity: seatingCapacity ? Number(seatingCapacity) : null,
-          tonnage: tonnage || null,
-          vehicle_type: motor_type || "PRIVATE",
-          year_of_manufacture: Number(form.year),
-          purpose: form.vehiclePurpose?.trim() || undefined,
-          purpose_type: form.vehiclePurposeCategory
-            ? Number(form.vehiclePurposeCategory)
-            : null,
-        },
-      };
 
       try {
         const res = await fetch("/api/vehicle/new", {

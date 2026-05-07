@@ -47,7 +47,7 @@ export function ValuersList({
     setSubmitted(false);
     axiosAuthClient
       .get(`/policy/valuers?underwriter_id=${underwriterId}`)
-      .then((res) => setValuers(res.data.valuers))
+      .then((res) => setValuers(res.data.valuers ?? []))
       .catch(() => {
         setFetchError(true);
         setValuers([]);

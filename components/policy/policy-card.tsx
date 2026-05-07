@@ -21,6 +21,7 @@ import {
   Pencil,
   Loader2,
   ClipboardCheck,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { axiosClient } from "@/utilities/axios-client";
@@ -28,6 +29,14 @@ import {
   POLICY_COMPLETE_PURCHASE_ENDPOINT,
   POLICY_UPDATE_ENDPOINT,
 } from "@/utilities/endpoints";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { useUserStore } from "@/stores/userStore";
 
 type Props = {
   policy: InsurancePolicy;
@@ -39,6 +48,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [completingPayment, setCompletingPayment] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
   const today = new Date();
   const expiryDate = new Date(policy.end_date);
@@ -133,6 +143,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
 
   const policyNumberDisplay = policy.policy_number ?? "—";
   const certDisplay = policy.certno ?? "—";
+  const phoneNumber = useUserStore((s) => s.profile?.msisdn);
 
   async function handleCompletePayment() {
     setCompletingPayment(true);
@@ -142,7 +153,7 @@ export const PolicyCard = ({ policy, token }: Props) => {
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      toast.success("Payment completed successfully.");
+      toast.success("Payment request initiated.");
     } catch {
       toast.error("Failed to complete payment. Please try again.");
     } finally {
@@ -174,154 +185,200 @@ export const PolicyCard = ({ policy, token }: Props) => {
   }
 
   return (
-    <Card className="border border-[#d7e8ee] shadow-md hover:shadow-xl transition-shadow duration-200 rounded-2xl overflow-hidden">
-      {/* Status bar */}
-      <div className={`h-1.5 w-full ${statusBarColor}`} />
+    <>
+      <Card className="border border-[#d7e8ee] shadow-md hover:shadow-xl transition-shadow duration-200 rounded-2xl overflow-hidden">
+        {/* Status bar */}
+        <div className={`h-1.5 w-full ${statusBarColor}`} />
 
-      <CardContent className="p-5">
-        {/* Header */}
-        <div className="mb-5 space-y-3">
-          {/* Row 1: vehicle info + days badge */}
-          <div className="flex items-start gap-3">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
-                <Shield className="w-6 h-6 text-primary" />
+        <CardContent className="p-5">
+          {/* Header */}
+          <div className="mb-5 space-y-3">
+            {/* Row 1: vehicle info + days badge */}
+            <div className="flex items-start gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-[#1e3a5f] truncate">
+                    {policy.vehicle_details.make} {policy.vehicle_details.model}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                    {policy.vehicle_details.registration_number}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-[#1e3a5f] truncate">
-                  {policy.vehicle_details.make} {policy.vehicle_details.model}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-0.5 truncate">
-                  {policy.vehicle_details.registration_number}
-                </p>
-              </div>
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0 self-start">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                {policy.days} days
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full shrink-0 self-start">
-              <Clock className="w-3.5 h-3.5 shrink-0" />
-              {policy.days} days
-            </span>
+
+            {/* Row 2: status badges + action buttons — all wrap freely */}
+            <div className="flex flex-wrap items-center gap-2">
+              {statusBadge}
+              {isPendingPayment && (
+                <Button
+                  size="sm"
+                  disabled={!startDateIsValid}
+                  onClick={
+                    startDateIsValid
+                      ? () => setPaymentDialogOpen(true)
+                      : () => setCalendarOpen(true)
+                  }
+                  title={
+                    !startDateIsValid
+                      ? "Update start date before proceeding"
+                      : undefined
+                  }
+                  className="text-white text-xs shrink-0"
+                >
+                  Complete Payment
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
+                asChild
+              >
+                <Link href={`/dashboard/policy/${policy.id}`}>
+                  View Details
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          {/* Row 2: status badges + action buttons — all wrap freely */}
-          <div className="flex flex-wrap items-center gap-2">
-            {statusBadge}
-            {isPendingPayment && (
-              <Button
-                size="sm"
-                disabled={!startDateIsValid || completingPayment}
-                onClick={
-                  startDateIsValid
-                    ? handleCompletePayment
-                    : () => setCalendarOpen(true)
-                }
-                title={
-                  !startDateIsValid
-                    ? "Update start date before proceeding"
-                    : undefined
-                }
-                className="text-white text-xs shrink-0"
-              >
-                {completingPayment && (
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                )}
-                Complete Payment
-              </Button>
+          {/* Info grid */}
+          <div className="flex flex-wrap justify-between gap-4 border-t border-[#d7e8ee] pt-4 text-sm">
+            <InfoBlock label="Policy #" value={policyNumberDisplay} />
+            {policy.certificate_issued && (
+              <InfoBlock label="Cert #" value={certDisplay} />
             )}
+            <InfoBlock
+              label="Coverage"
+              value={policy.policy_type.replace("_", " ")}
+            />
+            <InfoBlock
+              label="Premium"
+              value={`KES ${policy.premium.toLocaleString()}`}
+            />
+
+            {/* Start date — editable */}
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">
+                Start date
+              </p>
+              <div className="flex items-center gap-1.5">
+                <p className="font-semibold text-[#1e3a5f]">
+                  {startDate.toDateString()}
+                </p>
+                {!isActive && (
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        aria-label="Edit start date"
+                        disabled={saving}
+                        className="text-primary hover:text-primary/70 disabled:opacity-40 transition-colors"
+                      >
+                        {saving ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Pencil className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0 shadow-xl border-[#d7e8ee]"
+                      align="start"
+                      sideOffset={8}
+                    >
+                      <div className="p-3 border-b border-[#d7e8ee]">
+                        <p className="text-sm font-medium text-[#1e3a5f]">
+                          Select new start date
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Choose when your cover should begin
+                        </p>
+                      </div>
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={handleDateSelect}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                        autoFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+            </div>
+
+            {policy.is_paid && (
+              <InfoBlock
+                label="Expires"
+                value={expiryDate.toDateString()}
+                sub={isExpired ? "Expired" : `${daysRemaining} days remaining`}
+                subColor={
+                  isExpired
+                    ? "text-red-500"
+                    : isExpiringSoon
+                      ? "text-amber-500"
+                      : "text-emerald-600"
+                }
+              />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Payment method</DialogTitle>
+          </DialogHeader>
+          {/* TODO: create a unified and decoupled payment method component */}
+          <div className="flex items-center gap-3 pb-3 border-b border-[#d7e8ee]">
+            <div className="p-2.5 bg-primary/10 rounded-xl">
+              <Smartphone className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#1e3a5f]">
+                M-Pesa STK Push
+              </p>
+              <p className="text-xs text-muted-foreground">
+                You will receive a prompt on your phone to confirm payment.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <p className="block font-medium text-[#1e3a5f] mb-1.5">
+              Phone Number: <span className="font-normal">{phoneNumber}</span>
+            </p>
+          </div>
+
+          <DialogFooter>
             <Button
               variant="outline"
-              size="sm"
-              className="border-primary text-primary hover:bg-primary/5 text-xs shrink-0"
-              asChild
+              onClick={() => setPaymentDialogOpen(false)}
             >
-              <Link href={`/dashboard/policy/${policy.id}`}>View Details</Link>
+              Cancel
             </Button>
-          </div>
-        </div>
-
-        {/* Info grid */}
-        <div className="flex flex-wrap justify-between gap-4 border-t border-[#d7e8ee] pt-4 text-sm">
-          <InfoBlock label="Policy #" value={policyNumberDisplay} />
-          {policy.certificate_issued && (
-            <InfoBlock label="Cert #" value={certDisplay} />
-          )}
-          <InfoBlock
-            label="Coverage"
-            value={policy.policy_type.replace("_", " ")}
-          />
-          <InfoBlock
-            label="Premium"
-            value={`KES ${policy.premium.toLocaleString()}`}
-          />
-
-          {/* Start date — editable */}
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-0.5">
-              Start date
-            </p>
-            <div className="flex items-center gap-1.5">
-              <p className="font-semibold text-[#1e3a5f]">
-                {startDate.toDateString()}
-              </p>
-              {!isActive && (
-                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      aria-label="Edit start date"
-                      disabled={saving}
-                      className="text-primary hover:text-primary/70 disabled:opacity-40 transition-colors"
-                    >
-                      {saving ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Pencil className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-0 shadow-xl border-[#d7e8ee]"
-                    align="start"
-                    sideOffset={8}
-                  >
-                    <div className="p-3 border-b border-[#d7e8ee]">
-                      <p className="text-sm font-medium text-[#1e3a5f]">
-                        Select new start date
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Choose when your cover should begin
-                      </p>
-                    </div>
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={handleDateSelect}
-                      disabled={(date) =>
-                        date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
-                      autoFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+            <Button
+              disabled={completingPayment}
+              onClick={handleCompletePayment}
+            >
+              {completingPayment && (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
               )}
-            </div>
-          </div>
-
-          {policy.is_paid && (
-            <InfoBlock
-              label="Expires"
-              value={expiryDate.toDateString()}
-              sub={isExpired ? "Expired" : `${daysRemaining} days remaining`}
-              subColor={
-                isExpired
-                  ? "text-red-500"
-                  : isExpiringSoon
-                    ? "text-amber-500"
-                    : "text-emerald-600"
-              }
-            />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+              Send Payment request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
