@@ -1,6 +1,5 @@
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import VehicleDetails from "@/components/VehicleDetails";
-import { axiosServer } from "@/utilities/axios-server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,8 +21,6 @@ export default async function Page({
   const step = product_type === "COMPREHENSIVE" ? 4 : 3;
   const totalSteps = product_type === "COMPREHENSIVE" ? 5 : 4;
 
-  const makeModelMapResponse = await axiosServer.get("/vehicle/make-model-map");
-
   return (
     <>
       <FlowStepHeader
@@ -34,11 +31,7 @@ export default async function Page({
       />
       <div className="bg-[#f0f6f9] flex-1 px-4 md:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-          <VehicleDetails
-            modelMakeMap={makeModelMapResponse.data}
-            product_type={product_type}
-            motor_type={motor_type}
-          />
+          <VehicleDetails product_type={product_type} motor_type={motor_type} />
         </div>
       </div>
     </>
