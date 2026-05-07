@@ -21,6 +21,7 @@ import {
   Loader2,
   Shield,
   Sparkles,
+  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -78,6 +79,8 @@ const PaymentSummary = () => {
     (s) => s.selectedAdditionalBenefitIds,
   );
   const { vehicleDetails } = useVehicleStore();
+  const referralCode = useInsuranceStore((s) => s.referralCode);
+  const setReferralCode = useInsuranceStore((s) => s.setReferralCode);
   const [additionalBenefits, setAdditionalBenefits] = useState<
     AdditionalBenefit[]
   >([]);
@@ -353,6 +356,48 @@ const PaymentSummary = () => {
             </Card>
           </div>
         )}
+
+        {/* Referral code */}
+        <div>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium px-1">
+            Referral Code
+          </p>
+          <Card className="border border-[#d7e8ee] shadow-sm">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 pb-3 border-b border-[#d7e8ee]">
+                <div className="p-2.5 bg-primary/10 rounded-xl shrink-0">
+                  <UserPlus className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[#1e3a5f]">
+                    Have a referral code?
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Enter a referral code if you were referred by an agent or
+                    partner.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={referralCode ?? ""}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  placeholder="Enter referral code (optional)"
+                  className="flex-1 border border-[#d7e8ee] rounded-lg px-3 py-2.5 text-sm text-[#1e3a5f] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white placeholder:text-muted-foreground"
+                />
+                <Button
+                  variant="outline"
+                  className="shrink-0 text-[#1e3a5f] hover:bg-[#f0f6f9]"
+                  onClick={() => setReferralCode(null)}
+                  disabled={!referralCode}
+                >
+                  Clear
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Cover start date */}
         <div>
