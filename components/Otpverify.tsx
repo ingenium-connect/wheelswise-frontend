@@ -17,6 +17,11 @@ import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 import { useUserStore } from "@/stores/userStore";
+import {
+  clearLoginFlowState,
+  finalizePendingLogin,
+  getLoginNationalId,
+} from "@/utilities/login-flow";
 
 const PENDING_VEHICLE_KEY = "__pending_vehicle_payload__";
 
@@ -32,11 +37,7 @@ const OtpVerify: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isLoginFlow = searchParams.get("from") === "login";
-  const loginNationalId = isLoginFlow
-    ? typeof window !== "undefined"
-      ? (sessionStorage.getItem("__login_national_id__") ?? "")
-      : ""
-    : "";
+  const loginNationalId = isLoginFlow ? getLoginNationalId() : "";
 
   // Logged-in "new vehicle" flow: has product_type/motor_type params, not login flow,
   // and no pending vehicle payload (guest signup sets that before OTP)
@@ -78,7 +79,14 @@ const OtpVerify: React.FC = () => {
       : personalDetails.secondary_user
         ? personalDetails.secondary_user.idNumber
         : personalDetails.user.idNumber;
-    console.log("Resending OTP to national ID:", nationalId);
+
+    if (!nationalId) {
+      clearLoginFlowState();
+      toast.error("Your login session expired. Please log in again.");
+      router.push("/login");
+      return;
+    }
+
     setAllowResend(false);
     (async () => {
       try {
@@ -115,6 +123,12 @@ const OtpVerify: React.FC = () => {
 
   const verifyOtp = async (otpValue: string) => {
     if (otpValue.length < 6 || loading) return;
+    if (isLoginFlow && !loginNationalId) {
+      clearLoginFlowState();
+      toast.error("Your login session expired. Please log in again.");
+      router.push("/login");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -129,11 +143,20 @@ const OtpVerify: React.FC = () => {
       const data = res?.data;
 
       if (data) {
-        toast.success("OTP successfully verified");
         if (isLoginFlow) {
-          sessionStorage.removeItem("__login_national_id__");
-          router.push("/login");
+          const finalized = finalizePendingLogin();
+
+          if (finalized) {
+            toast.success("Successfully logged in!");
+            router.push("/dashboard");
+            router.refresh();
+          } else {
+            clearLoginFlowState();
+            toast.success("OTP successfully verified");
+            router.push("/login");
+          }
         } else if (isNewVehicleFlow) {
+          toast.success("OTP successfully verified");
           // Logged-in user: if insuring an existing registered vehicle, skip vehicle-value
           const insuringExisting =
             typeof window !== "undefined" &&
@@ -148,6 +171,7 @@ const OtpVerify: React.FC = () => {
             );
           }
         } else {
+          toast.success("OTP successfully verified");
           await registerPendingVehicle();
           window.dispatchEvent(new Event("auth:changed"));
           router.push("/dashboard/payment-summary");

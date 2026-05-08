@@ -6,7 +6,6 @@ import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import {
   Form,
@@ -30,19 +29,16 @@ import { PasswordInput } from "../forms/password-input";
 import { useState } from "react";
 import { loginSubmitHandler } from "@/utilities/api";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { setCookie } from "nookies";
 
 import { LoginPayload } from "@/types/data";
-import {
-  ACCESS_TOKEN,
-  EMAIL,
-  KYC_STATUS,
-  NAME,
-  REFRESH_TOKEN,
-  USER_ID,
-} from "@/utilities/constants";
 import { loginFormSchema } from "@/utilities/validation-schemas";
 import { useOtp } from "@/hooks/useOtp";
+import {
+  clearLoginFlowState,
+  createPendingLoginSession,
+  stagePendingLogin,
+  storeLoginNationalId,
+} from "@/utilities/login-flow";
 
 const formSchema = loginFormSchema;
 
@@ -90,6 +86,8 @@ const Login: React.FC = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setLoginError("");
+    clearLoginFlowState();
+
     try {
       const payload: LoginPayload = {
         national_identifier: values.national_identifier,
@@ -98,19 +96,7 @@ const Login: React.FC = () => {
       };
       const response = await loginSubmitHandler({ ...payload });
       if (response?.id) {
-        // absent field (Go omitempty) === false
-        const otpVerified = response?.otp_verified === true;
         const isActive = response?.is_active === true;
-
-        if (!otpVerified) {
-          sessionStorage.setItem(
-            "__login_national_id__",
-            values.national_identifier,
-          );
-          await sendOtp(values.national_identifier);
-          router.push("/otp-verify?from=login");
-          return;
-        }
 
         if (!isActive) {
           setLoginError(
@@ -120,41 +106,25 @@ const Login: React.FC = () => {
           return;
         }
 
-        const userData = {
-          [ACCESS_TOKEN]: response?.auth_credentials?.idToken,
-          [REFRESH_TOKEN]: response?.auth_credentials?.refreshToken,
-          [USER_ID]: response?.id,
-          [EMAIL]: response?.email,
-          [NAME]: response?.name,
-          [KYC_STATUS]: response?.kyc_documents_verification_status ?? "",
-        };
-
-        Object.entries(userData).forEach(([key, value]) =>
-          setCookie(null, key, value ?? "", {
-            maxAge: key === REFRESH_TOKEN ? 30 * 24 * 60 * 60 : 60 * 60,
-            path: "/",
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-          }),
+        const pendingLogin = createPendingLoginSession(
+          response,
+          values.national_identifier,
         );
 
-        // Notify the header (and any other listeners) that auth state changed
-        // so UI reflects the logged-in state immediately instead of waiting
-        // for a remount / visibility event.
-        window.dispatchEvent(new Event("auth:changed"));
+        if (!pendingLogin) {
+          setLoginError(
+            "We couldn't start your login session. Please try again.",
+          );
+          return;
+        }
 
-        toast.success("Successfully logged in!");
-        router.push("/dashboard");
-        // Invalidate server component cache so /dashboard server fetches
-        // run with the new auth cookie on first render.
-        router.refresh();
+        stagePendingLogin(pendingLogin);
+        await sendOtp(values.national_identifier);
+        router.push("/otp-verify?from=login");
       } else {
         const errorMsg = (response?.error as string) ?? "";
         if (errorMsg.toLowerCase().includes("not verified")) {
-          sessionStorage.setItem(
-            "__login_national_id__",
-            values.national_identifier,
-          );
+          storeLoginNationalId(values.national_identifier);
           await sendOtp(values.national_identifier);
           router.push("/otp-verify?from=login");
           return;
