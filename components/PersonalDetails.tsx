@@ -240,45 +240,6 @@ const PersonalDetailsForm = ({
         </div>
       </div>
 
-      {/* Contact */}
-      <div className="border-t border-[#d7e8ee] pt-5">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
-          Contact
-        </p>
-        <div className="grid grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
-            <Input
-              id="phoneNumber"
-              name="phoneNumber"
-              type="text"
-              value={!isCoOwned || isOwnerForm ? form.phoneNumber : undefined}
-              onChange={handleChange}
-              placeholder="eg. 0712345678"
-              disabled={isOwnerForm && isCoOwned}
-              readOnly={isOwnerForm && isCoOwned}
-              required
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="emailAddress">
-              Email Address<span className="text-red-500">*</span>
-            </FieldLabel>
-            <Input
-              id="emailAddress"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="email@example.com"
-              disabled={isCoOwned && isOwnerForm}
-              readOnly={isCoOwned && isOwnerForm}
-              required={isOwnerForm}
-            />
-          </Field>
-        </div>
-      </div>
-
       {/* Identity */}
       <div className="border-t border-[#d7e8ee] pt-5">
         <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
@@ -311,6 +272,47 @@ const PersonalDetailsForm = ({
               readOnly={isOwnerForm}
               disabled={isOwnerForm}
               required
+            />
+          </Field>
+        </div>
+      </div>
+
+      {/* Contact */}
+      <div className="border-t border-[#d7e8ee] pt-5">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+          Contact
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <Field>
+            <FieldLabel htmlFor="phoneNumber">
+              Phone Number<span className="text-red-500">*</span>
+            </FieldLabel>
+            <Input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="text"
+              value={!isCoOwned || isOwnerForm ? form.phoneNumber : undefined}
+              onChange={handleChange}
+              placeholder="eg. 0712345678"
+              disabled={isOwnerForm && isCoOwned}
+              readOnly={isOwnerForm && isCoOwned}
+              required
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="emailAddress">
+              Email Address<span className="text-red-500">*</span>
+            </FieldLabel>
+            <Input
+              id="emailAddress"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="email@example.com"
+              disabled={isCoOwned && isOwnerForm}
+              readOnly={isCoOwned && isOwnerForm}
+              required={isOwnerForm}
             />
           </Field>
         </div>
