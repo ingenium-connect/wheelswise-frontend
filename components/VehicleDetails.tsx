@@ -21,6 +21,9 @@ import {
   AlertCircle,
   Car,
   Loader2,
+  LucideCar,
+  LucideCog,
+  LucideShieldEllipsis,
   LucideUser,
   LucideUsers,
   Search,
@@ -349,7 +352,7 @@ const VehicleDetails = ({
         const ownerObj = owner[0];
         setPersonalDetails({
           firstName: ownerObj.FIRSTNAME || "",
-          lastName: ownerObj.LASTNAME || "",
+          lastName: ownerObj.LASTNAME || ownerObj.FIRSTNAME || "",
           phoneNumber: ownerObj.TELNO || "",
           idNumber: ownerObj.ID_NUMBER || "",
           kraPin: ownerObj.PIN || "",
@@ -552,343 +555,110 @@ const VehicleDetails = ({
         <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
         <CardContent className="p-6">
           {/* Search state */}
-          {searchStatus === "idle" ? (
-            <form onSubmit={searchVehicle} className="space-y-5">
-              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                  <Search className="w-5 h-5 text-primary" />
+          <div>
+            {searchStatus === "idle" ? (
+              <form onSubmit={searchVehicle} className="space-y-5">
+                <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
+                  <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
+                    <Search className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1e3a5f] text-sm">
+                      Search by Registration
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Enter your vehicle registration number to auto-fill
+                      details.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">
-                    Search by Registration
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Enter your vehicle registration number to auto-fill details.
-                  </p>
-                </div>
-              </div>
-              <Field>
-                <FieldLabel htmlFor="vehicleReg">
-                  Vehicle Registration Number{" "}
-                  <span className="text-red-500">*</span>
-                </FieldLabel>
-                <Input
-                  id="vehicleReg"
-                  value={vehicleRegNumber}
-                  onChange={(e) => setVehicleRegNumber(e.target.value)}
-                  placeholder="e.g. KAA 123A"
-                  required
-                />
-              </Field>
-              <Button
-                type="submit"
-                className="w-full text-white"
-                disabled={loadingSearch}
-              >
-                {loadingSearch ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Search Vehicle"
-                )}
-              </Button>
-            </form>
-          ) : (
-            /* Details form */
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Header */}
-              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                  <Car className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">
-                    Vehicle Details
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Enter your vehicle details manually.
-                  </p>
-                </div>
-              </div>
-
-              {/* Section: Identification */}
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
-                  Identification
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="vehicleNumber">
-                      Vehicle Number <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    <Input
-                      id="vehicleNumber"
-                      name="vehicleNumber"
-                      type="text"
-                      value={form.vehicleNumber}
-                      onChange={handleChange}
-                      placeholder="e.g. KAA 123A"
-                      required
-                      disabled={isFieldsDisabled}
-                      readOnly={isFieldsDisabled}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="chassisNumber">
-                      Chassis Number <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    <Input
-                      id="chassisNumber"
-                      name="chassisNumber"
-                      type="text"
-                      value={form.chassisNumber}
-                      onChange={handleChange}
-                      placeholder="Chassis Number"
-                      required
-                      disabled={isFieldsDisabled}
-                    />
-                  </Field>
-                </div>
-              </div>
-
-              {/* Section: Vehicle Specs */}
-              <div className="border-t border-[#d7e8ee] pt-5">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
-                  Vehicle Specs
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="vehicleMake">
-                      Make <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    {isFieldsDisabled ? (
-                      <Input
-                        value={form.make}
-                        readOnly
-                        disabled
-                        className="bg-[#f0f6f9]"
-                      />
-                    ) : (
-                      <Select
-                        onValueChange={(v) => handleSelectChange("make", v)}
-                        value={form.make}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Make" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {modelMakeMap.map((m) => (
-                            <SelectItem key={m.make} value={m.make}>
-                              {m.make}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="vehicleModel">
-                      Model <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    {isFieldsDisabled ? (
-                      <Input
-                        value={form.model}
-                        readOnly
-                        disabled
-                        className="bg-[#f0f6f9]"
-                      />
-                    ) : (
-                      <Select
-                        onValueChange={(v) => handleSelectChange("model", v)}
-                        value={form.model}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Model" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {models.map((model) => (
-                            <SelectItem key={model} value={model}>
-                              {model}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="yearOfManufacture">
-                      Year of Manufacture{" "}
-                      <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    {isFieldsDisabled ? (
-                      <Input
-                        value={form.year}
-                        readOnly
-                        disabled
-                        className="bg-[#f0f6f9]"
-                      />
-                    ) : (
-                      <Select
-                        onValueChange={(v) => handleSelectChange("year", v)}
-                        value={form.year}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Year of manufacture" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from(
-                            {
-                              length:
-                                motorSubType?.underwriter_product.yom_range ??
-                                0,
-                            },
-                            (_, i) => {
-                              const year = currentYear - i;
-                              return (
-                                <SelectItem key={year} value={year.toString()}>
-                                  {year}
-                                </SelectItem>
-                              );
-                            },
-                          )}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="bodyType">
-                      Body Type <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    {isFieldsDisabled ? (
-                      <Input
-                        value={form.bodyType}
-                        readOnly
-                        disabled
-                        className="bg-[#f0f6f9]"
-                      />
-                    ) : (
-                      <Select
-                        onValueChange={(v) => handleSelectChange("bodyType", v)}
-                        value={form.bodyType}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select body type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {bodyTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="engineCapacity">
-                      Engine Capacity <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    <Input
-                      id="engineCapacity"
-                      name="engineCapacity"
-                      type="text"
-                      value={form.engineCapacity}
-                      onChange={handleChange}
-                      placeholder="e.g. 1800CC"
-                      required
-                      disabled={isFieldsDisabled}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="engineNumber">
-                      Engine Number <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    <Input
-                      id="engineNumber"
-                      name="engineNumber"
-                      type="text"
-                      value={form.engineNumber}
-                      onChange={handleChange}
-                      placeholder="Engine Number"
-                      required
-                      disabled={isFieldsDisabled && !!form.engineNumber}
-                      readOnly={isFieldsDisabled && !!form.engineNumber}
-                    />
-                  </Field>
-                  {!isThirdParty && (
-                    <Field>
-                      <FieldLabel htmlFor="vehicleValue">
-                        Vehicle Value (KES)
-                      </FieldLabel>
-                      <Input
-                        id="vehicleValue"
-                        name="vehicleValue"
-                        value={form.vehicleValue}
-                        disabled
-                        readOnly
-                        aria-invalid={Boolean(vehicleValueError)}
-                        className="bg-[#f0f6f9]"
-                      />
-                      <FieldError>{vehicleValueError}</FieldError>
-                    </Field>
+                <Field>
+                  <FieldLabel htmlFor="vehicleReg">
+                    Vehicle Registration Number{" "}
+                    <span className="text-red-500">*</span>
+                  </FieldLabel>
+                  <Input
+                    id="vehicleReg"
+                    value={vehicleRegNumber}
+                    onChange={(e) => setVehicleRegNumber(e.target.value)}
+                    placeholder="e.g. KAA 123A"
+                    required
+                  />
+                </Field>
+                <Button
+                  type="submit"
+                  className="w-full text-white"
+                  disabled={loadingSearch}
+                >
+                  {loadingSearch ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Search Vehicle"
                   )}
-                  <Field>
-                    <FieldLabel htmlFor="seatingCapacity">
-                      Seating Capacity
-                    </FieldLabel>
-                    <Input
-                      id="seatingCapacity"
-                      type="number"
-                      min={1}
-                      value={seatingCapacity}
-                      onChange={(e) => setSeatingCapacity(e.target.value)}
-                      placeholder="e.g. 5"
-                      disabled={isFieldsDisabled}
-                      readOnly={isFieldsDisabled}
-                    />
-                  </Field>
-                  {isCommercial && tonnage > 0 && (
-                    <Field>
-                      <FieldLabel htmlFor="tonnage">
-                        Tonnage (tonnes)
-                      </FieldLabel>
-                      <Input
-                        id="tonnage"
-                        type="number"
-                        value={tonnage}
-                        disabled
-                        readOnly
-                        className="bg-[#f0f6f9]"
-                      />
-                    </Field>
-                  )}
+                </Button>
+              </form>
+            ) : (
+              // prefetched vehicle details preview
+              <>
+                <div className="flex gap-4 mb-8 justify-center">
+                  <div>
+                    <p className="font-bold text-2xl">{vehicleRegNumber} </p>
+                    <p className="text-muted-foreground">
+                      {form.make} {form.model} ({form.year})
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Section: Purpose */}
-              <div className="border-t border-[#d7e8ee] pt-5">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
-                  Purpose
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="vehiclePurpose">
-                      Vehicle Purpose <span className="text-red-500">*</span>
-                    </FieldLabel>
-                    <Input
-                      id="vehiclePurpose"
-                      name="vehiclePurpose"
-                      type="text"
-                      value={form.vehiclePurpose}
-                      onChange={handleChange}
-                      placeholder="e.g. PSV, Private"
-                      required
-                      disabled={isFieldsDisabled && !!form.vehiclePurpose}
-                      readOnly={isFieldsDisabled && !!form.vehiclePurpose}
-                    />
-                  </Field>
-                  <Field>
+                {/* Vehicle specs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
+                      <LucideCar />
+                    </div>
+                    <p>{form.bodyType}</p>
+                    <p>BODY TYPE</p>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
+                      <LucideCog />
+                    </div>
+                    {form.engineCapacity} CC
+                    <p>ENGINE CAPACITY</p>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
+                      <LucideShieldEllipsis />
+                    </div>
+                    <div>
+                      <div>
+                        <p>
+                          <span className="font-bold">Chassis:</span>{" "}
+                          {form.chassisNumber}
+                        </p>
+                      </div>
+                      <div>
+                        <p>
+                          <span className="font-bold">Engine:</span>{" "}
+                          {form.engineNumber}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+
+                {/* vehicle purpose */}
+                <div className="my-6">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                    Vehicle purpose ({form.vehiclePurpose})
+                  </p>
+
+                  <Field className="max-w-md">
                     <FieldLabel htmlFor="vehiclePurposeCategory">
-                      Purpose Category<span className="text-red-500">*</span>
+                      Select vehicle Purpose Category
+                      <span className="text-red-500">*</span>
                     </FieldLabel>
                     <Select
                       onValueChange={(v) =>
@@ -925,64 +695,65 @@ const VehicleDetails = ({
                     </Select>
                   </Field>
                 </div>
-              </div>
 
-              {/* section: ownership */}
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
-                  Vehicle ownership
-                </p>
+                {/* vehicle ownership */}
+                <div className="py-6">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+                    Vehicle ownership
+                  </p>
 
-                <p>
-                  Who is the registered owner of this vehicle?
-                  <span className="text-red-500">*</span>
-                </p>
-                <div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div
-                      onClick={() => setIsCoOwned(false)}
-                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned === false && " bg-primary text-white"}`}
-                    >
-                      <LucideUser />
-                      <p>I am the sole owner</p>
-                    </div>
-                    <div
-                      onClick={() => setIsCoOwned(true)}
-                      className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned && " bg-primary text-white"}`}
-                    >
-                      <LucideUsers />
-                      <p>
-                        It is co-owned or under finance (e.g. Hire Purchase)
-                      </p>
+                  <p>
+                    Who is the registered owner of this vehicle?
+                    <span className="text-red-500">*</span>
+                  </p>
+                  <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div
+                        onClick={() => setIsCoOwned(false)}
+                        className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned === false && " bg-primary text-white"}`}
+                      >
+                        <LucideUser />
+                        <p>I am the sole owner</p>
+                      </div>
+                      <div
+                        onClick={() => setIsCoOwned(true)}
+                        className={`flex items-center gap-3 border border-primary p-4 rounded-md cursor-pointer ${isCoOwned && " bg-primary text-white"}`}
+                      >
+                        <LucideUsers />
+                        <p>
+                          It is co-owned or under finance (e.g. Hire Purchase)
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
-                  onClick={cancelAction}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 text-white"
-                  disabled={!validDetails() || submitting}
-                >
-                  {submitting ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    "Next"
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
+                {/* actions */}
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="flex-1 border-[#d7e8ee] text-[#1e3a5f] hover:bg-[#f0f6f9]"
+                    onClick={cancelAction}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 text-white"
+                    disabled={!validDetails() || submitting}
+                    onClick={handleSubmit}
+                  >
+                    {submitting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      "Next"
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
