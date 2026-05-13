@@ -38,9 +38,13 @@ type Props = {
 
 type BenefitsSectionProps = {
   productId: string;
+  includedBenefits?: AdditionalBenefit[];
 };
 
-const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
+const BenefitsSection: React.FC<BenefitsSectionProps> = ({
+  productId,
+  includedBenefits,
+}) => {
   const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
@@ -71,6 +75,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
 
   const product_benefits = productBenefits.product_benefits ?? [];
   const applicable_excesses = productBenefits.applicable_excesses ?? [];
+  console.log("THE INCLUDED BENEFITS ARE", includedBenefits);
 
   if (product_benefits.length === 0 && applicable_excesses.length === 0) {
     return (
@@ -82,15 +87,38 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ productId }) => {
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center gap-1.5 mb-3">
+        <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+        <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+          Product Benefits
+        </p>
+      </div>
+      {/* included benefits for all-inclusive products */}
+      {includedBenefits && (
+        <>
+          {includedBenefits.map((benefit) => (
+            <div
+              key={benefit.id}
+              className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
+            >
+              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-[#1e3a5f]">
+                  {benefit.name ?? "—"}
+                </p>
+                {benefit.name && (
+                  <span className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full">
+                    {benefit.base_amount} {benefit.currency}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
       {/* Product Benefits */}
       {product_benefits.length > 0 && (
         <div>
-          <div className="flex items-center gap-1.5 mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-              Product Benefits
-            </p>
-          </div>
           <div className="space-y-2">
             {product_benefits.map((benefit) => (
               <div
@@ -481,68 +509,72 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     )}
                   </div>
 
-                  {/* Additional benefits */}
-                  {hasAdditionalBenefits && (
-                    <div className="mb-4">
-                      <div className="flex items-center gap-1.5 mb-2.5">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" />
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-                          Optional Add-ons
-                        </p>
+                  {/* Additional benefits for exclusive benefits, user must select option */}
+                  {hasAdditionalBenefits &&
+                    item.product_rate?.additional_benefit_inclusivity ===
+                      "EXCLUSIVE" && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-1.5 mb-2.5">
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+                            Optional Add-ons
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          {(product?.additional_benefits ?? []).map(
+                            (benefit) => {
+                              const isChecked = selectedBenefits.some(
+                                (b) => b.id === benefit.id,
+                              );
+                              return (
+                                <label
+                                  key={benefit.id}
+                                  className={cn(
+                                    "flex items-center gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors",
+                                    isChecked
+                                      ? "border-primary bg-primary/5"
+                                      : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
+                                  )}
+                                >
+                                  <input
+                                    name={benefit.id}
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) =>
+                                      toggleBenefit(
+                                        e,
+                                        benefit,
+                                        product.id,
+                                        item.product_rate?.id,
+                                      )
+                                    }
+                                    className="accent-primary cursor-pointer shrink-0"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-[#1e3a5f]">
+                                      {benefit.name ?? "—"}
+                                    </p>
+                                    {((benefit.base_amount ?? 0) > 0 ||
+                                      (benefit.percentage ?? 0) > 0) && (
+                                      <p className="text-xs text-muted-foreground mt-0.5">
+                                        {(benefit.base_amount ?? 0) > 0
+                                          ? `${benefit.base_amount!.toLocaleString()} ${benefit.currency ?? ""}`
+                                          : `${benefit.percentage}%`}
+                                        {(benefit.duration_days ?? 0) > 0 &&
+                                          ` · ${benefit.duration_days} days`}
+                                      </p>
+                                    )}
+                                  </div>
+                                  {isChecked && (
+                                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                  )}
+                                </label>
+                              );
+                            },
+                          )}
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        {(product?.additional_benefits ?? []).map((benefit) => {
-                          const isChecked = selectedBenefits.some(
-                            (b) => b.id === benefit.id,
-                          );
-                          return (
-                            <label
-                              key={benefit.id}
-                              className={cn(
-                                "flex items-center gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors",
-                                isChecked
-                                  ? "border-primary bg-primary/5"
-                                  : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
-                              )}
-                            >
-                              <input
-                                name={benefit.id}
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) =>
-                                  toggleBenefit(
-                                    e,
-                                    benefit,
-                                    product.id,
-                                    item.product_rate?.id,
-                                  )
-                                }
-                                className="accent-primary cursor-pointer shrink-0"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[#1e3a5f]">
-                                  {benefit.name ?? "—"}
-                                </p>
-                                {((benefit.base_amount ?? 0) > 0 ||
-                                  (benefit.percentage ?? 0) > 0) && (
-                                  <p className="text-xs text-muted-foreground mt-0.5">
-                                    {(benefit.base_amount ?? 0) > 0
-                                      ? `${benefit.base_amount!.toLocaleString()} ${benefit.currency ?? ""}`
-                                      : `${benefit.percentage}%`}
-                                    {(benefit.duration_days ?? 0) > 0 &&
-                                      ` · ${benefit.duration_days} days`}
-                                  </p>
-                                )}
-                              </div>
-                              {isChecked && (
-                                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                              )}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Toggle plan details */}
                   <button
@@ -560,7 +592,15 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
 
                   {isOpen && (
                     <div className="mb-4 border border-[#d7e8ee] rounded-xl p-4">
-                      <BenefitsSection productId={product?.id} />
+                      <BenefitsSection
+                        productId={product?.id}
+                        {...(item.product_rate
+                          ?.additional_benefit_inclusivity ===
+                          "ALL_INCLUSIVE" &&
+                          hasAdditionalBenefits && {
+                            includedBenefits: product.additional_benefits,
+                          })}
+                      />
                     </div>
                   )}
 
