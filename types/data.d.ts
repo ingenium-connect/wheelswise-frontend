@@ -85,6 +85,7 @@ export type MotorSubTypeItem = {
     min_sum_insured: number;
     max_sum_insured: number;
     least_premium_amount: number;
+    additional_benefit_inclusivity: "EXCLUSIVE" | "ALL_INCLUSIVE";
   };
   // Present for THIRD_PARTY plans
   tpo_price_list?: {
