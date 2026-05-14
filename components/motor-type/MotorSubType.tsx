@@ -551,7 +551,8 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                           );
                         })}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Toggle plan details */}
                   <button
