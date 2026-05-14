@@ -393,11 +393,11 @@ const SelectMotorType = ({ data }: Props) => {
       )}
 
       {selectedCover === "COMPREHENSIVE" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
           {(data?.motor_types ?? []).map((type) => (
             <Card
               key={type.id}
-              className="group border border-[#d7e8ee] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col rounded-2xl cursor-pointer"
+              className="group border border-[#d7e8ee] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col rounded-2xl cursor-pointer w-full"
               onClick={() => !sendingOtp && handleSelect(type)}
             >
               <div className="relative h-52 w-full overflow-hidden bg-[#f0f6f9] shrink-0">
@@ -410,13 +410,13 @@ const SelectMotorType = ({ data }: Props) => {
               </div>
 
               <div className="px-5 pt-4 pb-1">
-                <h2 className="text-lg font-bold text-[#1e3a5f] capitalize">
+                <h2 className="text-lg font-bold text-[#1e3a5f] capitalize text-center">
                   {type.name.charAt(0) + type.name.slice(1).toLowerCase()}
                 </h2>
               </div>
 
               <div className="px-5 pb-5 flex flex-col flex-grow">
-                <p className="text-sm text-muted-foreground leading-relaxed flex-grow">
+                <p className="text-sm text-muted-foreground leading-relaxed flex-grow text-center">
                   {type.description}
                 </p>
                 <Button

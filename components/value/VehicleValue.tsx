@@ -44,19 +44,20 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const vehicleValueError = getVehicleValueLimitError(vehicleValue);
 
   // Track if tonnage was pre-filled from MotorType page (TPO COMMERCIAL)
-  const tonnagePreFilled = useRef(tonnage > 0);
+  const tonnagePreFilled = useRef(tonnage > 0 && product_type === "THIRD_PARTY");
 
   useEffect(() => {
     setCoverStep(2);
     // Clear page values so the user enters them afresh when navigating back
     setVehicleValue(0);
     setSeatingCapacity("");
-    // Preserve tonnage if already set from MotorType page (TPO COMMERCIAL flow)
-    if (!tonnage || tonnage <= 0) {
+    // For Third Party, preserve tonnage if already set from MotorType page (TPO COMMERCIAL flow)
+    // For Comprehensive, always clear tonnage since it's not entered in MotorType page
+    if (product_type !== "THIRD_PARTY" || !tonnage || tonnage <= 0) {
       setTonnage(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setCoverStep, setVehicleValue, setSeatingCapacity, setTonnage]);
+  }, [product_type, setCoverStep, setVehicleValue, setSeatingCapacity, setTonnage]);
 
   const handleContinue = () => {
     let isValid = true;

@@ -12,18 +12,18 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent } from "./ui/card";
 import { axiosAuthClient, axiosClient } from "@/utilities/axios-client";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
 import {
   AlertCircle,
-  Car,
   Loader2,
   LucideCar,
   LucideCog,
-  LucideShieldEllipsis,
+  LucideFileSignature,
+  LucideSettings,
   LucideUser,
   LucideUsers,
   Search,
@@ -99,9 +99,6 @@ const VehicleDetails = ({
     });
   }, []);
 
-  const isCommercial = motorType?.name === "COMMERCIAL";
-
-  const [models, setModels] = useState<string[]>([]);
   const [bodyTypes, setBodyTypes] = useState<string[]>([]);
   const [purposeCategories, setPurposeCategories] = useState<
     { code: number; name: string }[]
@@ -111,7 +108,6 @@ const VehicleDetails = ({
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>("idle");
   const [searchMessage, setSearchMessage] = useState("");
-  const [isFieldsDisabled, setIsFieldsDisabled] = useState(false);
 
   const currentYear = new Date().getFullYear();
 
@@ -205,6 +201,9 @@ const VehicleDetails = ({
     ? ""
     : getVehicleValueLimitError(form.vehicleValue);
 
+  const isCommercial = motorType?.name === "COMMERCIAL";
+  const isThirdPartyCommercial = isThirdParty && isCommercial;
+
   const validDetails = () => {
     return (
       (isThirdParty || form.vehicleValue > 0) &&
@@ -219,7 +218,8 @@ const VehicleDetails = ({
       form.bodyType &&
       form.vehiclePurpose &&
       form.vehiclePurposeCategory &&
-      isCoOwned !== null
+      isCoOwned !== null &&
+      (!isCommercial || (tonnage && tonnage > 0))
     );
   };
 
@@ -227,12 +227,6 @@ const VehicleDetails = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-
-    // update model list when make changes
-    if (e.target.name === "make") {
-      const modelMake = modelMakeMap.find((m) => m.make === e.target.value);
-      setModels(modelMake?.models ?? []);
-    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -276,7 +270,6 @@ const VehicleDetails = ({
       const vehicleYear = parseInt(vehicle.yearOfManufacture);
       const maxAgeAllowed = motorSubType?.underwriter_product.yom_range;
 
-      setIsFieldsDisabled(true);
       if (maxAgeAllowed && vehicleYear) {
         const vehicleAge = currentYear - vehicleYear;
 
@@ -308,9 +301,6 @@ const VehicleDetails = ({
 
       const availableModels = matchingMakeEntry ? matchingMakeEntry.models : [];
 
-      // Set the list of models for the dropdown options
-      setModels(availableModels);
-
       const correctlyCasedModel =
         availableModels.find(
           (mod) => mod.toLowerCase() === vehicle.carModel?.toLowerCase(),
@@ -321,10 +311,6 @@ const VehicleDetails = ({
         bodyTypes.find(
           (bt) => bt.toLowerCase() === vehicle.bodyType?.toLowerCase(),
         ) || vehicle.bodyType;
-
-      // 🔁 Populate models BEFORE setting form.model
-      const modelMake = modelMakeMap.find((m) => m.make === vehicle.carMake);
-      setModels(modelMake?.models ?? []);
 
       setForm((prev) => ({
         ...prev,
@@ -396,7 +382,6 @@ const VehicleDetails = ({
         ntsaRegistered: false,
       });
 
-      setIsFieldsDisabled(true);
       setSearchStatus("error");
       setSearchMessage(
         "Vehicle not found. Please go back and enter a valid vehicle registration number.",
@@ -557,97 +542,126 @@ const VehicleDetails = ({
           {/* Search state */}
           <div>
             {searchStatus === "idle" ? (
-              <form onSubmit={searchVehicle} className="space-y-5">
-                <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-                  <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                    <Search className="w-5 h-5 text-primary" />
+              <form onSubmit={searchVehicle} className="space-y-6">
+                <div className="flex items-center gap-4 bg-primary/5 rounded-xl p-5">
+                  <div className="p-3 bg-white rounded-xl shadow-sm shrink-0">
+                    <Search className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#1e3a5f] text-sm">
+                    <p className="font-semibold text-[#1e3a5f] text-base">
                       Search by Registration
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       Enter your vehicle registration number to auto-fill
                       details.
                     </p>
                   </div>
                 </div>
-                <Field>
-                  <FieldLabel htmlFor="vehicleReg">
-                    Vehicle Registration Number{" "}
-                    <span className="text-red-500">*</span>
-                  </FieldLabel>
-                  <Input
-                    id="vehicleReg"
-                    value={vehicleRegNumber}
-                    onChange={(e) => setVehicleRegNumber(e.target.value)}
-                    placeholder="e.g. KAA 123A"
-                    required
-                  />
-                </Field>
-                <Button
-                  type="submit"
-                  className="w-full text-white"
-                  disabled={loadingSearch}
-                >
-                  {loadingSearch ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    "Search Vehicle"
-                  )}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <FieldLabel htmlFor="vehicleReg">
+                      Vehicle Registration Number{" "}
+                      <span className="text-red-500">*</span>
+                    </FieldLabel>
+                    <Input
+                      id="vehicleReg"
+                      value={vehicleRegNumber}
+                      onChange={(e) => setVehicleRegNumber(e.target.value)}
+                      placeholder="e.g. KAA 123A"
+                      required
+                      className="mt-2 h-11 text-lg tracking-wider"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      type="submit"
+                      className="w-full sm:w-auto text-white px-8 h-11"
+                      disabled={loadingSearch}
+                    >
+                      {loadingSearch ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        "Search"
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </form>
             ) : (
               // prefetched vehicle details preview
               <>
-                <div className="flex gap-4 mb-8 justify-center">
-                  <div>
-                    <p className="font-bold text-2xl">{vehicleRegNumber} </p>
-                    <p className="text-muted-foreground">
+                <div className="text-center mb-8">
+                  <h3 className="text-sm uppercase tracking-widest text-muted-foreground font-medium mb-2">
+                    Vehicle Found
+                  </h3>
+                  <div className="flex flex-col items-center">
+                    <p className="font-bold text-3xl text-[#1e3a5f] tracking-wider">
+                      {vehicleRegNumber}
+                    </p>
+                    <p className="text-muted-foreground mt-2 text-lg">
                       {form.make} {form.model} ({form.year})
                     </p>
                   </div>
                 </div>
 
                 {/* Vehicle specs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
-                      <LucideCar />
-                    </div>
-                    <p>{form.bodyType}</p>
-                    <p>BODY TYPE</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
+                    <LucideCar className="w-5 h-5 text-primary mb-2" />
+                    <p className="text-xs font-medium text-[#1e3a5f]">{form.bodyType}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">Body</p>
                   </div>
 
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
-                      <LucideCog />
-                    </div>
-                    {form.engineCapacity} CC
-                    <p>ENGINE CAPACITY</p>
+                  <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
+                    <LucideCog className="w-5 h-5 text-primary mb-2" />
+                    <p className="text-xs font-medium text-[#1e3a5f]">{form.engineCapacity} CC</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">Engine</p>
                   </div>
 
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center">
-                      <LucideShieldEllipsis />
-                    </div>
-                    <div>
-                      <div>
-                        <p>
-                          <span className="font-bold">Chassis:</span>{" "}
-                          {form.chassisNumber}
-                        </p>
-                      </div>
-                      <div>
-                        <p>
-                          <span className="font-bold">Engine:</span>{" "}
-                          {form.engineNumber}
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
+                    <LucideFileSignature className="w-5 h-5 text-primary mb-2" />
+                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">{form.chassisNumber}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">Chassis</p>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
+                    <LucideSettings className="w-5 h-5 text-primary mb-2" />
+                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">{form.engineNumber}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">Engine #</p>
                   </div>
                 </div>
-                <hr />
+
+                {/* Tonnage field for Commercial vehicles */}
+                {isCommercial && (
+                  <div className="mb-6">
+                    <Field>
+                      <FieldLabel htmlFor="tonnage">
+                        Vehicle Tonnage (tonnes)
+                        <span className="text-red-500">*</span>
+                      </FieldLabel>
+                      <Input
+                        id="tonnage"
+                        type="number"
+                        min={1}
+                        placeholder="e.g. 3"
+                        value={tonnage || ""}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          useVehicleStore.getState().setTonnage(value);
+                        }}
+                        className={isThirdPartyCommercial ? "bg-[#f0f6f9]" : ""}
+                        disabled={isThirdPartyCommercial}
+                      />
+                      {isThirdPartyCommercial && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Tonnage was pre-filled from your Third Party Commercial selection.
+                        </p>
+                      )}
+                    </Field>
+                  </div>
+                )}
+
+                <hr className="my-6" />
 
                 {/* vehicle purpose */}
                 <div className="my-6">

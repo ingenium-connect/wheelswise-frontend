@@ -2,15 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { usePersonalDetailsStore } from "@/stores/personalDetailsStore";
 import { toast } from "sonner";
 import { useInsuranceStore } from "@/stores/insuranceStore";
-import { User } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { User, UserCircle, Fingerprint, Mail, Phone } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { PersonalDetails as PersonalDetailsType } from "@/types/data";
 import { validateEmail } from "@/utilities/validation-schemas";
@@ -94,30 +94,27 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
       <div className="h-1.5 w-full bg-gradient-to-r from-[#1e3a5f] via-[#397397] to-[#2e5e74]" />
       <CardContent className="p-6">
         {isCoOwned ? (
-          <Tabs defaultValue="proposer">
-            <TabsList>
-              <TabsTrigger value="owner">Owner</TabsTrigger>
-              <TabsTrigger value="proposer" disabled={isCoOwned ? false : true}>
-                Proposer (Hirer)
+          <Tabs defaultValue="proposer" className="space-y-6">
+            <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-[#f0f6f9]">
+              <TabsTrigger value="owner" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <UserCircle className="w-4 h-4 mr-2" />
+                Owner
+              </TabsTrigger>
+              <TabsTrigger value="proposer" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <UserCircle className="w-4 h-4 mr-2" />
+                Proposer
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="owner">
-              {/* Header */}
-
-              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                  <User className="w-5 h-5 text-primary" />
+            <TabsContent value="owner" className="space-y-6">
+              <div className="flex items-center gap-4 bg-primary/5 rounded-xl p-5">
+                <div className="p-3 bg-white rounded-xl shadow-sm shrink-0">
+                  <UserCircle className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">
-                    Owner Details
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Details of the car owner.
-                  </p>
+                  <p className="font-semibold text-[#1e3a5f] text-base">Owner Details</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Details of the car owner.</p>
                 </div>
               </div>
-
               <PersonalDetailsForm
                 form={form}
                 handleChange={handleChange}
@@ -125,21 +122,16 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                 isOwnerForm={true}
               />
             </TabsContent>
-            <TabsContent value="proposer">
-              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-                <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                  <User className="w-5 h-5 text-primary" />
+            <TabsContent value="proposer" className="space-y-6">
+              <div className="flex items-center gap-4 bg-primary/5 rounded-xl p-5">
+                <div className="p-3 bg-white rounded-xl shadow-sm shrink-0">
+                  <UserCircle className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-sm">
-                    Policy holder details
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Details of the policy holder.
-                  </p>
+                  <p className="font-semibold text-[#1e3a5f] text-base">Proposer Details</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Details of the policy holder.</p>
                 </div>
               </div>
-
               <PersonalDetailsForm
                 form={secondaryForm}
                 handleChange={handleSecondaryChange}
@@ -150,15 +142,13 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
           </Tabs>
         ) : (
           <>
-            <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4">
-              <div className="p-2.5 bg-white rounded-xl shadow-sm shrink-0">
-                <User className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-4 bg-primary/5 rounded-xl p-5 mb-6">
+              <div className="p-3 bg-white rounded-xl shadow-sm shrink-0">
+                <User className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-[#1e3a5f] text-sm">
-                  Personal Details
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="font-semibold text-[#1e3a5f] text-base">Personal Details</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   Please provide your personal information.
                 </p>
               </div>
@@ -210,97 +200,110 @@ const PersonalDetailsForm = ({
         </p>
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+            <FieldLabel htmlFor="firstName" className="text-sm">First Name</FieldLabel>
             <Input
               id="firstName"
               name="firstName"
               type="text"
               value={!isCoOwned || isOwnerForm ? form.firstName : undefined}
               onChange={handleChange}
-              placeholder="First Name"
+              placeholder="e.g. John"
               readOnly={isOwnerForm}
               disabled={isOwnerForm}
               required
+              className="h-11 text-base"
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+            <FieldLabel htmlFor="lastName" className="text-sm">Last Name</FieldLabel>
             <Input
               id="lastName"
               name="lastName"
               type="text"
               value={!isCoOwned || isOwnerForm ? form.lastName : undefined}
               onChange={handleChange}
-              placeholder="Last Name"
+              placeholder="e.g. Doe"
               readOnly={isOwnerForm}
               disabled={isOwnerForm}
               required
+              className="h-11 text-base"
             />
           </Field>
         </div>
       </div>
 
       {/* Identity */}
-      <div className="border-t border-[#d7e8ee] pt-5">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+      <div className="border-t border-[#d7e8ee] pt-6">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-4">
           Identity
         </p>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="idNumber">ID Number</FieldLabel>
+            <FieldLabel htmlFor="idNumber" className="text-sm">
+              <Fingerprint className="w-4 h-4 inline mr-2" />
+              ID Number
+            </FieldLabel>
             <Input
               id="idNumber"
               name="idNumber"
               type="text"
               value={!isCoOwned || isOwnerForm ? form.idNumber : undefined}
               onChange={handleChange}
-              placeholder="ID Number"
+              placeholder="e.g. 12345678"
               readOnly={isOwnerForm}
               disabled={isOwnerForm}
               required
+              className="h-11 text-base"
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="kraPin">KRA PIN</FieldLabel>
+            <FieldLabel htmlFor="kraPin" className="text-sm">
+              <UserCircle className="w-4 h-4 inline mr-2" />
+              KRA PIN
+            </FieldLabel>
             <Input
               id="kraPin"
               name="kraPin"
               type="text"
               value={!isCoOwned || isOwnerForm ? form.kraPin : undefined}
               onChange={handleChange}
-              placeholder="KRA PIN"
+              placeholder="e.g. A1234567890B"
               readOnly={isOwnerForm}
               disabled={isOwnerForm}
               required
+              className="h-11 text-base"
             />
           </Field>
         </div>
       </div>
 
       {/* Contact */}
-      <div className="border-t border-[#d7e8ee] pt-5">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-3">
+      <div className="border-t border-[#d7e8ee] pt-6">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium mb-4">
           Contact
         </p>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="phoneNumber">
+            <FieldLabel htmlFor="phoneNumber" className="text-sm">
+              <Phone className="w-4 h-4 inline mr-2" />
               Phone Number<span className="text-red-500">*</span>
             </FieldLabel>
             <Input
               id="phoneNumber"
               name="phoneNumber"
-              type="text"
+              type="tel"
               value={!isCoOwned || isOwnerForm ? form.phoneNumber : undefined}
               onChange={handleChange}
-              placeholder="eg. 0712345678"
+              placeholder="e.g. 0712 345 678"
               disabled={isOwnerForm && isCoOwned}
               readOnly={isOwnerForm && isCoOwned}
               required
+              className="h-11 text-base"
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="emailAddress">
+            <FieldLabel htmlFor="emailAddress" className="text-sm">
+              <Mail className="w-4 h-4 inline mr-2" />
               Email Address<span className="text-red-500">*</span>
             </FieldLabel>
             <Input
@@ -309,10 +312,11 @@ const PersonalDetailsForm = ({
               type="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="email@example.com"
+              placeholder="e.g. john@example.com"
               disabled={isCoOwned && isOwnerForm}
               readOnly={isCoOwned && isOwnerForm}
               required={isOwnerForm}
+              className="h-11 text-base"
             />
           </Field>
         </div>
