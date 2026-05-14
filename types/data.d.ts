@@ -48,6 +48,7 @@ export type AdditionalBenefit = {
   id: string;
   name: string;
   included: boolean;
+  inclusive: boolean;
   duration_days: number;
   base_amount: number;
   currency: string;
