@@ -27,7 +27,6 @@ import {
   Clock,
   TrendingUp,
   Loader2,
-  LucideCircleCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
