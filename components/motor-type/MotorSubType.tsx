@@ -623,7 +623,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                   </p>
                                 )}
                               </div>
-                              {(isChecked || benefit.included || benefit.inclusive) && (
+                              {(isChecked || isAutoChecked) && (
                                 <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
                               )}
                             </label>
