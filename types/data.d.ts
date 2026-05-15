@@ -63,6 +63,12 @@ export type ProductBenefits = {
     name: string;
     limits?: { amount: string; currency: string; label?: string }[];
     description?: string;
+    reinstatement?: {
+      label: string;
+      minimum_amount?: number;
+      maximum_amount?: number;
+      currency?: string;
+    }[];
   }[];
   applicable_excesses: {
     name: string;
@@ -334,6 +340,12 @@ export type ProductBenefit = {
   limits?: BenefitLimit[];
   description?: string;
   underwriter_product_id: string;
+  reinstatement?: {
+    label: string;
+    minimum_amount?: number;
+    maximum_amount?: number;
+    currency?: string;
+  }[];
 };
 
 export type ApplicableExcess = {
