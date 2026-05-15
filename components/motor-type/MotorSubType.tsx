@@ -39,15 +39,17 @@ type Props = {
 type BenefitsSectionProps = {
   productId: string;
   includedBenefits?: AdditionalBenefit[];
+  showCollapsible?: boolean;
 };
 
 const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   productId,
-  includedBenefits,
+  showCollapsible = false,
 }) => {
   const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     axiosClient
@@ -75,7 +77,12 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
 
   const product_benefits = productBenefits.product_benefits ?? [];
   const applicable_excesses = productBenefits.applicable_excesses ?? [];
-  console.log("THE INCLUDED BENEFITS ARE", includedBenefits);
+
+  // Check if sections should be collapsible (more than 3 items)
+  const needsBenefitsCollapsible = showCollapsible && product_benefits.length > 3;
+  const needsExcessesCollapsible = showCollapsible && applicable_excesses.length > 3;
+  const showAllBenefits = expanded || !needsBenefitsCollapsible;
+  const showAllExcesses = expanded || !needsExcessesCollapsible;
 
   if (product_benefits.length === 0 && applicable_excesses.length === 0) {
     return (
@@ -95,26 +102,30 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
       </div>
       {/* Product Benefits */}
       {product_benefits.length > 0 && (
-        <div>
-          <div className="space-y-2">
-            {product_benefits.map((benefit) => (
-              <div
-                key={benefit.id}
-                className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
-              >
-                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#1e3a5f]">
-                    {benefit.name ?? "—"}
+        <div className="space-y-4">
+          {product_benefits.slice(0, showAllBenefits ? product_benefits.length : 3).map((benefit) => (
+            <div
+              key={benefit.id}
+              className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
+            >
+              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-[#1e3a5f]">
+                  {benefit.name ?? "—"}
+                </p>
+                {benefit.description && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {benefit.description}
                   </p>
-                  {benefit.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {benefit.description}
-                    </p>
-                  )}
-                  {(benefit.limits?.length ?? 0) > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {(benefit.limits ?? []).map((limit, i) => (
+                )}
+                {(benefit.limits?.length ?? 0) > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {(benefit.limits ?? []).map((limit, i) => {
+                      // Skip limits with amount 0
+                      if (limit.amount != null && Number(limit.amount) === 0) {
+                        return null;
+                      }
+                      return (
                         <span
                           key={i}
                           className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
@@ -125,13 +136,50 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                             : "—"}{" "}
                           {limit.currency ?? ""}
                         </span>
+                      );
+                    })}
+                  </div>
+                )}
+                {/* Reinstatements */}
+                {benefit.reinstatement && benefit.reinstatement.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-primary/10">
+                    <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-1.5">
+                      Reinstatements
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {benefit.reinstatement.map((reinstatement, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-1 rounded-full"
+                        >
+                          {reinstatement.label}
+                          {reinstatement.minimum_amount != null &&
+                            reinstatement.minimum_amount > 0 && (
+                              <>
+                                {" "}
+                                - Min{" "}
+                                {reinstatement.minimum_amount.toLocaleString()}{" "}
+                                {reinstatement.currency ?? "KES"}
+                              </>
+                            )}
+                        </span>
                       ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+          {needsBenefitsCollapsible && (
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
+            >
+              {expanded ? "Show less" : `Show all ${product_benefits.length} benefits`}
+              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
       )}
 
@@ -145,7 +193,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
             </p>
           </div>
           <div className="space-y-2">
-            {applicable_excesses.map((excess) => (
+            {applicable_excesses.slice(0, showAllExcesses ? applicable_excesses.length : 3).map((excess) => (
               <div
                 key={excess.id}
                 className="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2.5"
@@ -164,8 +212,12 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                   {excess.percentage != null && excess.percentage > 0
                     ? `${excess.percentage}% of ${excess.percentage_of ?? "—"} . `
                     : ""}
-                  Min {excess.minimum_amount?.toLocaleString() ?? "—"}{" "}
-                  {excess.currency ?? ""}
+                  {excess.minimum_amount != null && excess.minimum_amount > 0 && (
+                    <>
+                      Min {excess.minimum_amount.toLocaleString()}{" "}
+                      {excess.currency ?? ""}
+                    </>
+                  )}
                 </p>
                 {/* temporaary fix check for the 'nil' string: to change to only checking for null in future versions  */}
                 {excess.conditions && excess.conditions !== "nil" && (
@@ -176,6 +228,16 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
               </div>
             ))}
           </div>
+          {needsExcessesCollapsible && (
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1 mt-2"
+            >
+              {expanded ? "Show less" : `Show all ${applicable_excesses.length} excesses`}
+              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -488,13 +550,16 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     )}
                   </div>
 
-                  {/* Additional benefits for exclusive benefits, user must select option */}
+                  {/* Additional benefits */}
                   {hasAdditionalBenefits && (
                     <div className="mb-4">
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Sparkles className="w-3.5 h-3.5 text-primary" />
                         <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-                          Optional Add-ons
+                          {item.product_rate?.additional_benefit_inclusivity ===
+                          "EXCLUSIVE"
+                            ? "Optional Add-ons"
+                            : "Included Benefits"}
                         </p>
                       </div>
                       <div className="space-y-2">
@@ -502,6 +567,16 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                           const isChecked = selectedBenefits.some(
                             (b) => b.id === benefit.id,
                           );
+                          const isExclusive =
+                            item.product_rate?.additional_benefit_inclusivity ===
+                            "EXCLUSIVE";
+                          // Auto-check if benefit is included/inclusive AND not exclusive mode
+                          const isAutoChecked =
+                            !isExclusive &&
+                            (benefit.included || benefit.inclusive);
+                          const shouldShowCheckbox =
+                            isExclusive || !benefit.included;
+
                           return (
                             <label
                               key={benefit.id}
@@ -512,11 +587,11 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                   : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
                               )}
                             >
-                              {!benefit.included && (
+                              {shouldShowCheckbox && (
                                 <input
                                   name={benefit.id}
                                   type="checkbox"
-                                  checked={isChecked}
+                                  checked={isChecked || isAutoChecked}
                                   onChange={(e) =>
                                     toggleBenefit(
                                       e,
@@ -526,6 +601,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                     )
                                   }
                                   className="accent-primary cursor-pointer shrink-0"
+                                  disabled={!isExclusive && isChecked}
                                 />
                               )}
                               <div className="flex-1 min-w-0">
@@ -571,6 +647,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                     <div className="mb-4 border border-[#d7e8ee] rounded-xl p-4">
                       <BenefitsSection
                         productId={product?.id}
+                        showCollapsible
                         {...(item.product_rate
                           ?.additional_benefit_inclusivity ===
                           "ALL_INCLUSIVE" &&
