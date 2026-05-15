@@ -576,15 +576,19 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                             (benefit.included || benefit.inclusive);
                           const shouldShowCheckbox =
                             isExclusive || !benefit.included;
+                          // Disable checkbox when auto-checked (included/inclusive in non-exclusive mode)
+                          const isCheckboxDisabled =
+                            !isExclusive && (benefit.included || benefit.inclusive);
 
                           return (
                             <label
                               key={benefit.id}
                               className={cn(
-                                "flex items-center gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors",
+                                "flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors",
                                 isChecked
                                   ? "border-primary bg-primary/5"
                                   : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
+                                isCheckboxDisabled && "cursor-default opacity-70"
                               )}
                             >
                               {shouldShowCheckbox && (
@@ -601,7 +605,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                     )
                                   }
                                   className="accent-primary cursor-pointer shrink-0"
-                                  disabled={!isExclusive && isChecked}
+                                  disabled={isCheckboxDisabled}
                                 />
                               )}
                               <div className="flex-1 min-w-0">
