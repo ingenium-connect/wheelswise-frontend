@@ -378,17 +378,19 @@ const PaymentSummary = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={referralCode ?? ""}
-                  onChange={(e) => setReferralCode(e.target.value)}
-                  placeholder="Enter referral code (optional)"
-                  className="flex-1 border border-[#d7e8ee] rounded-lg px-3 py-2.5 text-sm text-[#1e3a5f] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white placeholder:text-muted-foreground"
-                />
+              <div className="flex gap-3 flex-wrap mt-4">
+                <div className="flex-1 min-w-[200px]">
+                  <input
+                    type="text"
+                    value={referralCode ?? ""}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                    placeholder="Enter referral code (optional)"
+                    className="w-full border border-[#d7e8ee] rounded-lg px-3 py-2.5 text-sm text-[#1e3a5f] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white placeholder:text-muted-foreground"
+                  />
+                </div>
                 <Button
                   variant="outline"
-                  className="shrink-0 text-[#1e3a5f] hover:bg-[#f0f6f9]"
+                  className="shrink-0 text-[#1e3a5f] hover:bg-[#f0f6f9] w-full sm:w-auto"
                   onClick={() => setReferralCode(null)}
                   disabled={!referralCode}
                 >
