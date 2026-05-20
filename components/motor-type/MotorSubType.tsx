@@ -79,8 +79,10 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   const applicable_excesses = productBenefits.applicable_excesses ?? [];
 
   // Check if sections should be collapsible (more than 3 items)
-  const needsBenefitsCollapsible = showCollapsible && product_benefits.length > 3;
-  const needsExcessesCollapsible = showCollapsible && applicable_excesses.length > 3;
+  const needsBenefitsCollapsible =
+    showCollapsible && product_benefits.length > 3;
+  const needsExcessesCollapsible =
+    showCollapsible && applicable_excesses.length > 3;
   const showAllBenefits = expanded || !needsBenefitsCollapsible;
   const showAllExcesses = expanded || !needsExcessesCollapsible;
 
@@ -103,81 +105,93 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
       {/* Product Benefits */}
       {product_benefits.length > 0 && (
         <div className="space-y-4">
-          {product_benefits.slice(0, showAllBenefits ? product_benefits.length : 3).map((benefit) => (
-            <div
-              key={benefit.id}
-              className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
-            >
-              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-[#1e3a5f]">
-                  {benefit.name ?? "—"}
-                </p>
-                {benefit.description && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {benefit.description}
+          {product_benefits
+            .slice(0, showAllBenefits ? product_benefits.length : 3)
+            .map((benefit) => (
+              <div
+                key={benefit.id}
+                className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
+              >
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-[#1e3a5f]">
+                    {benefit.name ?? "—"}
                   </p>
-                )}
-                {(benefit.limits?.length ?? 0) > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {(benefit.limits ?? []).map((limit, i) => {
-                      // Skip limits with amount 0
-                      if (limit.amount != null && Number(limit.amount) === 0) {
-                        return null;
-                      }
-                      return (
-                        <span
-                          key={i}
-                          className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
-                        >
-                          {limit.label ? `${limit.label}: ` : ""}
-                          {limit.amount != null
-                            ? Number(limit.amount).toLocaleString()
-                            : "—"}{" "}
-                          {limit.currency ?? ""}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-                {/* Reinstatements */}
-                {benefit.reinstatement && benefit.reinstatement.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-primary/10">
-                    <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-1.5">
-                      Reinstatements
+                  {benefit.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {benefit.description}
                     </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {benefit.reinstatement.map((reinstatement, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-1 rounded-full"
-                        >
-                          {reinstatement.label}
-                          {reinstatement.minimum_amount != null &&
-                            reinstatement.minimum_amount > 0 && (
-                              <>
-                                {" "}
-                                - Min{" "}
-                                {reinstatement.minimum_amount.toLocaleString()}{" "}
-                                {reinstatement.currency ?? "KES"}
-                              </>
-                            )}
-                        </span>
-                      ))}
+                  )}
+                  {(benefit.limits?.length ?? 0) > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {(benefit.limits ?? []).map((limit, i) => {
+                        // Skip limits with amount 0
+                        if (
+                          limit.amount != null &&
+                          Number(limit.amount) === 0
+                        ) {
+                          return null;
+                        }
+                        return (
+                          <span
+                            key={i}
+                            className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
+                          >
+                            {limit.label ? `${limit.label}: ` : ""}
+                            {limit.amount != null
+                              ? Number(limit.amount).toLocaleString()
+                              : "—"}{" "}
+                            {limit.currency ?? ""}
+                          </span>
+                        );
+                      })}
                     </div>
-                  </div>
-                )}
+                  )}
+                  {/* Reinstatements */}
+                  {benefit.reinstatement &&
+                    benefit.reinstatement.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-primary/10">
+                        <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-1.5">
+                          Reinstatements
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {benefit.reinstatement.map((reinstatement, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-1 rounded-full"
+                            >
+                              {reinstatement.label}
+                              {reinstatement.minimum_amount != null &&
+                                reinstatement.minimum_amount > 0 && (
+                                  <>
+                                    {" "}
+                                    - Min{" "}
+                                    {reinstatement.minimum_amount.toLocaleString()}{" "}
+                                    {reinstatement.currency ?? "KES"}
+                                  </>
+                                )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           {needsBenefitsCollapsible && (
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
               className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
             >
-              {expanded ? "Show less" : `Show all ${product_benefits.length} benefits`}
-              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expanded
+                ? "Show less"
+                : `Show all ${product_benefits.length} benefits`}
+              {expanded ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
             </button>
           )}
         </div>
@@ -193,40 +207,43 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
             </p>
           </div>
           <div className="space-y-2">
-            {applicable_excesses.slice(0, showAllExcesses ? applicable_excesses.length : 3).map((excess) => (
-              <div
-                key={excess.id}
-                className="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2.5"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium text-[#1e3a5f]">
-                    {excess.name ?? "—"}
+            {applicable_excesses
+              .slice(0, showAllExcesses ? applicable_excesses.length : 3)
+              .map((excess) => (
+                <div
+                  key={excess.id}
+                  className="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-medium text-[#1e3a5f]">
+                      {excess.name ?? "—"}
+                    </p>
+                    {excess.percentage != null && excess.percentage > 0 && (
+                      <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                        {excess.percentage}%
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {excess.percentage != null && excess.percentage > 0
+                      ? `${excess.percentage}% of ${excess.percentage_of ?? "—"} . `
+                      : ""}
+                    {excess.minimum_amount != null &&
+                      excess.minimum_amount > 0 && (
+                        <>
+                          Min {excess.minimum_amount.toLocaleString()}{" "}
+                          {excess.currency ?? ""}
+                        </>
+                      )}
                   </p>
-                  {excess.percentage != null && excess.percentage > 0 && (
-                    <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                      {excess.percentage}%
-                    </span>
+                  {/* temporaary fix check for the 'nil' string: to change to only checking for null in future versions  */}
+                  {excess.conditions && excess.conditions !== "nil" && (
+                    <p className="text-xs text-muted-foreground mt-0.5 italic">
+                      {excess.conditions}
+                    </p>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {excess.percentage != null && excess.percentage > 0
-                    ? `${excess.percentage}% of ${excess.percentage_of ?? "—"} . `
-                    : ""}
-                  {excess.minimum_amount != null && excess.minimum_amount > 0 && (
-                    <>
-                      Min {excess.minimum_amount.toLocaleString()}{" "}
-                      {excess.currency ?? ""}
-                    </>
-                  )}
-                </p>
-                {/* temporaary fix check for the 'nil' string: to change to only checking for null in future versions  */}
-                {excess.conditions && excess.conditions !== "nil" && (
-                  <p className="text-xs text-muted-foreground mt-0.5 italic">
-                    {excess.conditions}
-                  </p>
-                )}
-              </div>
-            ))}
+              ))}
           </div>
           {needsExcessesCollapsible && (
             <button
@@ -234,8 +251,14 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
               onClick={() => setExpanded(!expanded)}
               className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1 mt-2"
             >
-              {expanded ? "Show less" : `Show all ${applicable_excesses.length} excesses`}
-              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expanded
+                ? "Show less"
+                : `Show all ${applicable_excesses.length} excesses`}
+              {expanded ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
             </button>
           )}
         </div>
@@ -461,7 +484,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
           </p>
         </div>
       ) : (
-        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto">
+        <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-auto">
           {subtypes.map((item, index) => {
             const product = item.underwriter_product;
             const isOpen = openBenefits[product?.id] ?? false;
@@ -568,8 +591,8 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                             (b) => b.id === benefit.id,
                           );
                           const isExclusive =
-                            item.product_rate?.additional_benefit_inclusivity ===
-                            "EXCLUSIVE";
+                            item.product_rate
+                              ?.additional_benefit_inclusivity === "EXCLUSIVE";
                           // Auto-check if benefit is included/inclusive AND not exclusive mode
                           const isAutoChecked =
                             !isExclusive &&
@@ -578,7 +601,8 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                             isExclusive || !benefit.included;
                           // Disable checkbox when auto-checked (included/inclusive in non-exclusive mode)
                           const isCheckboxDisabled =
-                            !isExclusive && (benefit.included || benefit.inclusive);
+                            !isExclusive &&
+                            (benefit.included || benefit.inclusive);
 
                           return (
                             <label
@@ -588,7 +612,8 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                                 isChecked
                                   ? "border-primary bg-primary/5"
                                   : "border-[#d7e8ee] hover:bg-[#f0f6f9]",
-                                isCheckboxDisabled && "cursor-default opacity-70"
+                                isCheckboxDisabled &&
+                                  "cursor-default opacity-70",
                               )}
                             >
                               {shouldShowCheckbox && (
