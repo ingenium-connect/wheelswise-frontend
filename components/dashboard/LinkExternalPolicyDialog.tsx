@@ -234,8 +234,8 @@ export default function LinkExternalPolicyDialog({
         error instanceof Error &&
         "response" in (error as AxiosErrorWithResponse)
       ) {
-        const backendMessage =
-          (error as AxiosErrorWithResponse).response?.data?.message;
+        const backendMessage = (error as AxiosErrorWithResponse).response?.data
+          ?.message;
         if (backendMessage) {
           errorMessage = backendMessage;
           const errorMsgLower = backendMessage.toLowerCase();
@@ -274,7 +274,8 @@ export default function LinkExternalPolicyDialog({
           </DialogDescription>
           <div className="mt-2 rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm">
             <p className="text-yellow-900">
-              <span className="font-medium">Note:</span> Each vehicle can only be linked once from an external underwriter.
+              <span className="font-medium">Note:</span> Each vehicle can only
+              be linked once from an external underwriter.
             </p>
           </div>
         </DialogHeader>
@@ -290,10 +291,15 @@ export default function LinkExternalPolicyDialog({
                   <FormLabel>Select Your Vehicle *</FormLabel>
                   <FormControl>
                     <VehicleSelect
-                      value={form.watch("vehicle_registration_number") || undefined}
+                      value={
+                        form.watch("vehicle_registration_number") || undefined
+                      }
                       onChange={(vehicle) => {
                         if (vehicle) {
-                          form.setValue("vehicle_registration_number", vehicle.registration_number);
+                          form.setValue(
+                            "vehicle_registration_number",
+                            vehicle.registration_number,
+                          );
                         }
                       }}
                     />

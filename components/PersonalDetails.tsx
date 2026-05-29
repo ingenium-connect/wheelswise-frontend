@@ -96,11 +96,17 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
         {isCoOwned ? (
           <Tabs defaultValue="proposer" className="space-y-6">
             <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto bg-[#f0f6f9]">
-              <TabsTrigger value="owner" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger
+                value="owner"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Owner
               </TabsTrigger>
-              <TabsTrigger value="proposer" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger
+                value="proposer"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Proposer
               </TabsTrigger>
@@ -111,8 +117,12 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                   <UserCircle className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-base">Owner Details</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">Details of the car owner.</p>
+                  <p className="font-semibold text-[#1e3a5f] text-base">
+                    Owner Details
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Details of the car owner.
+                  </p>
                 </div>
               </div>
               <PersonalDetailsForm
@@ -128,8 +138,12 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                   <UserCircle className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1e3a5f] text-base">Proposer Details</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">Details of the policy holder.</p>
+                  <p className="font-semibold text-[#1e3a5f] text-base">
+                    Proposer Details
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Details of the policy holder.
+                  </p>
                 </div>
               </div>
               <PersonalDetailsForm
@@ -147,7 +161,9 @@ const PersonalDetails = ({ motor_type, product_type }: Props) => {
                 <User className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-[#1e3a5f] text-base">Personal Details</p>
+                <p className="font-semibold text-[#1e3a5f] text-base">
+                  Personal Details
+                </p>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Please provide your personal information.
                 </p>
@@ -200,7 +216,9 @@ const PersonalDetailsForm = ({
         </p>
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="firstName" className="text-sm">First Name</FieldLabel>
+            <FieldLabel htmlFor="firstName" className="text-sm">
+              First Name
+            </FieldLabel>
             <Input
               id="firstName"
               name="firstName"
@@ -215,7 +233,9 @@ const PersonalDetailsForm = ({
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="lastName" className="text-sm">Last Name</FieldLabel>
+            <FieldLabel htmlFor="lastName" className="text-sm">
+              Last Name
+            </FieldLabel>
             <Input
               id="lastName"
               name="lastName"

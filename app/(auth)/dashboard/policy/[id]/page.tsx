@@ -271,12 +271,12 @@ export default async function PolicyDetailPage({
             </div>
           </div>
         </div>
-
       </div>
 
       <div className="px-4 md:px-8 pb-12 max-w-4xl mx-auto space-y-5">
         {/* What's Covered by this Product */}
-        {coverageDetails?.coverage_details && coverageDetails.coverage_details.length > 0 ? (
+        {coverageDetails?.coverage_details &&
+        coverageDetails.coverage_details.length > 0 ? (
           <CoverageDetails coverageDetails={coverageDetails.coverage_details} />
         ) : null}
         {/* Policy Numbers */}

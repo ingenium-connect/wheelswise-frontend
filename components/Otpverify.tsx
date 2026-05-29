@@ -16,6 +16,7 @@ import axios from "axios";
 import { useOtp } from "@/hooks/useOtp";
 import { toast } from "sonner";
 import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useUserStore } from "@/stores/userStore";
 import {
   clearLoginFlowState,
@@ -24,6 +25,8 @@ import {
 } from "@/utilities/login-flow";
 
 const PENDING_VEHICLE_KEY = "__pending_vehicle_payload__";
+const SIGNUP_USER_ID_KEY = "__signup_user_id__";
+const SIGNUP_MSISDN_KEY = "__signup_msisdn__";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -31,13 +34,17 @@ const shakeClass =
 
 const OtpVerify: React.FC = () => {
   const { personalDetails } = usePersonalDetailsStore();
-  const { profile } = useUserStore();
   const { sendOtp, timeUntilResend } = useOtp();
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const isLoginFlow = searchParams.get("from") === "login";
+  const isSignupFlow = searchParams.get("from") === "signup";
   const loginNationalId = isLoginFlow ? getLoginNationalId() : "";
+  const signupUserId =
+    isSignupFlow && typeof window !== "undefined"
+      ? sessionStorage.getItem(SIGNUP_USER_ID_KEY)
+      : null;
 
   // Logged-in "new vehicle" flow: has product_type/motor_type params, not login flow,
   // and no pending vehicle payload (guest signup sets that before OTP)
@@ -47,7 +54,11 @@ const OtpVerify: React.FC = () => {
     typeof window !== "undefined" &&
     !!sessionStorage.getItem(PENDING_VEHICLE_KEY);
   const isNewVehicleFlow =
-    !isLoginFlow && !!flowProductType && !!flowMotorType && !hasPendingVehicle;
+    !isLoginFlow &&
+    !isSignupFlow &&
+    !!flowProductType &&
+    !!flowMotorType &&
+    !hasPendingVehicle;
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -74,13 +85,24 @@ const OtpVerify: React.FC = () => {
   }, [timer]);
 
   const resendOtp = () => {
-    const nationalId = isLoginFlow
-      ? loginNationalId
-      : personalDetails.secondary_user
-        ? personalDetails.secondary_user.idNumber
-        : personalDetails.user.idNumber;
+    let identifier: string | null = null;
+    let identifierType: "national_id" | "user_id" = "national_id";
 
-    if (!nationalId) {
+    if (isLoginFlow) {
+      identifier = loginNationalId;
+      identifierType = "national_id";
+    } else if (isSignupFlow) {
+      identifier = signupUserId;
+      identifierType = "user_id";
+    } else {
+      // New vehicle flow (logged-in user)
+      identifier =
+        personalDetails?.secondary_user?.idNumber ||
+        personalDetails?.user?.idNumber;
+      identifierType = "national_id";
+    }
+
+    if (!identifier) {
       clearLoginFlowState();
       toast.error("Your login session expired. Please log in again.");
       router.push("/login");
@@ -90,12 +112,12 @@ const OtpVerify: React.FC = () => {
     setAllowResend(false);
     (async () => {
       try {
-        const res = await sendOtp(nationalId);
+        const res = await sendOtp(identifier, identifierType);
         if (res.ok) {
           setTimer(Math.ceil(OTP_RESEND_WINDOW_MS / 1000));
         } else if (res.reason === "recently-sent") {
           toast.success("OTP already sent recently");
-          const until = timeUntilResend(nationalId);
+          const until = timeUntilResend(identifier, identifierType);
           setTimer(Math.ceil(until / 1000));
         }
       } catch (err) {
@@ -136,7 +158,17 @@ const OtpVerify: React.FC = () => {
     try {
       const payload = isLoginFlow
         ? { national_id: loginNationalId, otp: otpValue, user_type: "CUSTOMER" }
-        : { user_id: profile?.id ?? "", otp: otpValue, user_type: "CUSTOMER" };
+        : isSignupFlow
+          ? {
+              user_id: signupUserId ?? "",
+              otp: otpValue,
+              user_type: "CUSTOMER",
+            }
+          : {
+              national_id: personalDetails.user.idNumber,
+              otp: otpValue,
+              user_type: "CUSTOMER",
+            };
 
       const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
 
@@ -170,6 +202,15 @@ const OtpVerify: React.FC = () => {
               `/vehicle-value?product_type=${flowProductType}&motor_type=${flowMotorType}`,
             );
           }
+        } else if (isSignupFlow) {
+          toast.success("OTP successfully verified");
+          // Cleanup signup session data
+          if (typeof window !== "undefined") {
+            sessionStorage.removeItem(SIGNUP_USER_ID_KEY);
+            sessionStorage.removeItem(SIGNUP_MSISDN_KEY);
+          }
+          router.push("/dashboard");
+          router.refresh();
         } else {
           toast.success("OTP successfully verified");
           await registerPendingVehicle();

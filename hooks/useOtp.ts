@@ -8,7 +8,7 @@ import { OTP_RESEND_WINDOW_MS } from "@/utilities/constants";
 const STORAGE_KEY = "__otp_last_sent__";
 
 type LastSent = {
-  msisdn: string;
+  identifier: string;
   timestamp: number;
 };
 
@@ -27,9 +27,9 @@ export function useOtp() {
     }
   }, []);
 
-  const writeLastSent = useCallback((msisdn: string) => {
+  const writeLastSent = useCallback((identifier: string) => {
     try {
-      const item: LastSent = { msisdn, timestamp: Date.now() };
+      const item: LastSent = { identifier, timestamp: Date.now() };
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(item));
     } catch (err) {
       console.error(err);
@@ -37,25 +37,31 @@ export function useOtp() {
   }, []);
 
   const canSend = useCallback(
-    (msisdn: string) => {
+    (identifier: string) => {
       const last = readLastSent();
       if (!last) return true;
-      if (last.msisdn !== msisdn) return true;
+      if (last.identifier !== identifier) return true;
       return Date.now() - last.timestamp >= OTP_RESEND_WINDOW_MS;
     },
     [readLastSent],
   );
 
   const sendOtp = useCallback(
-    async (national_id: string) => {
+    async (
+      identifier: string,
+      identifierType: "national_id" | "user_id" = "national_id",
+    ) => {
       if (inFlight.current) return { ok: false, reason: "in-flight" };
-      if (!canSend(national_id)) return { ok: false, reason: "recently-sent" };
+      if (!canSend(identifier)) return { ok: false, reason: "recently-sent" };
 
       inFlight.current = true;
       setSending(true);
       try {
-        await axiosClient.post("otp", { national_id, user_type: "CUSTOMER" });
-        writeLastSent(national_id);
+        await axiosClient.post("otp", {
+          [identifierType]: identifier,
+          user_type: "CUSTOMER",
+        });
+        writeLastSent(identifier);
         toast.success("OTP sent successfully");
         return { ok: true };
       } catch (err) {
@@ -71,9 +77,12 @@ export function useOtp() {
   );
 
   const timeUntilResend = useCallback(
-    (msisdn: string) => {
+    (
+      identifier: string,
+      identifierType: "national_id" | "user_id" = "national_id",
+    ) => {
       const last = readLastSent();
-      if (!last || last.msisdn !== msisdn) return 0;
+      if (!last || last.identifier !== identifier) return 0;
       const elapsed = Date.now() - last.timestamp;
       return Math.max(0, OTP_RESEND_WINDOW_MS - elapsed);
     },

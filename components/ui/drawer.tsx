@@ -58,9 +58,11 @@ function DrawerContent({
 }) {
   const sideClasses = {
     top: "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-    bottom: "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+    bottom:
+      "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
     left: "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
-    right: "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+    right:
+      "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
   };
 
   return (
@@ -71,7 +73,7 @@ function DrawerContent({
         className={cn(
           "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col shadow-lg duration-300",
           sideClasses[side ?? "right"],
-          className
+          className,
         )}
         {...props}
       >
@@ -94,7 +96,10 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-header"
-      className={cn("flex flex-col gap-2 p-4 border-b border-border", className)}
+      className={cn(
+        "flex flex-col gap-2 p-4 border-b border-border",
+        className,
+      )}
       {...props}
     />
   );
@@ -104,7 +109,10 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-footer"
-      className={cn("flex flex-col-reverse gap-2 p-4 border-t border-border", className)}
+      className={cn(
+        "flex flex-col-reverse gap-2 p-4 border-t border-border",
+        className,
+      )}
       {...props}
     />
   );

@@ -44,7 +44,9 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
   const vehicleValueError = getVehicleValueLimitError(vehicleValue);
 
   // Track if tonnage was pre-filled from MotorType page (TPO COMMERCIAL)
-  const tonnagePreFilled = useRef(tonnage > 0 && product_type === "THIRD_PARTY");
+  const tonnagePreFilled = useRef(
+    tonnage > 0 && product_type === "THIRD_PARTY",
+  );
 
   useEffect(() => {
     setCoverStep(2);
@@ -57,7 +59,13 @@ const VehicleValue: React.FC<Props> = ({ product_type, motor_type }: Props) => {
       setTonnage(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product_type, setCoverStep, setVehicleValue, setSeatingCapacity, setTonnage]);
+  }, [
+    product_type,
+    setCoverStep,
+    setVehicleValue,
+    setSeatingCapacity,
+    setTonnage,
+  ]);
 
   const handleContinue = () => {
     let isValid = true;
