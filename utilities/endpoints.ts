@@ -40,3 +40,7 @@ export const ADDITIONAL_BENEFITS_ENDPOINT = "/benefit/additional";
 export const BENEFIT_EXTRAS_ENDPOINT = "/benefit/extras";
 export const PREMIUM_RECALCULATION_ENDPOINT =
   "/underwriter/product-premium-recalculation";
+
+// COVERAGE DETAILS ENDPOINT
+export const COVERAGE_DETAILS_ENDPOINT =
+  "/underwriter-product-coverage-details";
