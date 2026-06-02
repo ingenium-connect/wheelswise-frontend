@@ -44,3 +44,6 @@ export const PREMIUM_RECALCULATION_ENDPOINT =
 // COVERAGE DETAILS ENDPOINT
 export const COVERAGE_DETAILS_ENDPOINT =
   "/underwriter-product-coverage-details";
+
+// LINK EXTERNAL POLICY
+export const LINK_POLICY_ENDPOINT = "/link-policy";
