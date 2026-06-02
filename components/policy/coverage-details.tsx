@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronUp, FileText, Info, X } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { ChevronDown, ChevronUp, FileText } from "lucide-react";
 
 type CoverageDetailItem = {
   header: string;
@@ -20,12 +12,11 @@ type CoverageDetailItem = {
 
 type CoverageDetailsProps = {
   coverageDetails: CoverageDetailItem[];
-  variant?: "default" | "drawer";
 };
 
-export function CoverageDetails({ coverageDetails, variant = "default" }: CoverageDetailsProps) {
+export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sectionExpanded, setSectionExpanded] = useState(false);
 
   if (coverageDetails.length === 0) {
     return null;
@@ -38,110 +29,55 @@ export function CoverageDetails({ coverageDetails, variant = "default" }: Covera
     }));
   };
 
-  // Render as a drawer trigger button for the default variant
-  if (variant === "default") {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Info className="w-4 h-4" />
-            <span className="font-medium">What&apos;s covered by this product</span>
+  // Render as a standalone section with expandable items
+  return (
+    <div className="bg-white rounded-2xl border border-[#d7e8ee] shadow-sm overflow-hidden">
+      <button
+        onClick={() => setSectionExpanded(!sectionExpanded)}
+        className="w-full flex items-center justify-between px-5 py-4 border-b border-[#d7e8ee] bg-gradient-to-r from-[#f0f6f9] to-white hover:bg-gradient-to-r hover:from-[#e8f0f5] hover:to-[#e0e8f4] transition-colors"
+        aria-expanded={sectionExpanded}
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-primary/10 rounded-lg">
+            <FileText className="w-4 h-4 text-primary" />
           </div>
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <DrawerTrigger asChild>
-              <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
-                View Details
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </DrawerTrigger>
-            <DrawerContent side="right" className="sm:max-w-md w-full">
-              <DrawerHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <FileText className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <DrawerTitle className="text-[#1e3a5f]">What&apos;s covered</DrawerTitle>
-                      <DrawerDescription className="text-xs">
-                        Product coverage details
-                      </DrawerDescription>
-                    </div>
-                  </div>
-                  <DrawerTrigger asChild>
-                    <button className="rounded-full p-1 hover:bg-muted transition-colors">
-                      <X className="w-4 h-4 text-muted-foreground" />
-                      <span className="sr-only">Close</span>
-                    </button>
-                  </DrawerTrigger>
-                </div>
-              </DrawerHeader>
-              <div className="p-4 space-y-3 max-h-[70vh] overflow-y-auto">
-                {coverageDetails.map((item) => (
-                  <div
-                    key={item.header}
-                    className="border border-border rounded-xl overflow-hidden bg-white"
-                  >
-                    <button
-                      onClick={() => toggleSection(item.header)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
-                      aria-expanded={!!expandedSections[item.header]}
-                    >
-                      <span className="text-sm font-semibold text-[#1e3a5f] text-left">
-                        {item.header}
-                      </span>
-                      {expandedSections[item.header] ? (
-                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
-
-                    <div
-                      className={cn(
-                        "overflow-hidden transition-all duration-200 ease-in-out",
-                        expandedSections[item.header] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                      )}
-                    >
-                      <div className="px-4 pb-4 pl-4">
-                        {item.description && (
-                          <p className="text-sm text-muted-foreground mb-3">
-                            {item.description}
-                          </p>
-                        )}
-                        {item.conditions.length > 0 && (
-                          <ul className="space-y-2">
-                            {item.conditions.map((condition, idx) => (
-                              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                                <span className="leading-relaxed">{condition}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <div className="text-left">
+            <h2 className="font-semibold text-[#1e3a5f] text-sm">What&apos;s covered by this product</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {sectionExpanded ? "Click to collapse" : "Click to expand"} - {coverageDetails.length} items
+            </p>
+          </div>
         </div>
+        {sectionExpanded ? (
+          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        )}
+      </button>
 
-        <div className="space-y-2">
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-200 ease-in-out",
+          sectionExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="p-5 space-y-3">
           {coverageDetails.map((item) => (
             <div
               key={item.header}
-              className="border border-[#d7e8ee] rounded-xl overflow-hidden bg-white/50"
+              className="border border-border rounded-xl overflow-hidden bg-muted/30"
             >
               <button
                 onClick={() => toggleSection(item.header)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#f0f6f9] transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
                 aria-expanded={!!expandedSections[item.header]}
               >
-                <span className="text-sm font-semibold text-[#1e3a5f] text-left">
-                  {item.header}
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="text-sm font-semibold text-[#1e3a5f] text-left">
+                    {item.header}
+                  </span>
+                </div>
                 {expandedSections[item.header] ? (
                   <ChevronUp className="w-4 h-4 text-muted-foreground" />
                 ) : (
@@ -155,18 +91,18 @@ export function CoverageDetails({ coverageDetails, variant = "default" }: Covera
                   expandedSections[item.header] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                 )}
               >
-                <div className="px-4 pb-3 pl-4">
+                <div className="px-4 pb-4 pl-4">
                   {item.description && (
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-sm text-muted-foreground mb-3 pl-5">
                       {item.description}
                     </p>
                   )}
                   {item.conditions.length > 0 && (
-                    <ul className="space-y-1.5">
+                    <ul className="space-y-2 pl-5">
                       {item.conditions.map((condition, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                          <span>{condition}</span>
+                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <span className="mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+                          <span className="leading-relaxed">{condition}</span>
                         </li>
                       ))}
                     </ul>
@@ -176,69 +112,6 @@ export function CoverageDetails({ coverageDetails, variant = "default" }: Covera
             </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  // Render as a full drawer content for the drawer variant
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <FileText className="w-5 h-5 text-primary" />
-        </div>
-        <div>
-          <h3 className="font-semibold text-[#1e3a5f]">What&apos;s covered</h3>
-          <p className="text-xs text-muted-foreground">Product coverage details</p>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {coverageDetails.map((item) => (
-          <div
-            key={item.header}
-            className="border border-border rounded-xl overflow-hidden"
-          >
-            <button
-              onClick={() => toggleSection(item.header)}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
-              aria-expanded={!!expandedSections[item.header]}
-            >
-              <span className="text-sm font-semibold text-[#1e3a5f] text-left">
-                {item.header}
-              </span>
-              {expandedSections[item.header] ? (
-                <ChevronUp className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              )}
-            </button>
-
-            <div
-              className={cn(
-                "overflow-hidden transition-all duration-200 ease-in-out",
-                expandedSections[item.header] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-              )}
-            >
-              <div className="px-4 pb-4 pl-4">
-                {item.description && (
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {item.description}
-                  </p>
-                )}
-                {item.conditions.length > 0 && (
-                  <ul className="space-y-2">
-                    {item.conditions.map((condition, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                        <span className="leading-relaxed">{condition}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
