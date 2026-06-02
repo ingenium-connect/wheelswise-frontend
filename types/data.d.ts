@@ -367,6 +367,17 @@ export type BenefitExtras = {
   additional_benefits: null;
 };
 
+export type CoverageDetailItem = {
+  header: string;
+  description: string;
+  conditions: string[];
+};
+
+export type CoverageDetails = {
+  underwriter_product_id: string;
+  coverage_details: CoverageDetailItem[];
+};
+
 export type policyResponse = {
   policies: InsurancePolicy[];
   total_count: number;

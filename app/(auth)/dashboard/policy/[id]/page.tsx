@@ -2,12 +2,14 @@ import { getData } from "@/utilities/api";
 import {
   ADDITIONAL_BENEFITS_ENDPOINT,
   BENEFIT_EXTRAS_ENDPOINT,
+  COVERAGE_DETAILS_ENDPOINT,
   POLICY_DETAIL_ENDPOINT,
   SERVER_URL,
 } from "@/utilities/endpoints";
 import {
   AdditionalBenefit,
   BenefitExtras,
+  CoverageDetails as CoverageDetailsType,
   InsurancePolicy,
 } from "@/types/data";
 import { notFound } from "next/navigation";
@@ -21,6 +23,7 @@ import {
   ApplicableExcessesList,
   PolicyBenefitsList,
 } from "@/components/policy/policy-benefits-list";
+import { CoverageDetails } from "@/components/policy/coverage-details";
 import {
   ArrowLeft,
   Car,
@@ -117,6 +120,17 @@ export default async function PolicyDetailPage({
 
   const productBenefits = benefitExtras?.product_benefits ?? [];
   const applicableExcesses = benefitExtras?.applicable_excesses ?? [];
+
+  let coverageDetails: CoverageDetailsType | null = null;
+  if (policy.product_id) {
+    try {
+      coverageDetails = await getData(
+        `${COVERAGE_DETAILS_ENDPOINT}?underwriter_product_id=${policy.product_id}`,
+      );
+    } catch {
+      // silently skip — coverage details are supplemental
+    }
+  }
 
   const today = new Date();
   const expiryDate = policy.end_date ? new Date(policy.end_date) : null;
@@ -257,6 +271,13 @@ export default async function PolicyDetailPage({
             </div>
           </div>
         </div>
+
+        {/* What's Covered by this Product */}
+        {coverageDetails?.coverage_details?.length ? (
+          <div className="px-4 md:px-8 max-w-4xl mx-auto mb-5">
+            <CoverageDetails coverageDetails={coverageDetails.coverage_details} variant="default" />
+          </div>
+        ) : null}
       </div>
 
       <div className="px-4 md:px-8 pb-12 max-w-4xl mx-auto space-y-5">
