@@ -125,12 +125,13 @@ export default function VehicleSelect({
     <div className={cn("space-y-3", className)}>
       <Select value={value || undefined} onValueChange={handleSelect}>
         <SelectTrigger className="w-full h-9">
-          <SelectValue placeholder="Select a vehicle">
-            {/* Show the registration number when a valid vehicle is selected */}
-            {value && (
-              <span className="hidden sm:inline-flex">
+          <SelectValue>
+            {value ? (
+              <span className="truncate">
                 {vehicles.find((v) => v.registration_number === value)?.registration_number}
               </span>
+            ) : (
+              <span className="hidden sm:inline-flex">Select a vehicle</span>
             )}
           </SelectValue>
         </SelectTrigger>
