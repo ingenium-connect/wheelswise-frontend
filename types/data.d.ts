@@ -423,3 +423,24 @@ export type UnderwriterValuer = {
   phone: string;
   location: string;
 };
+
+// Link External Policy Types
+export type VehicleType = "COMMERCIAL" | "PRIVATE" | "MOTORBIKE" | "PSV";
+
+export type PolicyType = "COMPREHENSIVE" | "THIRD_PARTY";
+
+export interface LinkPolicyPayload {
+  vehicle_registration_number: string;
+  policy_number: string;
+  certificate_number: string;
+  start_date: string;
+  underwriter_name: string;
+  duration_in_days: number;
+  policy_type: PolicyType;
+  vehicle_type: VehicleType;
+  premium: number;
+}
+
+export interface LinkPolicyErrorResponse {
+  error: string;
+}

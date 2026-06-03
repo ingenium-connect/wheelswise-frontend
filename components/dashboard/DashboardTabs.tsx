@@ -12,6 +12,7 @@ import { AccountCard } from "@/components/auth/profile-card";
 import { UserDocumentsCard } from "@/components/auth/user-documents-upload";
 import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import DashboardBanner from "@/components/auth/dashboard-banner";
+import LinkExternalPolicyDialog from "@/components/dashboard/LinkExternalPolicyDialog";
 
 const VALID_TABS = ["home", "vehicle", "policies", "profile"] as const;
 type Tab = (typeof VALID_TABS)[number];
@@ -165,7 +166,7 @@ export default function DashboardTabs({
 
       {/* Policies */}
       <TabsContent value="policies">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#1e3a5f]">
               Insurance Policies
@@ -175,6 +176,7 @@ export default function DashboardTabs({
               {(policyPayload?.policies?.length ?? 0) !== 1 ? "ies" : "y"}
             </p>
           </div>
+          <LinkExternalPolicyDialog />
         </div>
 
         {!policyPayload?.policies?.length ? (
@@ -186,9 +188,18 @@ export default function DashboardTabs({
             <p className="text-sm text-muted-foreground mb-4">
               Purchase a policy to protect your vehicle.
             </p>
-            <Button asChild className="text-white">
-              <Link href="/cover-type">Get Insured</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button asChild className="text-white">
+                <Link href="/cover-type">Get Insured</Link>
+              </Button>
+              <LinkExternalPolicyDialog
+                trigger={
+                  <Button variant="outline" className="text-[#1e3a5f]">
+                    + Link External Policy
+                  </Button>
+                }
+              />
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
