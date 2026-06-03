@@ -44,6 +44,7 @@ import {
   SelectContent,
   SelectItem,
 } from "../ui/select";
+import VehicleSelect from "./VehicleSelect";
 
 // Type for Axios error with response
 interface AxiosErrorWithResponse extends Error {
@@ -204,25 +205,52 @@ export default function LinkExternalPolicyDialog({
         onSuccess?.();
       }
     } catch (error: unknown) {
-      // Handle the specific error for already linked vehicle
+      let errorMessage = "Failed to link policy. Please try again.";
+      let nextSteps = "";
+
+      if (error instanceof Error) {
+        const errorMsgLower = error.message.toLowerCase();
+        // Handle the specific error for already linked vehicle
+        if (
+          errorMsgLower.includes("you can only link your vehicle policy") &&
+          errorMsgLower.includes("once and only once")
+        ) {
+          // Extract vehicle registration number from error message
+          const regNumMatch = error.message.match(/[A-Z0-9]{3,7}[A-Z]?/);
+          const _regNum = regNumMatch ? regNumMatch[0] : "this vehicle";
+          errorMessage = `You have already linked a policy for ${_regNum}.`;
+          nextSteps =
+            "You may only link each vehicle's policy once from an external underwriter. Please select a different vehicle or contact support for assistance.";
+        } else if (errorMsgLower.includes("vehicle policy for")) {
+          const regNumMatch = error.message.match(/[A-Z0-9]{3,7}[A-Z]?/);
+          const _regNum = regNumMatch ? regNumMatch[0] : "this vehicle";
+          errorMessage = error.message;
+          nextSteps =
+            "Please select a different vehicle or contact support for assistance.";
+        }
+      }
+
       if (
-        error instanceof Error &&
-        error.message.includes("you can only link your vehicle policy") &&
-        error.message.includes("once and only once")
-      ) {
-        toast.error(error.message);
-      } else if (
         error instanceof Error &&
         "response" in (error as AxiosErrorWithResponse)
       ) {
-        toast.error(
-          (error as AxiosErrorWithResponse).response?.data?.message ||
-            error.message ||
-            "Failed to link policy. Please try again.",
-        );
-      } else {
-        toast.error("Failed to link policy. Please try again.");
+        const backendMessage =
+          (error as AxiosErrorWithResponse).response?.data?.message;
+        if (backendMessage) {
+          errorMessage = backendMessage;
+          const errorMsgLower = backendMessage.toLowerCase();
+          if (
+            errorMsgLower.includes("already") ||
+            errorMsgLower.includes("exists") ||
+            errorMsgLower.includes("once and only once")
+          ) {
+            nextSteps =
+              "You may only link each vehicle's policy once from an external underwriter. Please select a different vehicle or contact support for assistance.";
+          }
+        }
       }
+
+      toast.error(errorMessage + (nextSteps ? ` ${nextSteps}` : ""));
     } finally {
       setIsSubmitting(false);
     }
@@ -241,9 +269,14 @@ export default function LinkExternalPolicyDialog({
         <DialogHeader>
           <DialogTitle>Link External Policy</DialogTitle>
           <DialogDescription>
-            Add an existing insurance policy from another underwriter. Fill in
-            the details below to link your vehicle policy.
+            Add an existing insurance policy from another underwriter. Select
+            your vehicle from the list below, then fill in the policy details.
           </DialogDescription>
+          <div className="mt-2 rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm">
+            <p className="text-yellow-900">
+              <span className="font-medium">Note:</span> Each vehicle can only be linked once from an external underwriter.
+            </p>
+          </div>
         </DialogHeader>
 
         <Form {...form}>
@@ -252,14 +285,17 @@ export default function LinkExternalPolicyDialog({
             <FormField
               control={form.control}
               name="vehicle_registration_number"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
-                  <FormLabel>Vehicle Registration Number *</FormLabel>
+                  <FormLabel>Select Your Vehicle *</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="e.g., KCA 123A"
-                      {...field}
-                      maxLength={20}
+                    <VehicleSelect
+                      value={form.watch("vehicle_registration_number") || undefined}
+                      onChange={(vehicle) => {
+                        if (vehicle) {
+                          form.setValue("vehicle_registration_number", vehicle.registration_number);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
