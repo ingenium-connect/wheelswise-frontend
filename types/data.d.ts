@@ -444,3 +444,27 @@ export interface LinkPolicyPayload {
 export interface LinkPolicyErrorResponse {
   error: string;
 }
+
+// Vehicles API types
+export interface UserVehicle {
+  id: string;
+  chassis_number: string;
+  registration_number: string;
+  make: string;
+  model: string;
+  owner: string;
+  vehicle_value: number;
+  engine_number?: string;
+  seating_capacity: number;
+  body_type: string;
+  purpose: string;
+  purpose_type: number;
+  year_of_manufacture: number;
+  logbook_url?: string | null;
+  active_policy: InsurancePolicy | null;
+}
+
+export interface UserVehiclesResponse {
+  vehicles: UserVehicle[];
+  total_count: number;
+}
