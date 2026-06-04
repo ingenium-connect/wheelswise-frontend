@@ -608,26 +608,42 @@ const VehicleDetails = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                   <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
                     <LucideCar className="w-5 h-5 text-primary mb-2" />
-                    <p className="text-xs font-medium text-[#1e3a5f]">{form.bodyType}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Body</p>
+                    <p className="text-xs font-medium text-[#1e3a5f]">
+                      {form.bodyType}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase">
+                      Body
+                    </p>
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
                     <LucideCog className="w-5 h-5 text-primary mb-2" />
-                    <p className="text-xs font-medium text-[#1e3a5f]">{form.engineCapacity} CC</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Engine</p>
+                    <p className="text-xs font-medium text-[#1e3a5f]">
+                      {form.engineCapacity} CC
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase">
+                      Engine
+                    </p>
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
                     <LucideFileSignature className="w-5 h-5 text-primary mb-2" />
-                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">{form.chassisNumber}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Chassis</p>
+                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">
+                      {form.chassisNumber}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase">
+                      Chassis
+                    </p>
                   </div>
 
                   <div className="flex flex-col items-center justify-center p-3 bg-primary/5 rounded-lg">
                     <LucideSettings className="w-5 h-5 text-primary mb-2" />
-                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">{form.engineNumber}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Engine #</p>
+                    <p className="text-xs font-medium text-[#1e3a5f] truncate max-w-[80px]">
+                      {form.engineNumber}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase">
+                      Engine #
+                    </p>
                   </div>
                 </div>
 
@@ -654,7 +670,8 @@ const VehicleDetails = ({
                       />
                       {isThirdPartyCommercial && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Tonnage was pre-filled from your Third Party Commercial selection.
+                          Tonnage was pre-filled from your Third Party
+                          Commercial selection.
                         </p>
                       )}
                     </Field>

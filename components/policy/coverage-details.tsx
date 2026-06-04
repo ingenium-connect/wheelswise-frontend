@@ -15,7 +15,9 @@ type CoverageDetailsProps = {
 };
 
 export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({});
   const [sectionExpanded, setSectionExpanded] = useState(false);
 
   if (coverageDetails.length === 0) {
@@ -42,9 +44,12 @@ export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
             <FileText className="w-4 h-4 text-primary" />
           </div>
           <div className="text-left">
-            <h2 className="font-semibold text-[#1e3a5f] text-sm">What&apos;s covered by this product</h2>
+            <h2 className="font-semibold text-[#1e3a5f] text-sm">
+              What&apos;s covered by this product
+            </h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {sectionExpanded ? "Click to collapse" : "Click to expand"} - {coverageDetails.length} items
+              {sectionExpanded ? "Click to collapse" : "Click to expand"} -{" "}
+              {coverageDetails.length} items
             </p>
           </div>
         </div>
@@ -58,7 +63,7 @@ export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
       <div
         className={cn(
           "overflow-hidden transition-all duration-200 ease-in-out",
-          sectionExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          sectionExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0",
         )}
       >
         <div className="p-5 space-y-3">
@@ -88,7 +93,9 @@ export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
               <div
                 className={cn(
                   "overflow-hidden transition-all duration-200 ease-in-out",
-                  expandedSections[item.header] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  expandedSections[item.header]
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0",
                 )}
               >
                 <div className="px-4 pb-4 pl-4">
@@ -100,7 +107,10 @@ export function CoverageDetails({ coverageDetails }: CoverageDetailsProps) {
                   {item.conditions.length > 0 && (
                     <ul className="space-y-2 pl-5">
                       {item.conditions.map((condition, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                        >
                           <span className="mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
                           <span className="leading-relaxed">{condition}</span>
                         </li>
