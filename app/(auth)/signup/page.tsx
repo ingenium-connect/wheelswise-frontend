@@ -3,6 +3,15 @@ import StandaloneSignup from "@/components/auth/standalone-signup/SignupForm";
 import FlowStepHeader from "@/components/layout/FlowStepHeader";
 import type { Metadata } from "next";
 
+type SearchParams = {
+  product_type?: string;
+  motor_type?: string;
+};
+
+interface PageProps {
+  searchParams: Promise<SearchParams>;
+}
+
 export const metadata: Metadata = {
   title: "Create Your Account — Get Insured in Minutes",
   description:
@@ -10,10 +19,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/signup" },
 };
 
-export default async function Page(searchParams: {
-  product_type?: string;
-  motor_type?: string;
-}) {
+export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const motor_type = params?.motor_type || "PRIVATE";
   const product_type = params.product_type || "COMPREHENSIVE";
