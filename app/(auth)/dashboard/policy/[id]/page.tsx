@@ -132,21 +132,13 @@ export default async function PolicyDetailPage({
     }
   }
 
-  const today = new Date();
-  const expiryDate = policy.end_date ? new Date(policy.end_date) : null;
-  const timeDiff =
-    expiryDate && !isNaN(expiryDate.getTime())
-      ? expiryDate.getTime() - today.getTime()
-      : null;
-  const daysRemaining =
-    timeDiff != null ? Math.ceil(timeDiff / (1000 * 3600 * 24)) : null;
-  const isExpired = timeDiff != null ? timeDiff <= 0 : false;
-  const isExpiringSoon =
-    !isExpired && timeDiff != null && timeDiff <= 30 * 24 * 3600 * 1000;
   const isCancelled = policy.is_cancelled;
   const isPendingPayment = !policy.is_paid && !isCancelled;
 
-  const isActive = policy.is_paid && policy.is_active && !isExpired;
+  const isActive = policy.is_paid && policy.is_active;
+  const isExpired = policy.remaining_days_to_expiry != null && policy.remaining_days_to_expiry < 0;
+  const isExpiringSoon =
+    !isExpired && policy.remaining_days_to_expiry != null && policy.remaining_days_to_expiry <= 30;
 
   const statusConfig = isCancelled
     ? {
@@ -310,16 +302,24 @@ export default async function PolicyDetailPage({
             {policy.days != null && (
               <Detail label="Duration" value={`${policy.days} days`} />
             )}
-            {policy.is_paid && timeDiff != null && (
+            {policy.is_paid && (
               <Detail
                 label={isExpired ? "Status" : "Days Remaining"}
-                value={isExpired ? "Expired" : `${daysRemaining} days`}
+                value={
+                  policy.remaining_days_to_expiry == null
+                    ? "—"
+                    : isExpired
+                      ? "Expired"
+                      : `${policy.remaining_days_to_expiry} days`
+                }
                 valueClass={
-                  isExpired
-                    ? "text-red-600"
-                    : isExpiringSoon
-                      ? "text-amber-600"
-                      : "text-emerald-600"
+                  policy.remaining_days_to_expiry == null
+                    ? ""
+                    : isExpired
+                      ? "text-red-600"
+                      : isExpiringSoon
+                        ? "text-amber-600"
+                        : "text-emerald-600"
                 }
               />
             )}

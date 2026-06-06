@@ -21,6 +21,9 @@ import {
 } from "@/types/data";
 import axios, { isAxiosError } from "axios";
 
+const SIGNUP_USER_ID_KEY = "__signup_user_id__";
+const SIGNUP_MSISDN_KEY = "__signup_msisdn__";
+
 interface SignupForm {
   msisdn: string;
   password: { value: string; valid: boolean };
@@ -340,11 +343,17 @@ const Signup: React.FC<Props> = ({
 
       if (res?.user?.id) {
         setProfile({ id: res.user.id } as Parameters<typeof setProfile>[0]);
+        // Store user_id and msisdn for OTP verification
+        // Guest signup uses user_id ONLY - never national_id
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(SIGNUP_USER_ID_KEY, res.user.id);
+          sessionStorage.setItem(SIGNUP_MSISDN_KEY, res.user.msisdn);
+        }
       }
 
       toast.success("Successfully registered!");
       router.push(
-        `/otp-verify?product_type=${product_type}&motor_type=${motor_type}`,
+        `/otp-verify?product_type=${product_type}&motor_type=${motor_type}&from=signup`,
       );
       router.refresh();
     } catch (error) {

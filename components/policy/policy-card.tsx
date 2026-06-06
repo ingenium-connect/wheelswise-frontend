@@ -50,12 +50,10 @@ export const PolicyCard = ({ policy, token }: Props) => {
   const [completingPayment, setCompletingPayment] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
-  const today = new Date();
-  const expiryDate = new Date(policy.end_date);
-  const timeDiff = expiryDate.getTime() - today.getTime();
-  const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  const isExpired = timeDiff <= 0;
-  const isExpiringSoon = !isExpired && timeDiff <= 30 * 24 * 3600 * 1000;
+  const daysRemaining = policy.remaining_days_to_expiry;
+  const isExpired = daysRemaining != null && daysRemaining < 0;
+  const isExpiringSoon =
+    !isExpired && daysRemaining != null && daysRemaining <= 30;
 
   const isCancelled = policy.is_cancelled;
   const isPendingPayment = !policy.is_paid && !isCancelled;
@@ -319,14 +317,26 @@ export const PolicyCard = ({ policy, token }: Props) => {
             {policy.is_paid && (
               <InfoBlock
                 label="Expires"
-                value={expiryDate.toDateString()}
-                sub={isExpired ? "Expired" : `${daysRemaining} days remaining`}
+                value={
+                  policy.end_date
+                    ? new Date(policy.end_date).toDateString()
+                    : "—"
+                }
+                sub={
+                  daysRemaining == null
+                    ? "—"
+                    : isExpired
+                      ? "Expired"
+                      : `${daysRemaining} days remaining`
+                }
                 subColor={
-                  isExpired
-                    ? "text-red-500"
-                    : isExpiringSoon
-                      ? "text-amber-500"
-                      : "text-emerald-600"
+                  daysRemaining == null
+                    ? ""
+                    : isExpired
+                      ? "text-red-500"
+                      : isExpiringSoon
+                        ? "text-amber-500"
+                        : "text-emerald-600"
                 }
               />
             )}

@@ -92,6 +92,7 @@ const OtpVerify: React.FC = () => {
       identifier = loginNationalId;
       identifierType = "national_id";
     } else if (isSignupFlow) {
+      // Guest signup flow: ONLY use user_id, never national_id
       identifier = signupUserId;
       identifierType = "user_id";
     } else {
@@ -104,8 +105,13 @@ const OtpVerify: React.FC = () => {
 
     if (!identifier) {
       clearLoginFlowState();
-      toast.error("Your login session expired. Please log in again.");
-      router.push("/login");
+      if (isSignupFlow) {
+        toast.error("Your session expired. Please try again.");
+        router.push("/");
+      } else {
+        toast.error("Your login session expired. Please log in again.");
+        router.push("/login");
+      }
       return;
     }
 
@@ -156,19 +162,35 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
-      const payload = isLoginFlow
-        ? { national_id: loginNationalId, otp: otpValue, user_type: "CUSTOMER" }
-        : isSignupFlow
-          ? {
-              user_id: signupUserId ?? "",
-              otp: otpValue,
-              user_type: "CUSTOMER",
-            }
-          : {
-              national_id: personalDetails.user.idNumber,
-              otp: otpValue,
-              user_type: "CUSTOMER",
-            };
+      let payload: { user_id?: string; national_id?: string; otp: string; user_type: "CUSTOMER" };
+
+      if (isLoginFlow) {
+        payload = {
+          national_id: loginNationalId,
+          otp: otpValue,
+          user_type: "CUSTOMER",
+        };
+      } else if (isSignupFlow) {
+        // Guest signup flow: ONLY use user_id, never national_id
+        if (signupUserId) {
+          payload = {
+            user_id: signupUserId,
+            otp: otpValue,
+            user_type: "CUSTOMER",
+          };
+        } else {
+          clearLoginFlowState();
+          toast.error("Your session expired. Please try again.");
+          router.push("/");
+          return;
+        }
+      } else {
+        payload = {
+          national_id: personalDetails.user.idNumber,
+          otp: otpValue,
+          user_type: "CUSTOMER",
+        };
+      }
 
       const res = await axiosClient.patch(OTP_VERIFY_ENDPOINT, payload);
 
@@ -204,12 +226,15 @@ const OtpVerify: React.FC = () => {
           }
         } else if (isSignupFlow) {
           toast.success("OTP successfully verified");
+          // Register pending vehicle for guest signup
+          await registerPendingVehicle();
           // Cleanup signup session data
           if (typeof window !== "undefined") {
             sessionStorage.removeItem(SIGNUP_USER_ID_KEY);
             sessionStorage.removeItem(SIGNUP_MSISDN_KEY);
           }
-          router.push("/dashboard");
+          window.dispatchEvent(new Event("auth:changed"));
+          router.push("/dashboard/payment-summary");
           router.refresh();
         } else {
           toast.success("OTP successfully verified");

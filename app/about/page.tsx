@@ -336,7 +336,7 @@ export default function AboutPage() {
                       Address
                     </p>
                     <p className="text-sm font-medium text-[#1e3a5f]">
-                      Ushirika Road, Karen
+                      Real Towers, Hospital Road, Upper Hill
                       <br />
                       Nairobi, Kenya
                     </p>
