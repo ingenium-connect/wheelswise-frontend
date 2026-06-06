@@ -251,6 +251,7 @@ export type Vehicle = {
 export type InsurancePolicy = {
   id: string;
   days: number;
+  remaining_days_to_expiry?: number | null;
   policy_number?: string;
   certno?: string;
   policy_type: "COMPREHENSIVE" | "THIRD_PARTY";

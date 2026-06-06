@@ -79,8 +79,11 @@ export default async function VehicleDetailPage({
   let isExpiringSoon = false;
 
   if (policy) {
+    // Normalize dates to UTC to avoid timezone calculation issues
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const expiryDate = policy.end_date ? new Date(policy.end_date) : null;
+    if (expiryDate) expiryDate.setHours(0, 0, 0, 0);
     const timeDiff =
       expiryDate && !isNaN(expiryDate.getTime())
         ? expiryDate.getTime() - today.getTime()

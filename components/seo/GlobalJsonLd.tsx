@@ -15,7 +15,7 @@ const organizationSchema = {
   email: "support@medgeninsurance.com",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Ushirika Road, Karen",
+    streetAddress: "Real Towers, Hospital Road, Upper Hill",
     addressLocality: "Nairobi",
     addressRegion: "Nairobi County",
     addressCountry: "KE",

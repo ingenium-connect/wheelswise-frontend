@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,8 +36,7 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { LinkPolicyPayload } from "@/types/data";
-import { LINK_POLICY_ENDPOINT } from "@/utilities/endpoints";
-import { axiosAuthClient } from "@/utilities/axios-client";
+import { linkPolicyAction } from "@/app/actions/link-policy";
 import {
   Select,
   SelectTrigger,
@@ -81,15 +81,15 @@ const formSchema = z.object({
   certificate_number: z
     .string()
     .min(1, { message: "Certificate number is required" })
-    .max(50, { message: "Certificate number must be 50 characters or less" }),
+    .max(10, { message: "Certificate number must be 10 characters or less" }),
   start_date: z.string().min(1, { message: "Start date is required" }),
   end_date: z.string().optional(),
   underwriter_name: z
     .string()
     .min(1, { message: "Underwriter name is required" })
     .max(100, { message: "Underwriter name must be 100 characters or less" }),
-  duration_in_days: z.number().int().positive().max(3650, {
-    message: "Duration must be 3650 days or less",
+  duration_in_days: z.number().int().positive().max(365, {
+    message: "Duration must be 365 days or less",
   }),
   policy_type: z.enum(["COMPREHENSIVE", "THIRD_PARTY"], {
     message: "Policy type is required",
@@ -104,13 +104,12 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface LinkExternalPolicyDialogProps {
   trigger?: React.ReactNode;
-  onSuccess?: () => void;
 }
 
 export default function LinkExternalPolicyDialog({
   trigger,
-  onSuccess,
 }: LinkExternalPolicyDialogProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -188,21 +187,20 @@ export default function LinkExternalPolicyDialog({
     };
 
     try {
-      const response = await axiosAuthClient.post(
-        LINK_POLICY_ENDPOINT,
-        payload,
-      );
+      const response = await linkPolicyAction(payload);
 
       if (response?.data?.message) {
         toast.success("Policy linked successfully!");
         setIsOpen(false);
         form.reset();
-        onSuccess?.();
+        // Navigate to policies tab after successful link
+        router.push("/dashboard?tab=policies");
       } else {
         toast.success("Policy linked successfully!");
         setIsOpen(false);
         form.reset();
-        onSuccess?.();
+        // Navigate to policies tab after successful link
+        router.push("/dashboard?tab=policies");
       }
     } catch (error: unknown) {
       let errorMessage = "Failed to link policy. Please try again.";
@@ -356,7 +354,7 @@ export default function LinkExternalPolicyDialog({
                   <FormLabel>Certificate Number *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., CERT/2026/001234"
+                      placeholder="e.g., C22335678"
                       {...field}
                       maxLength={50}
                     />
