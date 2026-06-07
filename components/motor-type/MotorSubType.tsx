@@ -6,12 +6,14 @@ import { Button } from "../ui/button";
 import { useInsuranceStore } from "@/stores/insuranceStore";
 import {
   AdditionalBenefit,
+  CoverageDetails,
   MotorSubTypeItem,
   ProductBenefits,
 } from "@/types/data";
 import {
   POLICY_ENDPOINT,
   PREMIUM_RECALCULATION_ENDPOINT,
+  PRODUCT_COVERAGE_DETAILS_ENDPOINT,
 } from "@/utilities/endpoints";
 import { useVehicleStore } from "@/stores/vehicleStore";
 import { axiosClient } from "@/utilities/axios-client";
@@ -27,6 +29,7 @@ import {
   Clock,
   TrendingUp,
   Loader2,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
@@ -47,16 +50,34 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   showCollapsible = false,
 }) => {
   const [productBenefits, setProductBenefits] = useState<ProductBenefits>();
+  const [coverageDetails, setCoverageDetails] = useState<CoverageDetails>();
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"benefits" | "excesses" | "coverage">(
+    "benefits"
+  );
+  const [expandedBenefits, setExpandedBenefits] = useState(false);
+  const [expandedExcesses, setExpandedExcesses] = useState(false);
+  const [expandedCoverage, setExpandedCoverage] = useState(false);
+  const [coverageLoading, setCoverageLoading] = useState(false);
 
   useEffect(() => {
+    // Fetch benefits and excesses
     axiosClient
       .get("benefit/extras", { params: { underwriter_product_id: productId } })
       .then((response) => setProductBenefits(response.data))
       .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
+
+    // Fetch coverage details
+    setCoverageLoading(true);
+    axiosClient
+      .get(PRODUCT_COVERAGE_DETAILS_ENDPOINT, {
+        params: { underwriter_product_id: productId },
+      })
+      .then((response) => setCoverageDetails(response.data))
+      .catch(() => setFetchError(true))
+      .finally(() => setCoverageLoading(false));
   }, [productId]);
 
   if (loading) {
@@ -83,10 +104,21 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
     showCollapsible && product_benefits.length > 3;
   const needsExcessesCollapsible =
     showCollapsible && applicable_excesses.length > 3;
-  const showAllBenefits = expanded || !needsBenefitsCollapsible;
-  const showAllExcesses = expanded || !needsExcessesCollapsible;
+  const showAllBenefits = expandedBenefits || !needsBenefitsCollapsible;
+  const showAllExcesses = expandedExcesses || !needsExcessesCollapsible;
 
-  if (product_benefits.length === 0 && applicable_excesses.length === 0) {
+  const coverageDetailsData = coverageDetails?.coverage_details;
+  const hasCoverageDetails =
+    coverageDetailsData && coverageDetailsData.length > 0 && !coverageLoading;
+  const needsCoverageCollapsible =
+    showCollapsible && coverageDetailsData && coverageDetailsData.length > 5;
+  const showAllCoverage = expandedCoverage || !needsCoverageCollapsible;
+
+  if (
+    product_benefits.length === 0 &&
+    applicable_excesses.length === 0 &&
+    !hasCoverageDetails
+  ) {
     return (
       <p className="text-xs text-muted-foreground py-2">
         No additional details available for this plan.
@@ -95,174 +127,316 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-1.5 mb-3">
-        <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-          Product Benefits
-        </p>
+    <div className="space-y-4">
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-[#d7e8ee] pb-1 overflow-x-auto custom-scrollbar">
+        {product_benefits.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("benefits")}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-lg transition-colors ${
+              activeTab === "benefits"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-[#1e3a5f] hover:bg-[#f0f6f9]"
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Benefits
+          </button>
+        )}
+        {applicable_excesses.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("excesses")}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-lg transition-colors ${
+              activeTab === "excesses"
+                ? "border-b-2 border-amber-500 text-amber-500"
+                : "text-muted-foreground hover:text-[#1e3a5f] hover:bg-[#f0f6f9]"
+            }`}
+          >
+            <AlertCircle className="w-3.5 h-3.5" />
+            Excesses
+          </button>
+        )}
+        {hasCoverageDetails && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("coverage")}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-lg transition-colors ${
+              activeTab === "coverage"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-muted-foreground hover:text-[#1e3a5f] hover:bg-[#f0f6f9]"
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Coverage & Exclusions
+          </button>
+        )}
       </div>
-      {/* Product Benefits */}
-      {product_benefits.length > 0 && (
-        <div className="space-y-4">
-          {product_benefits
-            .slice(0, showAllBenefits ? product_benefits.length : 3)
-            .map((benefit) => (
-              <div
-                key={benefit.id}
-                className="flex items-start gap-2.5 bg-primary/5 rounded-lg px-3 py-2.5"
-              >
-                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-[#1e3a5f]">
-                    {benefit.name ?? "—"}
-                  </p>
-                  {benefit.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {benefit.description}
-                    </p>
-                  )}
-                  {(benefit.limits?.length ?? 0) > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {(benefit.limits ?? []).map((limit, i) => {
-                        // Skip limits with amount 0
-                        if (
-                          limit.amount != null &&
-                          Number(limit.amount) === 0
-                        ) {
-                          return null;
-                        }
-                        return (
-                          <span
-                            key={i}
-                            className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-0.5 rounded-full"
-                          >
-                            {limit.label ? `${limit.label}: ` : ""}
-                            {limit.amount != null
-                              ? Number(limit.amount).toLocaleString()
-                              : "—"}{" "}
-                            {limit.currency ?? ""}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {/* Reinstatements */}
-                  {benefit.reinstatement &&
-                    benefit.reinstatement.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-primary/10">
-                        <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-1.5">
-                          Reinstatements
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {benefit.reinstatement.map((reinstatement, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-1 rounded-full"
-                            >
-                              {reinstatement.label}
-                              {reinstatement.minimum_amount != null &&
-                                reinstatement.minimum_amount > 0 && (
-                                  <>
-                                    {" "}
-                                    - Min{" "}
-                                    {reinstatement.minimum_amount.toLocaleString()}{" "}
-                                    {reinstatement.currency ?? "KES"}
-                                  </>
-                                )}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                </div>
-              </div>
-            ))}
-          {needsBenefitsCollapsible && (
-            <button
-              type="button"
-              onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
-            >
-              {expanded
-                ? "Show less"
-                : `Show all ${product_benefits.length} benefits`}
-              {expanded ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5" />
-              )}
-            </button>
-          )}
-        </div>
-      )}
 
-      {/* Applicable Excesses */}
-      {applicable_excesses.length > 0 && (
-        <div>
-          <div className="flex items-center gap-1.5 mb-3">
-            <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
-              Applicable Excesses
-            </p>
-          </div>
-          <div className="space-y-2">
-            {applicable_excesses
-              .slice(0, showAllExcesses ? applicable_excesses.length : 3)
-              .map((excess) => (
-                <div
-                  key={excess.id}
-                  className="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2.5"
+      {/* Tab Content */}
+      <div className="border border-[#d7e8ee] rounded-b-xl overflow-hidden bg-white">
+        {activeTab === "benefits" && product_benefits.length > 0 && (
+          <div className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-max text-left text-sm">
+                <thead className="bg-[#f0f6f9] text-[#1e3a5f]">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Benefit
+                    </th>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Limits
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#d7e8ee]">
+                  {product_benefits
+                    .slice(0, showAllBenefits ? product_benefits.length : 3)
+                    .map((benefit) => (
+                      <tr
+                        key={benefit.id}
+                        className="hover:bg-[#f0f6f9]/50 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                              <p className="text-[#1e3a5f] font-medium">
+                                {benefit.name ?? "—"}
+                              </p>
+                              {benefit.description && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {benefit.description}
+                                </p>
+                              )}
+                              {/* Reinstatements */}
+                              {benefit.reinstatement &&
+                                benefit.reinstatement.length > 0 && (
+                                  <div className="mt-2 pt-2 border-t border-[#d7e8ee]">
+                                    <p className="text-[10px] uppercase tracking-wider text-primary font-semibold mb-1.5">
+                                      Reinstatements
+                                    </p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {benefit.reinstatement.map(
+                                        (reinstatement, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="inline-flex items-center text-[10px] font-medium bg-white border border-[#d7e8ee] text-primary px-2 py-1 rounded-full"
+                                          >
+                                            {reinstatement.label}
+                                            {reinstatement.minimum_amount !=
+                                              null &&
+                                              reinstatement.minimum_amount > 0 && (
+                                                <>
+                                                  {" "}
+                                                  - Min{" "}
+                                                  {reinstatement.minimum_amount.toLocaleString()}{" "}
+                                                  {reinstatement.currency ??
+                                                    "KES"}
+                                                </>
+                                              )}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1.5">
+                            {(benefit.limits ?? []).map((limit, i) => {
+                              // Skip limits with amount 0
+                              if (
+                                limit.amount != null &&
+                                Number(limit.amount) === 0
+                              ) {
+                                return null;
+                              }
+                              return (
+                                <span
+                                  key={i}
+                                  className="inline-flex items-center text-[10px] font-medium bg-primary/5 text-primary border border-primary/15 px-2 py-1 rounded-full"
+                                >
+                                  {limit.label ? `${limit.label}: ` : ""}
+                                  {limit.amount != null
+                                    ? Number(limit.amount).toLocaleString()
+                                    : "—"}{" "}
+                                  {limit.currency ?? ""}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+            {needsBenefitsCollapsible && (
+              <div className="px-4 py-3 border-t border-[#d7e8ee]">
+                <button
+                  type="button"
+                  onClick={() => setExpandedBenefits(!expandedBenefits)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium text-[#1e3a5f]">
-                      {excess.name ?? "—"}
-                    </p>
-                    {excess.percentage != null && excess.percentage > 0 && (
-                      <span className="shrink-0 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                        {excess.percentage}%
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {excess.percentage != null && excess.percentage > 0
-                      ? `${excess.percentage}% of ${excess.percentage_of ?? "—"} . `
-                      : ""}
-                    {excess.minimum_amount != null &&
-                      excess.minimum_amount > 0 && (
-                        <>
-                          Min {excess.minimum_amount.toLocaleString()}{" "}
-                          {excess.currency ?? ""}
-                        </>
-                      )}
-                  </p>
-                  {/* temporaary fix check for the 'nil' string: to change to only checking for null in future versions  */}
-                  {excess.conditions && excess.conditions !== "nil" && (
-                    <p className="text-xs text-muted-foreground mt-0.5 italic">
-                      {excess.conditions}
-                    </p>
+                  {expandedBenefits
+                    ? "Show less"
+                    : `Show all ${product_benefits.length} benefits`}
+                  {expandedBenefits ? (
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5" />
                   )}
-                </div>
-              ))}
+                </button>
+              </div>
+            )}
           </div>
-          {needsExcessesCollapsible && (
-            <button
-              type="button"
-              onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1 mt-2"
-            >
-              {expanded
-                ? "Show less"
-                : `Show all ${applicable_excesses.length} excesses`}
-              {expanded ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5" />
-              )}
-            </button>
-          )}
-        </div>
-      )}
+        )}
+
+        {activeTab === "excesses" && applicable_excesses.length > 0 && (
+          <div className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-max text-left text-sm">
+                <thead className="bg-[#fff8f0] text-[#1e3a5f]">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Excess Name
+                    </th>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Percentage
+                    </th>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Minimum Amount
+                    </th>
+                    <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
+                      Conditions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#d7e8ee]">
+                  {applicable_excesses
+                    .slice(0, showAllExcesses ? applicable_excesses.length : 3)
+                    .map((excess) => (
+                      <tr
+                        key={excess.id}
+                        className="hover:bg-[#fff8f0]/60 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <p className="text-[#1e3a5f] font-medium">
+                            {excess.name ?? "—"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          {excess.percentage != null &&
+                          excess.percentage > 0 ? (
+                            <span className="inline-flex items-center text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                              {excess.percentage}%
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {excess.minimum_amount != null &&
+                          excess.minimum_amount > 0 ? (
+                            <span className="text-[#1e3a5f]">
+                              {excess.minimum_amount.toLocaleString()}{" "}
+                              {excess.currency ?? ""}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {excess.conditions && excess.conditions !== "nil" ? (
+                            <p className="text-xs text-muted-foreground italic">
+                              {excess.conditions}
+                            </p>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+            {needsExcessesCollapsible && (
+              <div className="px-4 py-3 border-t border-[#d7e8ee]">
+                <button
+                  type="button"
+                  onClick={() => setExpandedExcesses(!expandedExcesses)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
+                >
+                  {expandedExcesses
+                    ? "Show less"
+                    : `Show all ${applicable_excesses.length} excesses`}
+                  {expandedExcesses ? (
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "coverage" && coverageDetails?.coverage_details && coverageDetails.coverage_details.length > 0 && (
+          <div className="p-4 space-y-4 max-h-64 overflow-y-auto custom-scrollbar">
+            {coverageLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading coverage details...</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {coverageDetails.coverage_details
+                  .slice(0, showAllCoverage ? coverageDetails.coverage_details.length : 5)
+                  .map((item, idx) => (
+                    <div key={idx} className="border-b border-[#d7e8ee] last:border-0 pb-4 last:pb-0">
+                      <h4 className="text-sm font-semibold text-[#1e3a5f] mb-1">{item.header}</h4>
+                      {item.description && (
+                        <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                      )}
+                      {item.conditions?.length > 0 && (
+                        <ul className="space-y-1">
+                          {item.conditions.map((condition, condIdx) => (
+                            <li key={condIdx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                              <span className="text-primary mt-0.5 shrink-0">•</span>
+                              <span>{condition}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            )}
+            {needsCoverageCollapsible && (
+              <div className="px-4 py-3 border-t border-[#d7e8ee]">
+                <button
+                  type="button"
+                  onClick={() => setExpandedCoverage(!expandedCoverage)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
+                >
+                  {expandedCoverage
+                    ? "Show less"
+                    : `Show all ${coverageDetails.coverage_details.length} items`}
+                  {expandedCoverage ? (
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -673,7 +847,7 @@ const MotorSubtype: React.FC<Props> = ({ motor_type, product_type }: Props) => {
                   </button>
 
                   {isOpen && (
-                    <div className="mb-4 border border-[#d7e8ee] rounded-xl p-4">
+                    <div className="mb-4 border border-[#d7e8ee] rounded-xl bg-[#fafbfc]">
                       <BenefitsSection
                         productId={product?.id}
                         showCollapsible

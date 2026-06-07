@@ -142,7 +142,7 @@ const Footer: React.FC = () => {
               <li className="flex items-start gap-2.5 text-white/70">
                 <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-[#8bbfd8]" />
                 <span>
-                  Ushirika Road, Karen
+                  Real Towers, Hospital Road, Upper Hill
                   <br />
                   Nairobi, Kenya
                 </span>
