@@ -309,7 +309,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                       Percentage
                     </th>
                     <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
-                      Minimum Amount
+                      Amount Range
                     </th>
                     <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wider">
                       Conditions
@@ -340,24 +340,51 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          {excess.minimum_amount != null &&
-                          excess.minimum_amount > 0 ? (
-                            <span className="text-[#1e3a5f]">
-                              {excess.minimum_amount.toLocaleString()}{" "}
-                              {excess.currency ?? ""}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
+                          <div className="flex flex-col gap-0.5">
+                            {excess.minimum_amount != null &&
+                            excess.minimum_amount > 0 ? (
+                              <span className="text-[#1e3a5f]">
+                                Min: {excess.minimum_amount.toLocaleString()}{" "}
+                                {excess.currency ?? ""}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                            {excess.maximum_amount != null &&
+                            excess.maximum_amount > 0 ? (
+                              <span className="text-[#1e3a5f]">
+                                Max: {excess.maximum_amount.toLocaleString()}{" "}
+                                {excess.currency ?? ""}
+                              </span>
+                            ) : null}
+                            {excess.additional_amount != null &&
+                            excess.additional_amount > 0 ? (
+                              <span className="text-[#1e3a5f]">
+                                Additional:{" "}
+                                {excess.additional_amount.toLocaleString()}{" "}
+                                {excess.currency ?? ""}
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
-                          {excess.conditions && excess.conditions !== "nil" ? (
-                            <p className="text-xs text-muted-foreground italic">
-                              {excess.conditions}
-                            </p>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
+                          <div className="flex flex-col gap-1">
+                            {excess.conditions && excess.conditions !== "nil" ? (
+                              <p className="text-xs text-muted-foreground italic">
+                                {excess.conditions}
+                              </p>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                            {excess.additional_amount != null &&
+                            excess.additional_amount > 0 &&
+                            excess.conditions &&
+                            excess.conditions !== "nil" ? (
+                              <p className="text-[10px] text-amber-600 font-medium">
+                                + {excess.conditions}
+                              </p>
+                            ) : null}
+                          </div>
                         </td>
                       </tr>
                     ))}

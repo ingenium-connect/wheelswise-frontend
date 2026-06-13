@@ -76,6 +76,7 @@ export type ProductBenefits = {
     percentage: number;
     percentage_of: string;
     minimum_amount: number;
+    maximum_amount: number;
     currency: string;
     additional_amount: number;
     conditions: string;
@@ -127,6 +128,7 @@ export type MotorSubTypeItem = {
       name: string;
       percentage: number;
       minimum_amount: number;
+      maximum_amount: number;
       currency: string;
       additional_amount: number;
       conditions: string;
@@ -355,6 +357,7 @@ export type ApplicableExcess = {
   percentage?: number;
   percentage_of?: string;
   minimum_amount?: number;
+  maximum_amount?: number;
   currency?: string;
   additional_amount?: number;
   conditions?: string;
