@@ -110,12 +110,12 @@ export default function HeaderAuth() {
 
   return (
     <>
-      <Link
+      {/* <Link
         href="/signup"
         className="px-4 py-2 rounded-lg text-sm font-medium bg-primary/50 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
       >
         Signup
-      </Link>
+      </Link> */}
       <Link
         href="/login"
         className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
