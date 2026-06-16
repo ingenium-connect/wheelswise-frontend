@@ -208,12 +208,10 @@ const VehicleDetails = ({
     return (
       (isThirdParty || form.vehicleValue > 0) &&
       !vehicleValueError &&
-      form.engineCapacity &&
       form.engineNumber &&
       form.vehicleNumber &&
       form.chassisNumber &&
       form.make &&
-      form.model &&
       form.year &&
       form.bodyType &&
       form.vehiclePurpose &&
