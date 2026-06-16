@@ -170,7 +170,7 @@ export interface UserPayload {
   password: string;
   confirm_password: string;
   first_name: string;
-  last_name: string;
+  last_name?: string;
   id_number: string;
   email: string;
   kra_pin: string;
@@ -472,3 +472,42 @@ export interface UserVehiclesResponse {
   vehicles: UserVehicle[];
   total_count: number;
 }
+
+export type vehicleSearchResponseType = {
+  vehicleFound: boolean;
+  personalDetails?: Array<{
+    ADDRESS: string;
+    CODE: string;
+    FIRSTNAME: string;
+    LASTNAME?: string;
+    ID_NUMBER: string;
+    OWNER_TYPE: string;
+    PIN: string;
+    TOWN: string;
+  }>;
+  vehicleDetails?: {
+    ChassisNo: string;
+    bodyColor: string;
+    bodyType: string;
+    carMake: string;
+    carModel: string;
+    dutyAmount: number;
+    dutyStatus: string;
+    ratings: number;
+    engineNumber: string;
+    customsEntryNumber: string;
+    fuel_type: string;
+    grossweight: number;
+    logbookNumber: string;
+    logbookSerial: string;
+    passengerCapacity: number;
+    purpose: string;
+    registrationDate: string;
+    tareweight: number;
+    vehicleType: string;
+    yearOfManufacture: string;
+    regStatus: string;
+    engineCapacity: number;
+  };
+  regNo?: string;
+};

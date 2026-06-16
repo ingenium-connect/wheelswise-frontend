@@ -136,9 +136,13 @@ export default async function PolicyDetailPage({
   const isPendingPayment = !policy.is_paid && !isCancelled;
 
   const isActive = policy.is_paid && policy.is_active;
-  const isExpired = policy.remaining_days_to_expiry != null && policy.remaining_days_to_expiry < 0;
+  const isExpired =
+    policy.remaining_days_to_expiry != null &&
+    policy.remaining_days_to_expiry < 0;
   const isExpiringSoon =
-    !isExpired && policy.remaining_days_to_expiry != null && policy.remaining_days_to_expiry <= 30;
+    !isExpired &&
+    policy.remaining_days_to_expiry != null &&
+    policy.remaining_days_to_expiry <= 30;
 
   const statusConfig = isCancelled
     ? {

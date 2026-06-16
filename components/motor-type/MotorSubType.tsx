@@ -53,9 +53,9 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
   const [coverageDetails, setCoverageDetails] = useState<CoverageDetails>();
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
-  const [activeTab, setActiveTab] = useState<"benefits" | "excesses" | "coverage">(
-    "benefits"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "benefits" | "excesses" | "coverage"
+  >("benefits");
   const [expandedBenefits, setExpandedBenefits] = useState(false);
   const [expandedExcesses, setExpandedExcesses] = useState(false);
   const [expandedCoverage, setExpandedCoverage] = useState(false);
@@ -227,7 +227,8 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                                             {reinstatement.label}
                                             {reinstatement.minimum_amount !=
                                               null &&
-                                              reinstatement.minimum_amount > 0 && (
+                                              reinstatement.minimum_amount >
+                                                0 && (
                                                 <>
                                                   {" "}
                                                   - Min{" "}
@@ -237,7 +238,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                                                 </>
                                               )}
                                           </span>
-                                        )
+                                        ),
                                       )}
                                     </div>
                                   </div>
@@ -369,7 +370,8 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1">
-                            {excess.conditions && excess.conditions !== "nil" ? (
+                            {excess.conditions &&
+                            excess.conditions !== "nil" ? (
                               <p className="text-xs text-muted-foreground italic">
                                 {excess.conditions}
                               </p>
@@ -412,57 +414,78 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({
           </div>
         )}
 
-        {activeTab === "coverage" && coverageDetails?.coverage_details && coverageDetails.coverage_details.length > 0 && (
-          <div className="p-4 space-y-4 max-h-64 overflow-y-auto custom-scrollbar">
-            {coverageLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                <span className="ml-2 text-sm text-muted-foreground">Loading coverage details...</span>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {coverageDetails.coverage_details
-                  .slice(0, showAllCoverage ? coverageDetails.coverage_details.length : 5)
-                  .map((item, idx) => (
-                    <div key={idx} className="border-b border-[#d7e8ee] last:border-0 pb-4 last:pb-0">
-                      <h4 className="text-sm font-semibold text-[#1e3a5f] mb-1">{item.header}</h4>
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
-                      )}
-                      {item.conditions?.length > 0 && (
-                        <ul className="space-y-1">
-                          {item.conditions.map((condition, condIdx) => (
-                            <li key={condIdx} className="flex items-start gap-2 text-xs text-muted-foreground">
-                              <span className="text-primary mt-0.5 shrink-0">•</span>
-                              <span>{condition}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            )}
-            {needsCoverageCollapsible && (
-              <div className="px-4 py-3 border-t border-[#d7e8ee]">
-                <button
-                  type="button"
-                  onClick={() => setExpandedCoverage(!expandedCoverage)}
-                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
-                >
-                  {expandedCoverage
-                    ? "Show less"
-                    : `Show all ${coverageDetails.coverage_details.length} items`}
-                  {expandedCoverage ? (
-                    <ChevronUp className="w-3.5 h-3.5" />
-                  ) : (
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === "coverage" &&
+          coverageDetails?.coverage_details &&
+          coverageDetails.coverage_details.length > 0 && (
+            <div className="p-4 space-y-4 max-h-64 overflow-y-auto custom-scrollbar">
+              {coverageLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    Loading coverage details...
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {coverageDetails.coverage_details
+                    .slice(
+                      0,
+                      showAllCoverage
+                        ? coverageDetails.coverage_details.length
+                        : 5,
+                    )
+                    .map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="border-b border-[#d7e8ee] last:border-0 pb-4 last:pb-0"
+                      >
+                        <h4 className="text-sm font-semibold text-[#1e3a5f] mb-1">
+                          {item.header}
+                        </h4>
+                        {item.description && (
+                          <p className="text-xs text-muted-foreground mb-2">
+                            {item.description}
+                          </p>
+                        )}
+                        {item.conditions?.length > 0 && (
+                          <ul className="space-y-1">
+                            {item.conditions.map((condition, condIdx) => (
+                              <li
+                                key={condIdx}
+                                className="flex items-start gap-2 text-xs text-muted-foreground"
+                              >
+                                <span className="text-primary mt-0.5 shrink-0">
+                                  •
+                                </span>
+                                <span>{condition}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+              {needsCoverageCollapsible && (
+                <div className="px-4 py-3 border-t border-[#d7e8ee]">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedCoverage(!expandedCoverage)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg px-2 py-1"
+                  >
+                    {expandedCoverage
+                      ? "Show less"
+                      : `Show all ${coverageDetails.coverage_details.length} items`}
+                    {expandedCoverage ? (
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );
