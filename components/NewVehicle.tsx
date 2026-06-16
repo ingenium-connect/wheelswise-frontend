@@ -117,11 +117,9 @@ const NewVehicle = ({ token, modelMakeMap }: Props) => {
     return (
       form.vehicleValue > 0 &&
       !vehicleValueError &&
-      form.engineCapacity &&
       form.vehicleNumber &&
       form.chassisNumber &&
       form.make &&
-      form.model &&
       form.year &&
       form.bodyType &&
       form.vehicle_type
