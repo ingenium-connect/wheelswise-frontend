@@ -162,7 +162,12 @@ const OtpVerify: React.FC = () => {
     setError("");
 
     try {
-      let payload: { user_id?: string; national_id?: string; otp: string; user_type: "CUSTOMER" };
+      let payload: {
+        user_id?: string;
+        national_id?: string;
+        otp: string;
+        user_type: "CUSTOMER";
+      };
 
       if (isLoginFlow) {
         payload = {
@@ -234,7 +239,7 @@ const OtpVerify: React.FC = () => {
             sessionStorage.removeItem(SIGNUP_MSISDN_KEY);
           }
           window.dispatchEvent(new Event("auth:changed"));
-          router.push("/dashboard/payment-summary");
+          router.push("/dashboard");
           router.refresh();
         } else {
           toast.success("OTP successfully verified");
