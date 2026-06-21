@@ -239,7 +239,11 @@ const OtpVerify: React.FC = () => {
             sessionStorage.removeItem(SIGNUP_MSISDN_KEY);
           }
           window.dispatchEvent(new Event("auth:changed"));
-          router.push("/dashboard");
+          // Guest funnel signup carries a pending vehicle/quote, so continue to
+          // payment. Standalone account signup has none and lands on dashboard.
+          router.push(
+            hasPendingVehicle ? "/dashboard/payment-summary" : "/dashboard",
+          );
           router.refresh();
         } else {
           toast.success("OTP successfully verified");
