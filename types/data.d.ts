@@ -143,7 +143,7 @@ export type MotorSubTypeItem = {
 export type OtpPayload = { msisdn: string; user_type: string; otp: string };
 
 export interface vehiclePayload {
-  vehicle_value: number | null;
+  vehicle_value: number | null | undefiend;
   registration_number: string;
   model: string;
   chassis_number: string;
@@ -161,7 +161,7 @@ export interface vehiclePayload {
 
 export interface FinalVehiclePayload {
   source: string;
-  intended_policy_type: string;
+  intended_policy_type?: string;
   vehicle: vehiclePayload;
 }
 
@@ -475,6 +475,7 @@ export interface UserVehiclesResponse {
 
 export type vehicleSearchResponseType = {
   vehicleFound: boolean;
+  motorType?: string;
   personalDetails?: Array<{
     ADDRESS: string;
     CODE: string;
@@ -510,4 +511,6 @@ export type vehicleSearchResponseType = {
     engineCapacity: number;
   };
   regNo?: string;
+  vehicleValue?: number | undefined;
+  purposeCategory?: number
 };

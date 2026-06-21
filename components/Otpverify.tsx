@@ -27,6 +27,7 @@ import {
 const PENDING_VEHICLE_KEY = "__pending_vehicle_payload__";
 const SIGNUP_USER_ID_KEY = "__signup_user_id__";
 const SIGNUP_MSISDN_KEY = "__signup_msisdn__";
+const STANDALONE_SIGNUP_KEY = "__standalone_signup__";
 
 // Optional – tiny shake animation
 const shakeClass =
@@ -53,6 +54,11 @@ const OtpVerify: React.FC = () => {
   const hasPendingVehicle =
     typeof window !== "undefined" &&
     !!sessionStorage.getItem(PENDING_VEHICLE_KEY);
+  // Standalone account signup stages a vehicle but selects no plan, so after
+  // OTP it should land on the dashboard rather than the payment summary.
+  const isStandaloneSignup =
+    typeof window !== "undefined" &&
+    sessionStorage.getItem(STANDALONE_SIGNUP_KEY) === "true";
   const isNewVehicleFlow =
     !isLoginFlow &&
     !isSignupFlow &&
@@ -237,12 +243,16 @@ const OtpVerify: React.FC = () => {
           if (typeof window !== "undefined") {
             sessionStorage.removeItem(SIGNUP_USER_ID_KEY);
             sessionStorage.removeItem(SIGNUP_MSISDN_KEY);
+            sessionStorage.removeItem(STANDALONE_SIGNUP_KEY);
           }
           window.dispatchEvent(new Event("auth:changed"));
-          // Guest funnel signup carries a pending vehicle/quote, so continue to
-          // payment. Standalone account signup has none and lands on dashboard.
+          // Guest funnel signup carries a selected plan, so continue to payment.
+          // Standalone signup only registers an account + vehicle, so it lands
+          // on the dashboard.
           router.push(
-            hasPendingVehicle ? "/dashboard/payment-summary" : "/dashboard",
+            hasPendingVehicle && !isStandaloneSignup
+              ? "/dashboard/payment-summary"
+              : "/dashboard",
           );
           router.refresh();
         } else {
