@@ -27,7 +27,7 @@ import { toast } from "sonner";
 
 import {
   FinalUserPayload,
-  UserPayload,
+  FinalVehiclePayload,
   vehicleSearchResponseType,
 } from "@/types/data";
 import axios, { isAxiosError } from "axios";
@@ -182,9 +182,13 @@ const StandaloneSignupForm: React.FC<Props> = ({ ...props }) => {
       };
 
       // extracting user data from the search results
-      if (!searchDetails.regNo) {
+      if (
+        !searchDetails.regNo ||
+        !searchDetails.vehicleDetails ||
+        !searchDetails.motorType
+      ) {
         return toast.error(
-          "Some details are missing. Please go back and try again.",
+          "Some vehicle details are missing. Please go back and search again.",
         );
       }
       if (
@@ -211,6 +215,28 @@ const StandaloneSignupForm: React.FC<Props> = ({ ...props }) => {
         },
       };
 
+      // Build the vehicle payload from the NTSA search result so the vehicle
+      // is registered (source: NTSA) after OTP verification.
+      const vehicle = searchDetails.vehicleDetails;
+      const finalVehiclePayload: FinalVehiclePayload = {
+        source: "NTSA",
+        vehicle: {
+          registration_number: searchDetails.regNo,
+          make: vehicle.carMake,
+          model: vehicle.carModel,
+          chassis_number: vehicle.ChassisNo,
+          engine_capacity: vehicle.engineCapacity,
+          engine_number: vehicle.engineNumber || undefined,
+          body_type: vehicle.bodyType,
+          seating_capacity: vehicle.passengerCapacity,
+          vehicle_value: searchDetails?.vehicleValue,
+          vehicle_type: searchDetails.motorType,
+          year_of_manufacture: Number(vehicle.yearOfManufacture),
+          purpose: vehicle.purpose || undefined,
+          purpose_type: searchDetails?.purposeCategory,
+        },
+      };
+
       const res = await axios.post("/api/signup", {
         userPayload: finalUserPayload,
       });
@@ -221,6 +247,14 @@ const StandaloneSignupForm: React.FC<Props> = ({ ...props }) => {
         if (typeof window !== "undefined") {
           sessionStorage.setItem("__signup_user_id__", userData.id);
           sessionStorage.setItem("__signup_msisdn__", userData.msisdn);
+          // Stage the NTSA vehicle for registration after OTP, and mark this as
+          // a standalone signup so OTP routing lands on the dashboard (no plan
+          // selected) instead of the payment summary.
+          sessionStorage.setItem(
+            "__pending_vehicle_payload__",
+            JSON.stringify(finalVehiclePayload),
+          );
+          sessionStorage.setItem("__standalone_signup__", "true");
         }
 
         toast.success("Account created successfully!");
@@ -243,7 +277,8 @@ const StandaloneSignupForm: React.FC<Props> = ({ ...props }) => {
       {!searchDetails.vehicleFound ? (
         <VehicleSearch
           onSearchSuccess={(res) => {
-            (setSearchDetails(res), setShowVehiclePreview(true));
+            setSearchDetails(res);
+            setShowVehiclePreview(true);
           }}
         />
       ) : (

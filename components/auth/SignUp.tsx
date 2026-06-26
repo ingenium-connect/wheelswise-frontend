@@ -332,6 +332,9 @@ const Signup: React.FC<Props> = ({
         "__pending_vehicle_payload__",
         JSON.stringify(finalVehiclePayload),
       );
+      // This funnel signup proceeds to payment after OTP; clear any stale
+      // standalone-signup marker so OTP routing isn't sent to the dashboard.
+      sessionStorage.removeItem("__standalone_signup__");
 
       // -------------------------------------
       // 7. Register user
