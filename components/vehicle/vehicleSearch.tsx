@@ -144,7 +144,7 @@ export default function VehicleSearch({
                   loadingCategories
                     ? "Loading…"
                     : !motorType
-                      ? "Enter purpose first"
+                      ? "Select vehicle purpose"
                       : "Select category"
                 }
               />
