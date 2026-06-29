@@ -706,7 +706,7 @@ const VehicleDetails = ({
                             loadingCategories
                               ? "Loading…"
                               : !form.vehiclePurpose
-                                ? "Enter purpose first"
+                                ? "Select vehicle purpose"
                                 : "Select category"
                           }
                         />
