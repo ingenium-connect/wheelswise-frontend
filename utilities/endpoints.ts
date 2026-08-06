@@ -10,6 +10,8 @@ export const PROFILE_ENDPOINT = "/users/profile";
 export const USER_POLICIES_ENDPOINT = "/users/policies";
 export const USER_VEHICLES_ENDPOINT = "/users/vehicles";
 export const USER_DOCUMENTS_ENDPOINT = "/users/documents";
+export const DOCUMENTS_OCR_ENDPOINT = "/documents/ocr";
+export const COMPLIANCE_DOCUMENTS_ENDPOINT = "/compliance-documents";
 export const RESET_PASSWORD_ENDPOINT = "/account/request";
 
 // DATA ENDPOINTS

@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { axiosAuthClient } from "@/utilities/axios-client";
 import {
+  COMPLIANCE_DOCUMENTS_ENDPOINT,
+  DOCUMENTS_OCR_ENDPOINT,
   FILE_UPLOAD_ENDPOINT,
   USER_DOCUMENTS_ENDPOINT,
 } from "@/utilities/endpoints";
@@ -47,16 +49,13 @@ function guessFileTypeFromUrl(url: string): "pdf" | "image" | null {
 
 function DocumentUploadRow({
   label,
-  field,
   existingUrl,
-  idNumber,
+  onUpload,
 }: {
   label: string;
-  field: DocumentField;
   existingUrl?: string | null;
-  idNumber: string;
+  onUpload: (file: File) => Promise<void>;
 }) {
-  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
@@ -86,26 +85,8 @@ function DocumentUploadRow({
 
     setUploading(true);
     try {
-      const slugField = field === "kra_pin_url" ? "kra_pin" : "national_id";
-      const formData = new FormData();
-      formData.append("file_name", `${idNumber.toLowerCase()}_${slugField}`);
-      formData.append("file", file);
-
-      const uploadRes = await axiosAuthClient.post(
-        FILE_UPLOAD_ENDPOINT,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
-      );
-
-      const mediaURL = uploadRes.data?.[0]?.mediaURL;
-      if (!mediaURL) throw new Error("Upload failed — no URL returned");
-
-      await axiosAuthClient.patch(USER_DOCUMENTS_ENDPOINT, {
-        [field]: mediaURL,
-      });
-
+      await onUpload(file);
       toast.success(`${label} uploaded successfully`);
-      router.refresh();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : `Failed to upload ${label}`;
@@ -276,43 +257,168 @@ function KycStatusBadge({ status }: { status: KycVerificationStatus }) {
   );
 }
 
-export function UserDocumentsCard({ user }: { user: UserProfile }) {
-  const kycStatus = user.kyc_documents_verification_status;
+type ComplianceDocumentType = "DRIVING_LICENSE" | "PSV_BADGE";
+
+type ComplianceDocument = {
+  document_type: ComplianceDocumentType;
+  mediaURL: string;
+};
+
+const COMPLIANCE_DOCUMENT_LABELS: Record<ComplianceDocumentType, string> = {
+  DRIVING_LICENSE: "Driving Licence",
+  PSV_BADGE: "PSV Badge",
+};
+
+function ComplianceDocumentsCard() {
+  const [documents, setDocuments] = useState<ComplianceDocument[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchDocuments = async () => {
+    try {
+      const response = await axiosAuthClient.get(
+        `${COMPLIANCE_DOCUMENTS_ENDPOINT}?page=1&page_size=100`,
+      );
+      const data = response.data;
+      // Handle both possible response formats
+      const list = data?.documents ?? data?.results ?? data;
+      setDocuments(Array.isArray(list) ? list : []);
+    } catch {
+      setDocuments([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const findDocument = (type: ComplianceDocumentType) =>
+    documents.find((doc) => doc.document_type === type);
 
   return (
     <Card className="border border-[#d7e8ee] shadow-sm mt-5">
       <CardContent className="p-6">
         <div className="flex items-center justify-between gap-3 mb-5">
           <h3 className="text-sm font-semibold text-[#1e3a5f] uppercase tracking-wide">
-            Identity Documents
+            Compliance Documents
           </h3>
-          {kycStatus && <KycStatusBadge status={kycStatus} />}
         </div>
-        {kycStatus === "REJECTED" && (
-          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
-            Your documents were not accepted. Please re-upload clear, valid
-            copies of your National ID and KRA PIN Certificate.
-          </p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-6 text-muted-foreground text-sm gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Loading documents...
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {(
+              Object.keys(
+                COMPLIANCE_DOCUMENT_LABELS,
+              ) as ComplianceDocumentType[]
+            ).map((type) => (
+              <div
+                key={type}
+                className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]"
+              >
+                <DocumentUploadRow
+                  label={COMPLIANCE_DOCUMENT_LABELS[type]}
+                  existingUrl={findDocument(type)?.mediaURL}
+                  onUpload={async (file) => {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("document_type", type);
+
+                    const uploadRes = await axiosAuthClient.post(
+                      DOCUMENTS_OCR_ENDPOINT,
+                      formData,
+                      { headers: { "Content-Type": "multipart/form-data" } },
+                    );
+
+                    if (uploadRes.data?.success === false) {
+                      throw new Error(
+                        `${COMPLIANCE_DOCUMENT_LABELS[type]} could not be verified — please upload a clearer copy`,
+                      );
+                    }
+
+                    await fetchDocuments();
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         )}
-        <div className="space-y-4">
-          <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
-            <DocumentUploadRow
-              label="National ID"
-              field="national_id_url"
-              existingUrl={user.national_id_url}
-              idNumber={user.id_number}
-            />
-          </div>
-          <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
-            <DocumentUploadRow
-              label="KRA PIN Certificate"
-              field="kra_pin_url"
-              existingUrl={user.kra_pin_url}
-              idNumber={user.id_number}
-            />
-          </div>
-        </div>
       </CardContent>
     </Card>
+  );
+}
+
+export function UserDocumentsCard({ user }: { user: UserProfile }) {
+  const router = useRouter();
+  const kycStatus = user.kyc_documents_verification_status;
+
+  const uploadIdentityDocument = async (field: DocumentField, file: File) => {
+    const slugField = field === "kra_pin_url" ? "kra_pin" : "national_id";
+    const formData = new FormData();
+    formData.append(
+      "file_name",
+      `${user.id_number.toLowerCase()}_${slugField}`,
+    );
+    formData.append("file", file);
+
+    const uploadRes = await axiosAuthClient.post(
+      FILE_UPLOAD_ENDPOINT,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+
+    const mediaURL = uploadRes.data?.[0]?.mediaURL;
+    if (!mediaURL) throw new Error("Upload failed — no URL returned");
+
+    await axiosAuthClient.patch(USER_DOCUMENTS_ENDPOINT, {
+      [field]: mediaURL,
+    });
+
+    router.refresh();
+  };
+
+  return (
+    <>
+      <Card className="border border-[#d7e8ee] shadow-sm mt-5">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <h3 className="text-sm font-semibold text-[#1e3a5f] uppercase tracking-wide">
+              Identity Documents
+            </h3>
+            {kycStatus && <KycStatusBadge status={kycStatus} />}
+          </div>
+          {kycStatus === "REJECTED" && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+              Your documents were not accepted. Please re-upload clear, valid
+              copies of your National ID and KRA PIN Certificate.
+            </p>
+          )}
+          <div className="space-y-4">
+            <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
+              <DocumentUploadRow
+                label="National ID"
+                existingUrl={user.national_id_url}
+                onUpload={(file) =>
+                  uploadIdentityDocument("national_id_url", file)
+                }
+              />
+            </div>
+            <div className="p-3 rounded-xl bg-[#f8fbfc] border border-[#d7e8ee]">
+              <DocumentUploadRow
+                label="KRA PIN Certificate"
+                existingUrl={user.kra_pin_url}
+                onUpload={(file) => uploadIdentityDocument("kra_pin_url", file)}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ComplianceDocumentsCard />
+    </>
   );
 }
