@@ -213,8 +213,10 @@ export default function DashboardTabs({
       {/* Profile */}
       {profile && (
         <TabsContent value="profile">
-          <AccountCard user={profile} />
-          <UserDocumentsCard user={profile} />
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <AccountCard user={profile} />
+            <UserDocumentsCard user={profile} />
+          </div>
         </TabsContent>
       )}
     </Tabs>
