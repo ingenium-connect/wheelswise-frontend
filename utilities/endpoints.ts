@@ -50,3 +50,9 @@ export const PRODUCT_COVERAGE_DETAILS_ENDPOINT = "/product-coverage-details";
 
 // LINK EXTERNAL POLICY
 export const LINK_POLICY_ENDPOINT = "/link-policy";
+
+// COVER EXTENSION
+// A function rather than a constant because the policy id sits in the middle of the
+// path. GET reads what is still owed after a valuation; POST sends the STK prompt.
+export const coverExtensionEndpoint = (policyId: string) =>
+  `/policy/${policyId}/cover-extension`;

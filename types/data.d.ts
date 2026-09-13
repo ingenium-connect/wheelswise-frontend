@@ -514,3 +514,39 @@ export type vehicleSearchResponseType = {
   vehicleValue?: number | undefined;
   purposeCategory?: number
 };
+
+/**
+ * What the backend says about extending a policy's cover after its valuation.
+ *
+ * `can_pay` gates the button. When it is false, `reason` is written for the customer
+ * to read — the panel still renders, it just explains itself instead of offering to
+ * take money.
+ */
+export type CoverExtensionQuote = {
+  policy_id?: string;
+  vehicle_registration_number?: string;
+  can_pay: boolean;
+  reason?: string;
+  /** The outstanding balance, and what the STK prompt will charge. */
+  amount_due: number;
+  /** The re-rated premium the valuation produced, and what has been paid against it. */
+  annual_premium: number;
+  amount_paid: number;
+  /** The period paying in full would buy. */
+  cover_from?: string;
+  cover_to?: string;
+};
+
+/** The record created when a customer starts paying that balance. */
+export type CoverExtension = {
+  id: string;
+  policy_id: string;
+  policy_reference?: string;
+  payment_reference: string;
+  vehicle_registration_number?: string;
+  amount: number;
+  status: "PENDING" | "PAID" | "COMPLETED" | "FAILED";
+  failure_reason?: string;
+  date_created?: string;
+  updated_at?: string;
+};
