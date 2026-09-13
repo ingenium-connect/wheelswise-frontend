@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ValuersList } from "./ValuersList";
+import { CoverExtensionPanel } from "./CoverExtensionPanel";
 
 type ValuationStatus =
   | "AWAITING_VALUATION"
@@ -51,7 +52,7 @@ const STATUS_META: Record<
   UNDER_REVIEW: {
     label: "Under Review",
     description:
-      "The valuer is currently reviewing your vehicle details. You will be notified once complete.",
+      "Your vehicle has been valued and your premium updated for the rest of the year.",
     icon: Eye,
     cardClass: "bg-blue-50 border-blue-200",
     iconClass: "bg-blue-100 border-blue-200 text-blue-600",
@@ -89,6 +90,10 @@ export function ValuationSection({
   const meta = STATUS_META[valuationStatus];
   const Icon = meta.icon;
   const isAwaiting = valuationStatus === "AWAITING_VALUATION";
+  // UNDER_REVIEW is the state a valuation figure has been applied in: the premium has
+  // been re-rated and the difference is owed. It is the only state the balance can be
+  // paid off from, which is why the panel is bound to it rather than shown always.
+  const isAwaitingBalance = valuationStatus === "UNDER_REVIEW";
 
   return (
     <>
@@ -134,6 +139,7 @@ export function ValuationSection({
                   Select a Valuer
                 </Button>
               )}
+              {isAwaitingBalance && <CoverExtensionPanel policyId={policyId} />}
             </div>
           </div>
         </div>
